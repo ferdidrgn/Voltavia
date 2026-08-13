@@ -1,0 +1,31 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Dart/Flutter kaynak dosyaları
+*.dart text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
+
+# Windows batch dosyaları CRLF kalsın
+*.bat text eol=crlf
+
+# Görsel/binary dosyalar - diff alınmasın
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.jar binary
+*.keystore binary
+*.jks binary
+
+# GitHub dil istatistiklerinde bazı klasörleri dışarıda bırak
+**/*.g.dart linguist-generated=true
+**/*.freezed.dart linguist-generated=true
+**/l10n/*.dart linguist-generated=true
