@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voltavia Admin Paneli</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <!-- ============ GİRİŞ EKRANI ============ -->
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-mark">⚡</div>
+        <div class="brand-name">Voltavia</div>
+      </div>
+      <div class="brand-sub">Admin Paneli</div>
+      <h1 style="margin-top:22px">Yönetici Girişi</h1>
+      <p class="lead">İstasyon, operatör ve firma verilerini yönetmek için giriş yap.</p>
+
+      <label for="email">E-posta</label>
+      <input id="email" type="email" placeholder="admin@voltavia.app" value="admin@voltavia.app" />
+
+      <label for="password">Şifre</label>
+      <input id="password" type="password" placeholder="••••••••" value="••••••••" />
+
+      <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+      <p class="hint">Bu bir arayüz iskeletidir (mock) — Firebase Authentication bağlanınca gerçek girişe geçilecektir.</p>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="dashboard" class="app-shell" style="display:none">
+    <aside class="sidebar">
+      <div class="brand" style="margin-bottom:32px">
+        <div class="brand-mark">⚡</div>
+        <div>
+          <div class="brand-name" style="font-size:16px">Voltavia</div>
+          <div style="font-size:11px;color:var(--text-muted)">Admin Paneli</div>
+        </div>
+      </div>
+      <div class="nav-item active" data-view="viewDashboard" onclick="showView(this)">📊 Genel Bakış</div>
+      <div class="nav-item" data-view="viewStations" onclick="showView(this)">🔌 İstasyonlar</div>
+      <div class="nav-item" data-view="viewOperators" onclick="showView(this)">🏢 Operatörler</div>
+      <div class="nav-item" data-view="viewCompanies" onclick="showView(this)">📄 Firma / Lisans</div>
+      <div class="nav-item" data-view="viewAudit" onclick="showView(this)">🛡️ Audit Log</div>
+      <div style="flex:1"></div>
+      <div class="nav-item" onclick="logout()">↩ Çıkış Yap</div>
+    </aside>
+
+    <main class="main">
+      <!-- Genel Bakış -->
+      <div id="viewDashboard" class="view active">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Genel Bakış</h1>
+            <p class="lead" style="margin:4px 0 0">Voltavia platformunun anlık özeti</p>
+          </div>
+          <button class="btn btn-primary" onclick="showView(document.querySelector('[data-view=viewStations]'))">+ Yeni İstasyon</button>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">TOPLAM İSTASYON</div>
+            <div class="stat-value">1.248</div>
+            <div class="stat-delta">▲ %4.2 bu ay</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">AKTİF OPERATÖR</div>
+            <div class="stat-value">14</div>
+            <div class="stat-delta">▲ 2 yeni sözleşme</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">KAYITLI KULLANICI</div>
+            <div class="stat-value">86.402</div>
+            <div class="stat-delta">▲ %11 bu ay</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">VERİ SÜRÜMÜ</div>
+            <div class="stat-value">v128</div>
+            <div class="stat-delta" style="color:var(--text-muted)">3 gün önce güncellendi</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <strong>Son Eklenen İstasyonlar</strong>
+            <button class="btn btn-secondary" onclick="showView(document.querySelector('[data-view=viewStations]'))">Tümünü Gör</button>
+          </div>
+          <table>
+            <thead><tr><th>İstasyon</th><th>Şehir</th><th>Operatör</th><th>Durum</th></tr></thead>
+            <tbody id="dashboardStationRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- İstasyonlar -->
+      <div id="viewStations" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">İstasyonlar</h1>
+            <p class="lead" style="margin:4px 0 0">Ekle, düzenle, pasife al — haritadan koordinat seç</p>
+          </div>
+          <button class="btn btn-primary" onclick="toggleStationForm()">+ Yeni İstasyon</button>
+        </div>
+
+        <div id="stationForm" class="panel" style="display:none; margin-bottom:20px; padding:20px">
+          <strong>Yeni İstasyon Ekle</strong>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px">
+            <div><label>İstasyon Adı</label><input placeholder="Örn. Zorlu Center Şarj Noktası" /></div>
+            <div><label>Operatör</label><input placeholder="Örn. VoltCharge" /></div>
+            <div><label>Şehir</label><input placeholder="İstanbul" /></div>
+            <div><label>İlçe</label><input placeholder="Beşiktaş" /></div>
+            <div><label>Koordinat (Haritadan Seç)</label><input placeholder="41.0766, 29.0180" /></div>
+            <div><label>Bağlantı Tipi / Güç</label><input placeholder="CCS2, 150 kW" /></div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:18px" onclick="toggleStationForm()">Kaydet ve Veri Sürümünü Artır</button>
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead><tr><th>İstasyon</th><th>Şehir/İlçe</th><th>Operatör</th><th>Güç</th><th>Durum</th><th></th></tr></thead>
+            <tbody id="stationRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Operatörler -->
+      <div id="viewOperators" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Operatörler</h1>
+            <p class="lead" style="margin:4px 0 0">Şarj operatörü / firma hesapları</p>
+          </div>
+          <button class="btn btn-primary">+ Yeni Operatör</button>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>Operatör</th><th>İstasyon Sayısı</th><th>Uygulama İçi Entegrasyon</th><th>Durum</th></tr></thead>
+            <tbody id="operatorRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Firma / Lisans -->
+      <div id="viewCompanies" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Firma / Lisans Yönetimi</h1>
+            <p class="lead" style="margin:4px 0 0">Sabit lisans/entegrasyon geliri — Faz 2 kapsamı</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>Firma</th><th>Paket</th><th>Aylık Bedel</th><th>Sözleşme Bitişi</th><th>Durum</th></tr></thead>
+            <tbody id="companyRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Audit Log -->
+      <div id="viewAudit" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Audit Log</h1>
+            <p class="lead" style="margin:4px 0 0">Admin/firma panelindeki kritik değişiklik kayıtları</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th></tr></thead>
+            <tbody id="auditRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

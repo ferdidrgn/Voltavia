@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voltavia Firma Paneli</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <!-- ============ GİRİŞ EKRANI ============ -->
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-mark">⚡</div>
+        <div class="brand-name">Voltavia</div>
+      </div>
+      <div class="brand-sub">Firma Paneli</div>
+      <h1 style="margin-top:22px">Firma Girişi</h1>
+      <p class="lead">İstasyonlarını, fiyatlarını ve lisans durumunu yönet.</p>
+
+      <label for="email">E-posta</label>
+      <input id="email" type="email" placeholder="ops@voltcharge.com" value="ops@voltcharge.com" />
+
+      <label for="password">Şifre</label>
+      <input id="password" type="password" placeholder="••••••••" value="••••••••" />
+
+      <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+      <p class="hint">Bu bir arayüz iskeletidir (mock) — gerçek sürümde firma yetkilendirmesi Firebase Authentication + rol/yetki sistemiyle yapılacaktır.</p>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="dashboard" class="app-shell" style="display:none">
+    <aside class="sidebar">
+      <div class="brand" style="margin-bottom:32px">
+        <div class="brand-mark">⚡</div>
+        <div>
+          <div class="brand-name" style="font-size:16px">VoltCharge</div>
+          <div style="font-size:11px;color:var(--text-muted)">Firma Paneli</div>
+        </div>
+      </div>
+      <div class="nav-item active" data-view="viewOverview" onclick="showView(this)">📊 Genel Bakış</div>
+      <div class="nav-item" data-view="viewStations" onclick="showView(this)">🔌 İstasyonlarım</div>
+      <div class="nav-item" data-view="viewPricing" onclick="showView(this)">💳 Fiyatlandırma</div>
+      <div class="nav-item" data-view="viewIntegration" onclick="showView(this)">🔗 Entegrasyon Durumu</div>
+      <div class="nav-item" data-view="viewLicense" onclick="showView(this)">📄 Sözleşme / Lisans</div>
+      <div style="flex:1"></div>
+      <div class="nav-item" onclick="logout()">↩ Çıkış Yap</div>
+    </aside>
+
+    <main class="main">
+      <!-- Genel Bakış -->
+      <div id="viewOverview" class="view active">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Genel Bakış</h1>
+            <p class="lead" style="margin:4px 0 0">VoltCharge şarj ağı özeti</p>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">İSTASYONLARIM</div>
+            <div class="stat-value">412</div>
+            <div class="stat-delta">▲ 6 yeni bu ay</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">GÜNLÜK GÖRÜNTÜLENME</div>
+            <div class="stat-value">18.204</div>
+            <div class="stat-delta">▲ %8.1</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ENTEGRASYON</div>
+            <div class="stat-value">Aktif</div>
+            <div class="stat-delta" style="color:var(--text-muted)">Uygulama içi şarj açık</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">LİSANS PAKETİ</div>
+            <div class="stat-value">Kurumsal</div>
+            <div class="stat-delta" style="color:var(--text-muted)">Yenileme: 12 Mar 2027</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><strong>Bilgilendirme</strong></div>
+          <div style="padding:20px; color:var(--text-muted); font-size:14px; line-height:1.6">
+            Şarj bedeli tahsilatı sizin ödeme kuruluşunuz üzerinden yapılır; Voltavia şarj parasını
+            tahsil etmez. Platform geliri sabit yıllık/aylık lisans ve entegrasyon ücretine dayanır.
+            Şarj oturumları ve raporlar OCPI/API entegrasyonu tamamlandığında bu panelde görünür
+            hale gelecektir (Faz 3).
+          </div>
+        </div>
+      </div>
+
+      <!-- İstasyonlarım -->
+      <div id="viewStations" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">İstasyonlarım</h1>
+            <p class="lead" style="margin:4px 0 0">Yetki verilen alanları görüntüle ve düzenle</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>İstasyon</th><th>Şehir/İlçe</th><th>Soket</th><th>Durum</th><th></th></tr></thead>
+            <tbody id="stationRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Fiyatlandırma -->
+      <div id="viewPricing" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Fiyatlandırma</h1>
+            <p class="lead" style="margin:4px 0 0">Bağlantı tipine göre kWh birim fiyatı</p>
+          </div>
+        </div>
+        <div class="panel" style="padding:20px">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px">
+            <div><label>CCS2 (kWh)</label><input value="8,90 ₺" /></div>
+            <div><label>Type 2 (kWh)</label><input value="6,90 ₺" /></div>
+            <div><label>CHAdeMO (kWh)</label><input value="8,50 ₺" /></div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:18px">Fiyatları Kaydet</button>
+        </div>
+      </div>
+
+      <!-- Entegrasyon Durumu -->
+      <div id="viewIntegration" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Entegrasyon Durumu</h1>
+            <p class="lead" style="margin:4px 0 0">OCPI / API bağlantı sağlığı ve ödeme sağlayıcısı ayarları</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>Bileşen</th><th>Durum</th><th>Son Kontrol</th></tr></thead>
+            <tbody>
+              <tr><td>OCPI Bağlantısı</td><td><span class="badge badge-available"><span class="badge-dot"></span>Sağlıklı</span></td><td>2 dk önce</td></tr>
+              <tr><td>Ödeme Sağlayıcısı (Hosted)</td><td><span class="badge badge-available"><span class="badge-dot"></span>Sağlıklı</span></td><td>2 dk önce</td></tr>
+              <tr><td>Şarj Başlat/Durdur API</td><td><span class="badge badge-maintenance"><span class="badge-dot"></span>Faz 3'te aktif olacak</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sözleşme / Lisans -->
+      <div id="viewLicense" class="view">
+        <div class="topbar">
+          <div>
+            <h1 style="margin:0">Sözleşme / Lisans</h1>
+            <p class="lead" style="margin:4px 0 0">Paket ve fatura bilgileri</p>
+          </div>
+        </div>
+        <div class="panel" style="padding:20px; color:var(--text-muted); line-height:1.8">
+          <p><strong style="color:var(--text)">Paket:</strong> Kurumsal</p>
+          <p><strong style="color:var(--text)">Aylık Bedel:</strong> 38.000 ₺</p>
+          <p><strong style="color:var(--text)">Yenileme Tarihi:</strong> 12 Mart 2027</p>
+          <p><strong style="color:var(--text)">Kapsam:</strong> Sınırsız istasyon, API/OCPI entegrasyonu, öncelikli destek</p>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
