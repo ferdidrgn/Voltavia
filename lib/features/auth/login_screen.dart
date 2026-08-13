@@ -51,7 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Şarj istasyonlarını bulmaya devam etmek için giriş yap.',
                 style: AppTextStyles.body.copyWith(color: muted),
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
+              _TestEntryBanner(onTap: _continue),
+              const SizedBox(height: AppSpacing.lg),
               const TextField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
@@ -123,6 +125,61 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// UI/UX incelemesi için giriş yapmadan uygulamaya erişim sağlayan kısayol.
+/// Yalnızca tasarım/mockup aşamasında kullanılır; gerçek Firebase Authentication
+/// bağlandığında bu banner kaldırılmalıdır.
+class _TestEntryBanner extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _TestEntryBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.brandSecondary.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: AppColors.brandSecondary, width: 1.2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.brandSecondary,
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+                ),
+                child: const Icon(Icons.visibility_outlined, color: Color(0xFF12162B), size: 20),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Test Girişi', style: AppTextStyles.bodyStrong),
+                    Text(
+                      'Giriş yapmadan tüm ekranları incele',
+                      style: AppTextStyles.caption.copyWith(color: context.voltaviaColors.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_rounded, size: 18),
             ],
           ),
         ),
