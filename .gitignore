@@ -41,6 +41,13 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android - Gradle'ın yerel cache/derleme durumu ve makineye özel SDK yolları.
+# Bunlar asla commit edilmemeli; her geliştiricide farklıdır.
+android/.gradle/
+android/local.properties
+android/captures/
+android/.cxx/
+
 # iOS/XCode related
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
