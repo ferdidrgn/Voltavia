@@ -11,6 +11,7 @@ import '../../widgets/connector_chip.dart';
 import '../../widgets/map_grid_background.dart';
 import '../../widgets/status_badge.dart';
 import '../charging/start_charging_screen.dart';
+import '../operators/operator_detail_screen.dart';
 
 class StationDetailScreen extends StatelessWidget {
   final Station station;
@@ -157,44 +158,56 @@ class StationDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
                   Text('Operatör Bilgisi', style: AppTextStyles.title),
                   const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: context.voltaviaColors.surfaceElevated,
+                  Material(
+                    color: context.voltaviaColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: context.voltaviaColors.border),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: AppColors.energyGradient),
-                            borderRadius: BorderRadius.circular(AppRadius.sm),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            station.chargeOperator.logoLetter,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-                          ),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => OperatorDetailScreen(chargeOperator: station.chargeOperator),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(station.chargeOperator.name, style: AppTextStyles.bodyStrong),
-                              Text(
-                                station.canStartFromApp
-                                    ? 'Voltavia ile uygulama içi şarj mevcut'
-                                    : 'Bu operatörle uygulama içi entegrasyon henüz yok',
-                                style: AppTextStyles.caption.copyWith(color: muted),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: context.voltaviaColors.border),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: AppColors.energyGradient),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
                               ),
-                            ],
-                          ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                station.chargeOperator.logoLetter,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(station.chargeOperator.name, style: AppTextStyles.bodyStrong),
+                                  Text(
+                                    station.canStartFromApp
+                                        ? 'Voltavia ile uygulama içi şarj mevcut'
+                                        : 'Bu operatörle uygulama içi entegrasyon henüz yok',
+                                    style: AppTextStyles.caption.copyWith(color: muted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.chevron_right, color: muted),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 120),

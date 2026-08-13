@@ -101,11 +101,9 @@ class ProfileScreen extends StatelessWidget {
             items: [
               ValueListenableBuilder<ThemeMode>(
                 valueListenable: themeController,
-                builder: (context, mode, _) => _ProfileSwitchItem(
-                  icon: Icons.dark_mode_outlined,
-                  label: 'Koyu Tema',
-                  value: mode == ThemeMode.dark,
-                  onChanged: (v) => themeController.setMode(v ? ThemeMode.dark : ThemeMode.light),
+                builder: (context, mode, _) => _ThemeModeSelector(
+                  mode: mode,
+                  onChanged: themeController.setMode,
                 ),
               ),
               const _ProfileItem(icon: Icons.language_outlined, label: 'Dil · Türkçe'),
@@ -171,7 +169,14 @@ class _ProfileSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: context.voltaviaColors.border),
           ),
-          child: Column(children: items),
+          child: Column(
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                if (i > 0) Divider(height: 1, color: context.voltaviaColors.border),
+                items[i],
+              ],
+            ],
+          ),
         ),
       ],
     );
@@ -217,29 +222,69 @@ class _ProfileItem extends StatelessWidget {
   }
 }
 
-class _ProfileSwitchItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
+/// Sistem (cihaz teması) / Açık (kendi light temamız) / Koyu (kendi dark
+/// temamız) arasında seçim yapılan 3'lü tema anahtarı.
+class _ThemeModeSelector extends StatelessWidget {
+  final ThemeMode mode;
+  final ValueChanged<ThemeMode> onChanged;
 
-  const _ProfileSwitchItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
+  const _ThemeModeSelector({required this.mode, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
+    final muted = context.voltaviaColors.textMuted;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xxs),
-      child: Row(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.brandPrimary),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(label, style: AppTextStyles.body)),
-          Switch(value: value, onChanged: onChanged),
+          Row(
+            children: [
+              const Icon(Icons.palette_outlined, size: 20, color: AppColors.brandPrimary),
+              const SizedBox(width: AppSpacing.sm),
+              Text('Görünüm', style: AppTextStyles.body),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<ThemeMode>(
+              segments: const [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  icon: Icon(Icons.smartphone_outlined, size: 16),
+                  label: Text('Sistem'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  icon: Icon(Icons.light_mode_outlined, size: 16),
+                  label: Text('Açık'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  icon: Icon(Icons.dark_mode_outlined, size: 16),
+                  label: Text('Koyu'),
+                ),
+              ],
+              selected: {mode},
+              showSelectedIcon: false,
+              onSelectionChanged: (selection) => onChanged(selection.first),
+              style: SegmentedButton.styleFrom(
+                textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+                selectedBackgroundColor: AppColors.brandPrimary,
+                selectedForegroundColor: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            mode == ThemeMode.system
+                ? 'Telefonunun tema ayarını takip eder.'
+                : mode == ThemeMode.light
+                    ? 'Voltavia açık tema her zaman kullanılır.'
+                    : 'Voltavia koyu tema her zaman kullanılır.',
+            style: AppTextStyles.caption.copyWith(color: muted),
+          ),
         ],
       ),
     );

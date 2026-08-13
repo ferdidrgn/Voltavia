@@ -199,21 +199,39 @@ verilerini yönetebilir.
 
 ## 9. Bu Teslimatta Neler Var?
 
-Bu commit ile aşağıdakiler eklendi:
+### İlk sürüm (iskelet)
 
 - **Tasarım sistemi**: Marka renkleri (Voltaic Indigo + Volt Lime), açık/koyu tema,
   tipografi ölçeği, tutarlı spacing/radius sabitleri (`lib/core/theme`)
-- **Bottom navigation bar** (Harita · İstasyonlar · Favoriler · Profil) + aktif şarj
-  durumunda üstte beliren canlı şerit
-- **17 ekran** — mock veriyle çalışan, gerçek Flutter widget ağacı (statik görsel değil,
-  çalışan prototip): Splash, Onboarding, Giriş, Kayıt, Harita, İstasyon Listesi,
-  Şehir/İlçe Filtresi, İstasyon Detayı, Konnektör Seçimi, Ödeme, Aktif Şarj,
-  Oturum Özeti, Favoriler, Şarj Geçmişi, Bildirimler, Profil, Profil Düzenleme
 - **Mock veri katmanı** (`lib/data`) — gerçek Firestore bağlanana kadar UI'ı
   besleyen örnek istasyon/operatör/oturum verisi
 - **Admin paneli ve firma paneli için başlangıç iskeleti** (`admin-panel/`,
   `company-panel/`) — dokümandaki HTML/CSS/Vanilla JS kararına uygun
 - **Backend iskeleti** (`backend/`) — Cloudflare Workers için başlangıç yapısı
+
+### 2. tur — Ana Sayfa odaklı kökten revizyon
+
+- **Ana Sayfa (dashboard)**: karşılama + bildirim zili, kampanya slider'ı, hızlı
+  erişim kısayolları (Harita/İstasyonlar/Favoriler/Geçmiş/Bildirimler/Profil),
+  "Sana En Yakın Noktalar" haritaya-git CTA'sı + yakın istasyon önizlemeleri,
+  "Firmalar" bölümü (ilk 10 + Tümünü Gör), son bildirim önizlemesi
+- **Firmalar (Operatörler) akışı**: tüm firmaları listeleyen arama destekli grid
+  ekranı + her firmanın kendi istasyonlarını gösteren detay sayfası; istasyon
+  detayındaki operatör satırı da bu sayfaya bağlanır
+- **Bottom navigation bar 5 sekmeye çıkarıldı**: Ana Sayfa · Harita · İstasyonlar
+  · Favoriler · Profil + aktif şarj durumunda üstte beliren canlı şerit
+- **3'lü tema seçici**: Profil ekranında Sistem (cihaz teması) / Açık (kendi
+  light temamız) / Koyu (kendi dark temamız) arasında geçiş
+- **Test Girişi**: Giriş ekranında, kimlik doğrulama olmadan doğrudan uygulamaya
+  girmeyi sağlayan inceleme kısayolu
+- Mock veri genişletildi: 12 operatör, 10 istasyon (İstanbul, Ankara, İzmir,
+  Bursa, Antalya), 3 kampanya
+
+**Toplam 20 ekran**, mock veriyle çalışan gerçek Flutter widget ağacı (statik
+görsel değil, çalışan prototip): Splash, Onboarding, Giriş, Kayıt, Ana Sayfa,
+Harita, İstasyon Listesi, Şehir/İlçe Filtresi, İstasyon Detayı, Firmalar,
+Firma Detayı, Konnektör Seçimi, Ödeme, Aktif Şarj, Oturum Özeti, Favoriler,
+Şarj Geçmişi, Bildirimler, Profil, Profil Düzenleme.
 
 Bir sonraki adım: Firebase/Cloudflare projelerinin kurulması ve bu ekranların gerçek
 veriye bağlanmasıdır (bkz. bölüm 2.2 ve 2.6).

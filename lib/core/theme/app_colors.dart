@@ -40,6 +40,8 @@ abstract final class AppColors {
   // Gradients
   static const List<Color> heroGradient = [Color(0xFF4C5FFF), Color(0xFF7C3AED)];
   static const List<Color> energyGradient = [Color(0xFF4C5FFF), Color(0xFFC6FF6B)];
+  static const List<Color> campaignGradient = [Color(0xFF7C3AED), Color(0xFFEC4899)];
+  static const List<Color> sunsetGradient = [Color(0xFFFF7A59), Color(0xFFF5A623)];
 
   const AppColors._();
 }

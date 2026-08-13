@@ -9,6 +9,7 @@ import '../favorites/favorites_screen.dart';
 import '../map/map_screen.dart';
 import '../profile/profile_screen.dart';
 import '../stations/station_list_screen.dart';
+import 'home_dashboard_screen.dart';
 
 /// Uygulamanın ana kabuğu: alt gezinme çubuğu (bottom navbar) ve aktif şarj
 /// oturumu varsa her sekmenin üstünde beliren canlı durum şeridi.
@@ -22,14 +23,8 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  static const _screens = [
-    MapScreen(),
-    StationListScreen(),
-    FavoritesScreen(),
-    ProfileScreen(),
-  ];
-
   static const _destinations = [
+    NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Ana Sayfa'),
     NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Harita'),
     NavigationDestination(
       icon: Icon(Icons.ev_station_outlined),
@@ -48,9 +43,19 @@ class _HomeShellState extends State<HomeShell> {
     ),
   ];
 
+  void _goToTab(int index) => setState(() => _index = index);
+
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
+    final screens = [
+      HomeDashboardScreen(onNavigateTab: _goToTab),
+      const MapScreen(),
+      const StationListScreen(),
+      const FavoritesScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -58,14 +63,14 @@ class _HomeShellState extends State<HomeShell> {
           children: [
             if (appState.hasActiveSession) _ActiveSessionBanner(appState: appState),
             Expanded(
-              child: IndexedStack(index: _index, children: _screens),
+              child: IndexedStack(index: _index, children: screens),
             ),
           ],
         ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        onDestinationSelected: _goToTab,
         destinations: _destinations,
       ),
     );
