@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
+import '../../widgets/nav_item.dart';
+import '../../widgets/responsive_scaffold.dart';
 import '../charging/active_charging_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../map/map_screen.dart';
@@ -11,8 +16,9 @@ import '../profile/profile_screen.dart';
 import '../stations/station_list_screen.dart';
 import 'home_dashboard_screen.dart';
 
-/// Uygulamanın ana kabuğu: alt gezinme çubuğu (bottom navbar) ve aktif şarj
-/// oturumu varsa her sekmenin üstünde beliren canlı durum şeridi.
+/// Uygulamanın adaptive ana kabuğu: ≥1024px'de sabit sidebar, altında ise
+/// havada asılı bottom nav ile 5 sekme arasında geçiş sağlar. Aktif şarj
+/// oturumu varsa her sekmenin üstünde canlı bir durum şeridi belirir.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -23,24 +29,12 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  static const _destinations = [
-    NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Ana Sayfa'),
-    NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Harita'),
-    NavigationDestination(
-      icon: Icon(Icons.ev_station_outlined),
-      selectedIcon: Icon(Icons.ev_station),
-      label: 'İstasyonlar',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.favorite_border),
-      selectedIcon: Icon(Icons.favorite),
-      label: 'Favoriler',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.person_outline),
-      selectedIcon: Icon(Icons.person),
-      label: 'Profil',
-    ),
+  static const _items = [
+    NavItem(icon: LucideIcons.layoutGrid, activeIcon: LucideIcons.layoutGrid, label: 'Ana Sayfa'),
+    NavItem(icon: LucideIcons.map, activeIcon: LucideIcons.map, label: 'Harita'),
+    NavItem(icon: Icons.ev_station_outlined, activeIcon: Icons.ev_station_rounded, label: 'İstasyonlar'),
+    NavItem(icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded, label: 'Favoriler'),
+    NavItem(icon: LucideIcons.user, activeIcon: LucideIcons.user, label: 'Profil'),
   ];
 
   void _goToTab(int index) => setState(() => _index = index);
@@ -48,7 +42,7 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final screens = [
+    final pages = [
       HomeDashboardScreen(onNavigateTab: _goToTab),
       const MapScreen(),
       const StationListScreen(),
@@ -56,23 +50,14 @@ class _HomeShellState extends State<HomeShell> {
       const ProfileScreen(),
     ];
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            if (appState.hasActiveSession) _ActiveSessionBanner(appState: appState),
-            Expanded(
-              child: IndexedStack(index: _index, children: screens),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: _goToTab,
-        destinations: _destinations,
-      ),
+    return ResponsiveScaffold(
+      brandLabel: 'Voltavia',
+      brandSubLabel: 'Şarj platformu',
+      items: _items,
+      selectedIndex: _index,
+      onSelect: _goToTab,
+      pages: pages,
+      topBanner: appState.hasActiveSession ? _ActiveSessionBanner(appState: appState) : null,
     );
   }
 }
@@ -86,30 +71,38 @@ class _ActiveSessionBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final session = appState.activeSession!;
     final elapsed = DateTime.now().difference(session.startedAt);
-    return InkWell(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const ActiveChargingScreen()),
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: AppColors.heroGradient),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ActiveChargingScreen()),
         ),
-        child: Row(
-          children: [
-            const Icon(Icons.bolt_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: AppSpacing.xs),
-            Expanded(
-              child: Text(
-                '${session.stationName} · şarj oluyor · ${Formatters.duration(elapsed)}',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: AppPalette.indigoGradient),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            boxShadow: [
+              BoxShadow(color: AppPalette.indigo.withValues(alpha: 0.35), blurRadius: 18, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.zap, color: Colors.white, size: 18),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  '${session.stationName} · şarj oluyor · ${Formatters.duration(elapsed)}',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: Colors.white, size: 20),
-          ],
+              const Icon(LucideIcons.chevronRight, color: Colors.white, size: 18),
+            ],
+          ),
         ),
       ),
     );

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/station.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/gradient_button.dart';
 import 'active_charging_screen.dart';
 
@@ -26,8 +27,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   bool _processing = false;
 
   final _methods = const [
-    ('Visa •••• 4242', Icons.credit_card),
-    ('Mastercard •••• 8891', Icons.credit_card),
+    ('Visa •••• 4242', LucideIcons.creditCard),
+    ('Mastercard •••• 8891', LucideIcons.creditCard),
   ];
 
   Future<void> _confirm() async {
@@ -44,7 +45,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Scaffold(
       appBar: AppBar(title: const Text('Ödeme Yöntemi')),
       body: Padding(
@@ -52,14 +54,11 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${widget.station.chargeOperator.name} lisanslı ödeme altyapısı',
-              style: AppTextStyles.title,
-            ),
+            Text('${widget.station.chargeOperator.name} lisanslı ödeme altyapısı', style: text.title),
             const SizedBox(height: 4),
             Text(
               'Tutar, şarj tamamlandığında tüketilen kWh üzerinden operatör tarafından tahsil edilir.',
-              style: AppTextStyles.body.copyWith(color: muted),
+              style: text.bodyMuted,
             ),
             const SizedBox(height: AppSpacing.lg),
             ...List.generate(_methods.length, (i) {
@@ -67,62 +66,42 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               final (label, icon) = _methods[i];
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                child: BentoCard(
                   onTap: () => setState(() => _selected = i),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? AppColors.brandPrimary.withValues(alpha: 0.1)
-                          : context.voltaviaColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: selected ? AppColors.brandPrimary : context.voltaviaColors.border,
-                        width: selected ? 1.6 : 1,
+                  tint: selected ? colors.accentPrimary.withValues(alpha: 0.08) : null,
+                  child: Row(
+                    children: [
+                      Icon(icon, color: colors.accentPrimary),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(child: Text(label, style: text.bodyStrong)),
+                      Icon(
+                        selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                        color: selected ? colors.accentPrimary : colors.textMuted,
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(icon, color: AppColors.brandPrimary),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Text(label, style: AppTextStyles.bodyStrong)),
-                        Icon(
-                          selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                          color: selected ? AppColors.brandPrimary : muted,
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               );
             }),
             OutlinedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.add),
+              icon: const Icon(LucideIcons.plus, size: 17),
               label: const Text('Yeni kart ekle'),
             ),
             const Spacer(),
             Row(
               children: [
-                Icon(Icons.lock_outline, size: 16, color: muted),
+                Icon(LucideIcons.lock, size: 15, color: colors.textMuted),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    'Kart numarası ve CVV Voltavia veritabanında saklanmaz.',
-                    style: AppTextStyles.caption.copyWith(color: muted),
-                  ),
+                  child: Text('Kart numarası ve CVV Voltavia veritabanında saklanmaz.', style: text.captionMuted),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
             _processing
                 ? const Center(child: CircularProgressIndicator())
-                : GradientButton(
-                    label: 'Şarjı Başlat',
-                    icon: Icons.bolt_rounded,
-                    onPressed: _confirm,
-                  ),
+                : GradientButton(label: 'Şarjı Başlat', icon: LucideIcons.zap, onPressed: _confirm),
           ],
         ),
       ),

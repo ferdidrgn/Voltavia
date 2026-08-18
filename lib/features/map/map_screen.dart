@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
@@ -20,6 +21,10 @@ const _pinPositions = <String, Offset>{
   's4': Offset(0.72, 0.55),
   's5': Offset(0.48, 0.42),
   's6': Offset(0.55, 0.75),
+  's7': Offset(0.15, 0.40),
+  's8': Offset(0.80, 0.30),
+  's9': Offset(0.35, 0.80),
+  's10': Offset(0.65, 0.60),
 };
 
 class MapScreen extends StatefulWidget {
@@ -39,7 +44,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Color _pinColor(BuildContext context, StationStatus status) {
-    final c = context.voltaviaColors;
+    final c = context.colors;
     switch (status) {
       case StationStatus.available:
         return c.success;
@@ -64,17 +69,14 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           Positioned.fill(
-            child: MapGridBackground(
-              baseColor: isDark ? const Color(0xFF0D1326) : const Color(0xFFE9EDFB),
-              lineColor: isDark ? Colors.white : AppColors.brandPrimary,
-            ),
+            child: MapGridBackground(baseColor: colors.canvas, lineColor: colors.accentPrimary),
           ),
           for (final station in _visibleStations)
             if (_pinPositions[station.id] != null)
@@ -95,27 +97,21 @@ class _MapScreenState extends State<MapScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: context.voltaviaColors.surfaceElevated,
+                            color: colors.surface,
                             borderRadius: BorderRadius.circular(AppRadius.pill),
-                            border: Border.all(color: context.voltaviaColors.border),
+                            border: Border.all(color: colors.border),
                             boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.24), blurRadius: 16, offset: const Offset(0, 6)),
                             ],
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.search, color: muted, size: 20),
+                              Icon(LucideIcons.search, color: colors.textMuted, size: 19),
                               const SizedBox(width: AppSpacing.xs),
                               Expanded(
                                 child: Text(
-                                  _selectedCity == null
-                                      ? 'İstasyon veya bölge ara'
-                                      : '$_selectedCity içinde ara',
-                                  style: TextStyle(color: muted, fontSize: 14),
+                                  _selectedCity == null ? 'İstasyon veya bölge ara' : '$_selectedCity içinde ara',
+                                  style: TextStyle(color: colors.textMuted, fontSize: 14),
                                 ),
                               ),
                             ],
@@ -124,7 +120,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _RoundIconButton(
-                        icon: Icons.tune_rounded,
+                        icon: LucideIcons.slidersHorizontal,
                         highlighted: _selectedCity != null,
                         onTap: _openCityFilter,
                       ),
@@ -136,9 +132,9 @@ class _MapScreenState extends State<MapScreen> {
                       alignment: Alignment.centerLeft,
                       child: Chip(
                         label: Text(_selectedCity!),
-                        avatar: const Icon(Icons.location_city, size: 16),
+                        avatar: Icon(LucideIcons.building, size: 15, color: colors.accentPrimary),
                         onDeleted: () => setState(() => _selectedCity = null),
-                        backgroundColor: context.voltaviaColors.surfaceElevated,
+                        backgroundColor: colors.surface,
                       ),
                     ),
                   ],
@@ -149,7 +145,7 @@ class _MapScreenState extends State<MapScreen> {
           Positioned(
             right: AppSpacing.md,
             bottom: _selected != null ? 200 : AppSpacing.lg,
-            child: _RoundIconButton(icon: Icons.my_location_rounded, onTap: () {}),
+            child: _RoundIconButton(icon: LucideIcons.navigation, onTap: () {}),
           ),
           if (_selected != null)
             Positioned(
@@ -176,12 +172,7 @@ class _MapPin extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _MapPin({
-    required this.alignment,
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
+  const _MapPin({required this.alignment, required this.color, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -199,11 +190,9 @@ class _MapPin extends StatelessWidget {
               color: color,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2.5),
-              boxShadow: [
-                BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 1),
-              ],
+              boxShadow: [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 1)],
             ),
-            child: const Icon(Icons.bolt, color: Colors.white, size: 18),
+            child: const Icon(LucideIcons.zap, color: Colors.white, size: 16),
           ),
         ),
       ),
@@ -220,10 +209,10 @@ class _RoundIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
     return Material(
-      color: highlighted ? AppColors.brandPrimary : context.voltaviaColors.surfaceElevated,
-      shape: const CircleBorder(),
+      color: highlighted ? colors.accentPrimary : colors.surface,
+      shape: CircleBorder(side: BorderSide(color: colors.border)),
       elevation: 0,
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -231,18 +220,8 @@ class _RoundIconButton extends StatelessWidget {
         child: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: context.voltaviaColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Icon(icon, color: highlighted ? Colors.white : context.voltaviaColors.textMuted),
+          decoration: const BoxDecoration(shape: BoxShape.circle),
+          child: Icon(icon, size: 19, color: highlighted ? Colors.white : colors.textMuted),
         ),
       ),
     );
@@ -258,19 +237,38 @@ class _StationPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Material(
-      color: context.voltaviaColors.surfaceElevated,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(AppRadius.lg),
       elevation: 8,
-      shadowColor: Colors.black.withValues(alpha: 0.2),
+      shadowColor: Colors.black.withValues(alpha: 0.3),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.lg),
         onTap: onOpen,
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: colors.border),
+          ),
           child: Row(
             children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: AppPalette.indigoGradient),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  station.chargeOperator.logoLetter,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,12 +276,7 @@ class _StationPreviewCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            station.name,
-                            style: AppTextStyles.bodyStrong,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          child: Text(station.name, style: text.bodyStrong, maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                         StatusBadge(status: station.status, compact: true),
                       ],
@@ -291,7 +284,7 @@ class _StationPreviewCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${station.chargeOperator.name} · ${Formatters.km(station.distanceKm)} · ${Formatters.tryPrice(station.pricePerKwh)}/kWh',
-                      style: AppTextStyles.caption.copyWith(color: muted),
+                      style: text.captionMuted,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -299,7 +292,7 @@ class _StationPreviewCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              IconButton(onPressed: onClose, icon: const Icon(Icons.close, size: 18)),
+              IconButton(onPressed: onClose, icon: Icon(LucideIcons.x, size: 17, color: colors.textMuted)),
             ],
           ),
         ),

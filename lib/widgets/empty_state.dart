@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_radius_extension.dart';
+import '../core/theme/app_motion.dart';
+import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
 
+/// Boş durum (empty state) görselleştirmesi — liste/veri olmadığında
+/// kullanıcıya net bir açıklama ve isteğe bağlı bir eylem sunar.
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -20,35 +23,34 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xxl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 76,
+            height: 76,
             decoration: BoxDecoration(
-              color: context.voltaviaColors.surfaceElevated,
+              color: colors.surfaceHighlight,
               shape: BoxShape.circle,
+              border: Border.all(color: colors.border),
             ),
-            child: Icon(icon, size: 32, color: muted),
+            child: Icon(icon, size: 32, color: colors.textMuted),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(title, style: AppTextStyles.title, textAlign: TextAlign.center),
+          Text(title, style: text.title, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.xxs),
-          Text(
-            message,
-            style: AppTextStyles.body.copyWith(color: muted),
-            textAlign: TextAlign.center,
-          ),
+          Text(message, style: text.bodyMuted, textAlign: TextAlign.center),
           if (action != null) ...[
             const SizedBox(height: AppSpacing.lg),
             action!,
           ],
         ],
       ),
-    );
+    ).enterFade();
   }
 }

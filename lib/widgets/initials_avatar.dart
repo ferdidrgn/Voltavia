@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_colors.dart';
+import '../core/theme/app_palette.dart';
 
 class InitialsAvatar extends StatelessWidget {
   final String name;
@@ -22,7 +22,7 @@ class InitialsAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(colors: AppColors.heroGradient),
+        gradient: LinearGradient(colors: AppPalette.auroraGradient),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,

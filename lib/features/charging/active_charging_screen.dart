@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
+import '../../widgets/bento_card.dart';
 import 'session_summary_screen.dart';
 
 class ActiveChargingScreen extends StatefulWidget {
@@ -73,7 +74,8 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
     final station = appState.activeStation;
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     final elapsed = DateTime.now().difference(_startedAt);
     final cost = _kwh * _pricePerKwh;
 
@@ -83,16 +85,9 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           children: [
-            Text(
-              station?.name ?? 'İstasyon',
-              style: AppTextStyles.headline,
-              textAlign: TextAlign.center,
-            ),
+            Text(station?.name ?? 'İstasyon', style: text.headline, textAlign: TextAlign.center),
             const SizedBox(height: 4),
-            Text(
-              station?.chargeOperator.name ?? '',
-              style: AppTextStyles.body.copyWith(color: muted),
-            ),
+            Text(station?.chargeOperator.name ?? '', style: text.bodyMuted),
             const SizedBox(height: AppSpacing.xl),
             SizedBox(
               width: 220,
@@ -106,20 +101,17 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
                     child: CircularProgressIndicator(
                       value: _batteryPercent / 100,
                       strokeWidth: 14,
-                      backgroundColor: context.voltaviaColors.border,
-                      valueColor: const AlwaysStoppedAnimation(AppColors.brandPrimary),
+                      backgroundColor: colors.border,
+                      valueColor: AlwaysStoppedAnimation(colors.accentPrimary),
                       strokeCap: StrokeCap.round,
                     ),
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.bolt_rounded, color: AppColors.brandSecondary, size: 28),
-                      Text(
-                        '%${_batteryPercent.toStringAsFixed(0)}',
-                        style: AppTextStyles.numeric,
-                      ),
-                      Text('şarj seviyesi', style: AppTextStyles.caption.copyWith(color: muted)),
+                      Icon(LucideIcons.zap, color: colors.accentSecondary, size: 26),
+                      Text('%${_batteryPercent.toStringAsFixed(0)}', style: text.numericLg),
+                      Text('şarj seviyesi', style: text.captionMuted),
                     ],
                   ),
                 ],
@@ -129,27 +121,15 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _MetricTile(
-                    icon: Icons.timer_outlined,
-                    label: 'Süre',
-                    value: Formatters.duration(elapsed),
-                  ),
+                  child: _MetricTile(icon: LucideIcons.timer, label: 'Süre', value: Formatters.duration(elapsed)),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _MetricTile(
-                    icon: Icons.electric_bolt_outlined,
-                    label: 'Enerji',
-                    value: Formatters.kwh(_kwh),
-                  ),
+                  child: _MetricTile(icon: LucideIcons.zap, label: 'Enerji', value: Formatters.kwh(_kwh)),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _MetricTile(
-                    icon: Icons.payments_outlined,
-                    label: 'Tutar',
-                    value: Formatters.tryPrice(cost),
-                  ),
+                  child: _MetricTile(icon: LucideIcons.creditCard, label: 'Tutar', value: Formatters.tryPrice(cost)),
                 ),
               ],
             ),
@@ -159,10 +139,10 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
               child: OutlinedButton.icon(
                 onPressed: _stop,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.statusBusy,
-                  side: const BorderSide(color: AppColors.statusBusy),
+                  foregroundColor: colors.danger,
+                  side: BorderSide(color: colors.danger.withValues(alpha: 0.5)),
                 ),
-                icon: const Icon(Icons.stop_circle_outlined),
+                icon: const Icon(Icons.stop_circle_outlined, size: 19),
                 label: const Text('Şarjı Durdur'),
               ),
             ),
@@ -182,20 +162,15 @@ class _MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
-    return Container(
+    final text = context.text;
+    return BentoCard(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
-      decoration: BoxDecoration(
-        color: context.voltaviaColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.voltaviaColors.border),
-      ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.brandPrimary, size: 20),
+          Icon(icon, color: context.colors.accentPrimary, size: 20),
           const SizedBox(height: AppSpacing.xxs),
-          Text(value, style: AppTextStyles.bodyStrong, textAlign: TextAlign.center),
-          Text(label, style: AppTextStyles.caption.copyWith(color: muted)),
+          Text(value, style: text.bodyStrong, textAlign: TextAlign.center),
+          Text(label, style: text.captionMuted),
         ],
       ),
     );

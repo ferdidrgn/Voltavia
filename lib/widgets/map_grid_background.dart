@@ -28,11 +28,11 @@ class _GridPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, Paint()..color = baseColor);
 
     final thin = Paint()
-      ..color = lineColor.withValues(alpha: 0.35)
+      ..color = lineColor.withValues(alpha: 0.06)
       ..strokeWidth = 1;
     final thick = Paint()
-      ..color = lineColor.withValues(alpha: 0.55)
-      ..strokeWidth = 1.4;
+      ..color = lineColor.withValues(alpha: 0.12)
+      ..strokeWidth = 1.2;
 
     const step = 28.0;
     for (double x = 0; x < size.width; x += step) {

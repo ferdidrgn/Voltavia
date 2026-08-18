@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/responsive.dart';
 import '../../data/mock/mock_data.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
 import 'operator_detail_screen.dart';
 
@@ -22,114 +25,112 @@ class _OperatorsScreenState extends State<OperatorsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
-    final operators = MockData.operators
-        .where((o) => o.name.toLowerCase().contains(_query.toLowerCase()))
-        .toList();
+    final colors = context.colors;
+    final text = context.text;
+    final isDesktop = Responsive.isDesktop(context);
+    final operators =
+        MockData.operators.where((o) => o.name.toLowerCase().contains(_query.toLowerCase())).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Firmalar')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.sm),
-            child: TextField(
-              onChanged: (v) => setState(() => _query = v),
-              decoration: const InputDecoration(
-                hintText: 'Firma ara',
-                prefixIcon: Icon(Icons.search),
+      backgroundColor: Colors.transparent,
+      appBar: isDesktop ? null : AppBar(title: const Text('Firmalar')),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: Responsive.maxContentWidth(context)),
+          child: Column(
+            children: [
+              if (isDesktop)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.lg, AppSpacing.xxl, 0),
+                  child: Align(alignment: Alignment.centerLeft, child: Text('Firmalar', style: text.display)),
+                ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                  AppSpacing.md,
+                  isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                  AppSpacing.sm,
+                ),
+                child: TextField(
+                  onChanged: (v) => setState(() => _query = v),
+                  decoration: InputDecoration(hintText: 'Firma ara', prefixIcon: Icon(LucideIcons.search, size: 18)),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: operators.isEmpty
-                ? Center(
-                    child: EmptyState(
-                      icon: Icons.storefront_outlined,
-                      title: 'Firma bulunamadı',
-                      message: 'Farklı bir arama terimi dene.',
-                    ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.md, 0, AppSpacing.md, AppSpacing.lg,
-                    ),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: AppSpacing.sm,
-                      crossAxisSpacing: AppSpacing.sm,
-                      childAspectRatio: 1.05,
-                    ),
-                    itemCount: operators.length,
-                    itemBuilder: (context, i) {
-                      final op = operators[i];
-                      final stationCount = MockData.stationsFor(op.id).length;
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => OperatorDetailScreen(chargeOperator: op)),
+              Expanded(
+                child: operators.isEmpty
+                    ? Center(
+                        child: EmptyState(
+                          icon: LucideIcons.building,
+                          title: 'Firma bulunamadı',
+                          message: 'Farklı bir arama terimi dene.',
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: context.voltaviaColors.surfaceElevated,
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            border: Border.all(color: context.voltaviaColors.border),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(colors: AppColors.energyGradient),
-                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                      )
+                    : GridView.builder(
+                        padding: EdgeInsets.fromLTRB(
+                          isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                          0,
+                          isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                          AppSpacing.lg,
+                        ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isDesktop ? Responsive.gridColumns(context) + 1 : 2,
+                          mainAxisSpacing: AppSpacing.sm,
+                          crossAxisSpacing: AppSpacing.sm,
+                          childAspectRatio: 1.05,
+                        ),
+                        itemCount: operators.length,
+                        itemBuilder: (context, i) {
+                          final op = operators[i];
+                          final stationCount = MockData.stationsFor(op.id).length;
+                          return BentoCard(
+                            onTap: () => Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (_) => OperatorDetailScreen(chargeOperator: op))),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(colors: AppPalette.auroraGradient),
+                                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    op.logoLetter,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                                  ),
                                 ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  op.logoLetter,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                op.name,
-                                style: AppTextStyles.bodyStrong,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '$stationCount istasyon',
-                                style: AppTextStyles.caption.copyWith(color: muted),
-                              ),
-                              if (op.hasAppIntegration) ...[
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Icon(Icons.verified_rounded,
-                                        size: 13, color: context.voltaviaColors.success),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      'Uygulama içi şarj',
-                                      style: AppTextStyles.caption.copyWith(
-                                        color: context.voltaviaColors.success,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 10.5,
+                                const Spacer(),
+                                Text(op.name, style: text.bodyStrong, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 2),
+                                Text('$stationCount istasyon', style: text.captionMuted),
+                                if (op.hasAppIntegration) ...[
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.verified_rounded, size: 13, color: colors.success),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        'Uygulama içi şarj',
+                                        style: text.captionMuted.copyWith(
+                                          color: colors.success,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

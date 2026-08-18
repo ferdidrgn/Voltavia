@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_palette.dart';
 import '../models/app_notification.dart';
+import '../models/audit_log_entry.dart';
 import '../models/campaign.dart';
 import '../models/charging_session.dart';
+import '../models/company_license.dart';
 import '../models/connector_type.dart';
 import '../models/operator.dart';
 import '../models/station.dart';
@@ -270,7 +272,7 @@ abstract final class MockData {
           subtitle: 'Yeni üyelere özel kampanyaları kaçırma, hemen katıl.',
           ctaLabel: 'Kampanyayı İncele',
           icon: Icons.card_giftcard_rounded,
-          colors: AppColors.heroGradient,
+          colors: AppPalette.indigoGradient,
         ),
         Campaign(
           id: 'c2',
@@ -278,7 +280,7 @@ abstract final class MockData {
           subtitle: '150 kW\'a kadar güçle dakikalar içinde doldur.',
           ctaLabel: 'İstasyonları Gör',
           icon: Icons.bolt_rounded,
-          colors: AppColors.energyGradient,
+          colors: AppPalette.auroraGradient,
         ),
         Campaign(
           id: 'c3',
@@ -286,9 +288,81 @@ abstract final class MockData {
           subtitle: 'Bursa ve Antalya artık Voltavia haritasında.',
           ctaLabel: 'Keşfet',
           icon: Icons.location_city_rounded,
-          colors: AppColors.campaignGradient,
+          colors: AppPalette.campaignGradient,
         ),
       ];
+
+  static List<CompanyLicense> get companyLicenses => [
+        CompanyLicense(
+          id: 'lic1',
+          companyName: 'VoltCharge A.Ş.',
+          plan: 'Kurumsal',
+          monthlyFeeTry: 38000,
+          renewalDate: DateTime(2027, 3, 12),
+          status: LicenseStatus.active,
+        ),
+        CompanyLicense(
+          id: 'lic2',
+          companyName: 'Şimşek Enerji Ltd.',
+          plan: 'Standart',
+          monthlyFeeTry: 24000,
+          renewalDate: DateTime(2026, 11, 5),
+          status: LicenseStatus.active,
+        ),
+        CompanyLicense(
+          id: 'lic3',
+          companyName: 'AkımNet',
+          plan: 'Deneme',
+          monthlyFeeTry: 0,
+          renewalDate: DateTime(2026, 9, 30),
+          status: LicenseStatus.negotiating,
+        ),
+        CompanyLicense(
+          id: 'lic4',
+          companyName: 'ElektraPark',
+          plan: 'Standart',
+          monthlyFeeTry: 22000,
+          renewalDate: DateTime(2026, 8, 1),
+          status: LicenseStatus.expired,
+        ),
+      ];
+
+  static List<AuditLogEntry> get auditLog => [
+        AuditLogEntry(
+          id: 'a1',
+          time: DateTime.now().subtract(const Duration(hours: 6)),
+          actorEmail: 'admin@voltavia.app',
+          action: 'Kadıköy Sahil Otoparkı istasyonu pasife alındı',
+        ),
+        AuditLogEntry(
+          id: 'a2',
+          time: DateTime.now().subtract(const Duration(days: 1, hours: 3)),
+          actorEmail: 'admin@voltavia.app',
+          action: 'Yeni istasyon eklendi: Antalya Havalimanı Otoparkı',
+        ),
+        AuditLogEntry(
+          id: 'a3',
+          time: DateTime.now().subtract(const Duration(days: 2, hours: 9)),
+          actorEmail: 'ops@voltcharge.com',
+          action: 'VoltCharge lisans paketi Kurumsal olarak güncellendi',
+        ),
+        AuditLogEntry(
+          id: 'a4',
+          time: DateTime.now().subtract(const Duration(days: 4)),
+          actorEmail: 'admin@voltavia.app',
+          action: 'Bursa Nilüfer AVM istasyonu için güç bilgisi düzenlendi',
+        ),
+        AuditLogEntry(
+          id: 'a5',
+          time: DateTime.now().subtract(const Duration(days: 6, hours: 4)),
+          actorEmail: 'admin@voltavia.app',
+          action: 'İstasyon veri sürümü v128 olarak yayınlandı',
+        ),
+      ];
+
+  /// Son 7 günün kayıtlı kullanıcı büyüme trendi (mock) — Admin Dashboard'daki
+  /// fl_chart grafiğini besler.
+  static const List<double> weeklyUserGrowth = [820, 932, 901, 1120, 1050, 1240, 1380];
 
   static List<ChargingSession> get history => [
         ChargingSession(

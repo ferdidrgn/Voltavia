@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_motion.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_spacing.dart';
 import '../onboarding/onboarding_screen.dart';
 
@@ -15,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1400), () {
+    Future.delayed(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
@@ -27,13 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E1A), Color(0xFF1B2350), Color(0xFF3546D6)],
-          ),
-        ),
+        decoration: const BoxDecoration(color: AppPalette.darkCanvas),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -42,34 +38,31 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 96,
                 height: 96,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  gradient: const LinearGradient(colors: AppPalette.indigoGradient),
+                  borderRadius: BorderRadius.circular(AppRadius.xxl),
+                  boxShadow: [
+                    BoxShadow(color: AppPalette.indigo.withValues(alpha: 0.4), blurRadius: 36, spreadRadius: 4),
+                  ],
                 ),
-                child: const Icon(Icons.bolt_rounded, color: AppColors.brandSecondary, size: 52),
-              ),
+                child: const Icon(LucideIcons.zap, color: Colors.white, size: 46),
+              ).enterScale(),
               const SizedBox(height: AppSpacing.lg),
               const Text(
                 'Voltavia',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
+                style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -0.8),
+              ).enterFade(delay: AppMotion.staggerStep * 2),
               const SizedBox(height: AppSpacing.xxs),
               Text(
                 'Tek uygulama, her şarj istasyonu',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 14),
-              ),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14),
+              ).enterFade(delay: AppMotion.staggerStep * 3),
               const SizedBox(height: AppSpacing.xxl),
-              const SizedBox(
-                width: 26,
-                height: 26,
+              SizedBox(
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.4,
-                  valueColor: AlwaysStoppedAnimation(AppColors.brandSecondary),
+                  valueColor: AlwaysStoppedAnimation(AppPalette.indigoSoft),
                 ),
               ),
             ],

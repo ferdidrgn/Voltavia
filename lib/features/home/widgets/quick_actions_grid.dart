@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_radius_extension.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -22,7 +21,8 @@ class QuickActionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -45,10 +45,11 @@ class QuickActionsGrid extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.brandPrimary.withValues(alpha: 0.1),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: colors.border),
                 ),
-                child: Icon(item.icon, color: AppColors.brandPrimary, size: 22),
+                child: Icon(item.icon, color: colors.accentPrimary, size: 21),
               ),
               const SizedBox(height: AppSpacing.xxs),
               Text(
@@ -56,7 +57,7 @@ class QuickActionsGrid extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.caption.copyWith(color: muted, fontWeight: FontWeight.w600),
+                style: text.captionMuted.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),

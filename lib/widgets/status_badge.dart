@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_radius_extension.dart';
+import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../data/models/connector_type.dart';
 
@@ -11,7 +11,7 @@ class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.status, this.compact = false});
 
   Color _color(BuildContext context) {
-    final c = context.voltaviaColors;
+    final c = context.colors;
     switch (status) {
       case StationStatus.available:
         return c.success;
@@ -35,6 +35,7 @@ class StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

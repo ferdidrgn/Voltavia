@@ -233,5 +233,33 @@ Harita, İstasyon Listesi, Şehir/İlçe Filtresi, İstasyon Detayı, Firmalar,
 Firma Detayı, Konnektör Seçimi, Ödeme, Aktif Şarj, Oturum Özeti, Favoriler,
 Şarj Geçmişi, Bildirimler, Profil, Profil Düzenleme.
 
+### 3. tur — Linear/Vercel standardında kökten görsel yenileme + Admin Dashboard
+
+Önceki tasarım sistemi tamamen atıldı; veri modelleri, mock veri katmanı ve
+state management (AppState/ThemeController) korunarak UI katmanı sıfırdan
+yeniden kuruldu:
+
+- **Yeni tasarım sistemi**: Slate/Zinc tabanlı derin dark mod (bayrak taşıyan)
+  + aydınlık karşılığı, Indigo/Emerald aksan, Google Fonts *Plus Jakarta Sans*,
+  `ThemeExtension` tabanlı `AppSemanticColors`/`AppTextStyles`, glassmorphism
+  yüzeyler, `flutter_animate` giriş animasyonları — bkz. `lib/core/theme/`
+- **Bento-grid bileşen kütüphanesi**: `BentoCard`, `KpiStatCard`, `AppSidebar`,
+  `FloatingBottomNav`, `ResponsiveScaffold`, shimmer `Skeleton`, `EmptyState`,
+  `ErrorState` — bkz. `lib/widgets/`
+- **Adaptive mimari**: ≥1024px'de sabit sidebar + çok sütunlu bento-grid,
+  altında havada asılı buzlu-cam bottom nav — tüketici uygulaması ve Admin
+  Dashboard aynı `ResponsiveScaffold`'u paylaşır
+- **Tüm tüketici ekranları** yeni dile taşındı (aynı 20 ekran, sıfırdan
+  widget ağacı)
+- **Flutter tabanlı Admin Dashboard** (`lib/features/admin/`): Genel Bakış
+  (KPI kartları + `fl_chart` trend grafiği + istasyon tablosu), İstasyonlar
+  (tam veri tablosu + ekleme formu), Operatörler, Firma/Lisans, Audit Log —
+  statik `admin-panel/` HTML/JS'in yerini alan, aynı kod tabanında web+mobil
+  çalışan gerçek bir Flutter uygulaması. Profil → "Firma Paneline Git"
+  üzerinden erişilir.
+
+**Toplam 27 ekran** (20 tüketici + 7 admin), hâlâ mock veriyle çalışan gerçek
+Flutter widget ağaçları.
+
 Bir sonraki adım: Firebase/Cloudflare projelerinin kurulması ve bu ekranların gerçek
 veriye bağlanmasıdır (bkz. bölüm 2.2 ve 2.6).

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
+import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
 
@@ -12,14 +14,29 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final text = context.text;
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppTextStyles.headline),
+          Text(title, style: text.headline),
           if (actionLabel != null)
-            TextButton(onPressed: onAction, child: Text(actionLabel!)),
+            TextButton(
+              onPressed: onAction,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    actionLabel!,
+                    style: text.caption.copyWith(color: colors.accentPrimary, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(LucideIcons.chevronRight, size: 16, color: colors.accentPrimary),
+                ],
+              ),
+            ),
         ],
       ),
     );

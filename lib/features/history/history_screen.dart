@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/mock/mock_data.dart';
 import '../../data/models/charging_session.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/kpi_stat_card.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -23,7 +25,7 @@ class HistoryScreen extends StatelessWidget {
       body: sessions.isEmpty
           ? Center(
               child: EmptyState(
-                icon: Icons.history_rounded,
+                icon: LucideIcons.history,
                 title: 'Henüz şarj geçmişin yok',
                 message: 'Bir şarj oturumu tamamladığında burada listelenecek.',
               ),
@@ -34,56 +36,26 @@ class HistoryScreen extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _SummaryTile(
-                        label: 'Toplam Enerji',
-                        value: Formatters.kwh(totalKwh),
-                        icon: Icons.electric_bolt_outlined,
-                      ),
+                      child: KpiStatCard(icon: LucideIcons.zap, label: 'Toplam Enerji', value: Formatters.kwh(totalKwh)),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
-                      child: _SummaryTile(
+                      child: KpiStatCard(
+                        icon: LucideIcons.creditCard,
                         label: 'Toplam Harcama',
                         value: Formatters.tryPrice(totalCost),
-                        icon: Icons.payments_outlined,
+                        accent: context.colors.accentSecondary,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                ...sessions.map((s) => _SessionTile(session: s)),
+                ...sessions.map((s) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _SessionTile(session: s),
+                    )),
               ],
             ),
-    );
-  }
-}
-
-class _SummaryTile extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _SummaryTile({required this.label, required this.value, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: context.voltaviaColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.voltaviaColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: AppColors.brandPrimary),
-          const SizedBox(height: AppSpacing.xs),
-          Text(value, style: AppTextStyles.headline),
-          Text(label, style: AppTextStyles.caption.copyWith(color: muted)),
-        ],
-      ),
     );
   }
 }
@@ -95,29 +67,21 @@ class _SessionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     final isStopped = session.state == SessionState.stopped;
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: context.voltaviaColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.voltaviaColors.border),
-      ),
+    final accent = isStopped ? colors.warning : colors.accentPrimary;
+
+    return BentoCard(
       child: Row(
         children: [
           Container(
             width: 44,
             height: 44,
-            decoration: BoxDecoration(
-              color: (isStopped ? AppColors.statusMaintenance : AppColors.brandPrimary)
-                  .withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
+            decoration: BoxDecoration(color: accent.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(AppRadius.sm)),
             child: Icon(
               isStopped ? Icons.pause_circle_outline : Icons.check_circle_outline,
-              color: isStopped ? AppColors.statusMaintenance : AppColors.brandPrimary,
+              color: accent,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -125,19 +89,16 @@ class _SessionTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(session.stationName, style: AppTextStyles.bodyStrong),
+                Text(session.stationName, style: text.bodyStrong),
                 const SizedBox(height: 2),
                 Text(
                   '${Formatters.dateTime(session.startedAt)} · ${Formatters.kwh(session.energyKwh)}',
-                  style: AppTextStyles.caption.copyWith(color: muted),
+                  style: text.captionMuted,
                 ),
               ],
             ),
           ),
-          Text(
-            Formatters.tryPrice(session.costTry),
-            style: AppTextStyles.bodyStrong.copyWith(color: AppColors.brandPrimary),
-          ),
+          Text(Formatters.tryPrice(session.costTry), style: text.bodyStrong.copyWith(color: colors.accentPrimary)),
         ],
       ),
     );

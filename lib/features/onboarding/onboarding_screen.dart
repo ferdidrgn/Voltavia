@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../auth/login_screen.dart';
@@ -16,22 +17,19 @@ class _OnboardPage {
 
 const _pages = [
   _OnboardPage(
-    icon: Icons.map_rounded,
+    icon: LucideIcons.map,
     title: 'Tüm istasyonlar tek haritada',
-    description:
-        'Türkiye\'deki şarj istasyonlarını tek bir uygulamadan keşfet; şehir ve ilçeye göre filtrele.',
+    description: 'Türkiye\'deki şarj istasyonlarını tek bir uygulamadan keşfet; şehir ve ilçeye göre filtrele.',
   ),
   _OnboardPage(
-    icon: Icons.bolt_rounded,
+    icon: LucideIcons.zap,
     title: 'Ayrı uygulama indirme',
-    description:
-        'Anlaşmalı operatörlerde şarjı doğrudan Voltavia üzerinden başlat, farklı uygulamalarla uğraşma.',
+    description: 'Anlaşmalı operatörlerde şarjı doğrudan Voltavia üzerinden başlat, farklı uygulamalarla uğraşma.',
   ),
   _OnboardPage(
     icon: Icons.verified_user_rounded,
     title: 'Güvenli ödeme',
-    description:
-        'Ödeme, operatörün lisanslı altyapısı üzerinden alınır. Kart bilgilerin platformda tutulmaz.',
+    description: 'Ödeme, operatörün lisanslı altyapısı üzerinden alınır. Kart bilgilerin platformda tutulmaz.',
   ),
 ];
 
@@ -45,6 +43,12 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _controller = PageController();
   int _index = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _next() {
     if (_index == _pages.length - 1) {
@@ -62,7 +66,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -89,20 +94,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Container(
                           width: 140,
                           height: 140,
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: AppColors.energyGradient),
-                            borderRadius: BorderRadius.circular(AppSpacing.xl),
+                            gradient: const LinearGradient(colors: AppPalette.auroraGradient),
+                            borderRadius: BorderRadius.circular(AppRadius.xxl),
+                            boxShadow: [
+                              BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.3), blurRadius: 30, spreadRadius: 2),
+                            ],
                           ),
-                          child: Icon(page.icon, size: 64, color: Colors.white),
+                          child: Icon(page.icon, size: 60, color: Colors.white),
                         ),
                         const SizedBox(height: AppSpacing.xl),
-                        Text(page.title, style: AppTextStyles.displayMd, textAlign: TextAlign.center),
+                        Text(page.title, style: text.display.copyWith(fontSize: 26), textAlign: TextAlign.center),
                         const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          page.description,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.body.copyWith(color: muted),
-                        ),
+                        Text(page.description, textAlign: TextAlign.center, style: text.bodyMuted),
                       ],
                     ),
                   );
@@ -119,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: active ? 22 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: active ? AppColors.brandPrimary : muted.withValues(alpha: 0.3),
+                    color: active ? colors.accentPrimary : colors.border,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

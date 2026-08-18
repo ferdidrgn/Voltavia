@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/connector_type.dart';
 import '../../data/models/station.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/gradient_button.dart';
 import 'payment_method_screen.dart';
 
@@ -31,7 +32,8 @@ class _StartChargingScreenState extends State<StartChargingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Scaffold(
       appBar: AppBar(title: const Text('Şarjı Başlat')),
       body: Padding(
@@ -39,77 +41,56 @@ class _StartChargingScreenState extends State<StartChargingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.station.name, style: AppTextStyles.headline),
+            Text(widget.station.name, style: text.headline),
             const SizedBox(height: 4),
             Text(
               '${widget.station.chargeOperator.name} · ${widget.station.district}, ${widget.station.city}',
-              style: AppTextStyles.body.copyWith(color: muted),
+              style: text.bodyMuted,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Konnektör Seç', style: AppTextStyles.title),
+            Text('Konnektör Seç', style: text.title),
             const SizedBox(height: AppSpacing.sm),
             ...widget.station.connectors.map((c) {
               final selected = c == _selected;
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                child: BentoCard(
                   onTap: () => setState(() => _selected = c),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? AppColors.brandPrimary.withValues(alpha: 0.1)
-                          : context.voltaviaColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: selected ? AppColors.brandPrimary : context.voltaviaColors.border,
-                        width: selected ? 1.6 : 1,
+                  tint: selected ? colors.accentPrimary.withValues(alpha: 0.08) : null,
+                  child: Row(
+                    children: [
+                      Icon(c.icon, color: colors.accentPrimary),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(c.label, style: text.bodyStrong),
+                            Text('${widget.station.maxPowerKw.toStringAsFixed(0)} kW\'a kadar', style: text.captionMuted),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(c.icon, color: AppColors.brandPrimary),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(c.label, style: AppTextStyles.bodyStrong),
-                              Text(
-                                '${widget.station.maxPowerKw.toStringAsFixed(0)} kW\'a kadar',
-                                style: AppTextStyles.caption.copyWith(color: muted),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                          color: selected ? AppColors.brandPrimary : muted,
-                        ),
-                      ],
-                    ),
+                      Icon(
+                        selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                        color: selected ? colors.accentPrimary : colors.textMuted,
+                      ),
+                    ],
                   ),
                 ),
               );
             }),
             const SizedBox(height: AppSpacing.lg),
-            Container(
+            BentoCard(
               padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: context.voltaviaColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: context.voltaviaColors.border),
-              ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 18, color: muted),
+                  Icon(LucideIcons.info, size: 17, color: colors.textMuted),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Text(
                       'Ödeme, operatörün lisanslı ödeme kuruluşu üzerinden alınır. '
                       'Kart bilgilerin Voltavia sunucularında tutulmaz.',
-                      style: AppTextStyles.caption.copyWith(color: muted),
+                      style: text.captionMuted,
                     ),
                   ),
                 ],
@@ -118,13 +99,11 @@ class _StartChargingScreenState extends State<StartChargingScreen> {
             const Spacer(),
             GradientButton(
               label: 'Devam Et',
-              icon: Icons.arrow_forward_rounded,
+              icon: LucideIcons.arrowRight,
               onPressed: _selected == null
                   ? null
                   : () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => PaymentMethodScreen(station: widget.station),
-                        ),
+                        MaterialPageRoute(builder: (_) => PaymentMethodScreen(station: widget.station)),
                       ),
             ),
           ],

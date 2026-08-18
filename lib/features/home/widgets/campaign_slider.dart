@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../core/theme/app_radius_extension.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/campaign.dart';
@@ -31,7 +32,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
     return Column(
       children: [
         SizedBox(
-          height: 144,
+          height: 148,
           child: PageView.builder(
             controller: _controller,
             onPageChanged: (i) => setState(() => _page = i),
@@ -55,17 +56,20 @@ class _CampaignSliderState extends State<CampaignSlider> {
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(AppRadius.lg),
+                        boxShadow: [
+                          BoxShadow(
+                            color: campaign.colors.first.withValues(alpha: 0.28),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
                       child: Stack(
                         children: [
                           Positioned(
                             right: -18,
                             bottom: -18,
-                            child: Icon(
-                              campaign.icon,
-                              size: 96,
-                              color: Colors.white.withValues(alpha: 0.14),
-                            ),
+                            child: Icon(campaign.icon, size: 96, color: Colors.white.withValues(alpha: 0.14)),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +77,11 @@ class _CampaignSliderState extends State<CampaignSlider> {
                             children: [
                               Text(
                                 campaign.title,
-                                style: AppTextStyles.title.copyWith(color: Colors.white),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16.5,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -95,7 +103,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white),
+                                  const Icon(LucideIcons.arrowRight, size: 15, color: Colors.white),
                                 ],
                               ),
                             ],
@@ -120,9 +128,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
               width: active ? 18 : 6,
               height: 6,
               decoration: BoxDecoration(
-                color: active
-                    ? context.voltaviaColors.textMuted
-                    : context.voltaviaColors.border,
+                color: active ? context.colors.textSecondary : context.colors.border,
                 borderRadius: BorderRadius.circular(4),
               ),
             );

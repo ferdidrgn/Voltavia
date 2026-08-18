@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_radius_extension.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/station.dart';
+import '../../../widgets/bento_card.dart';
 import '../../../widgets/map_grid_background.dart';
 import '../../../widgets/status_badge.dart';
 import '../../stations/station_detail_screen.dart';
@@ -20,7 +22,8 @@ class NearbyStationsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
+    final text = context.text;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,23 +37,20 @@ class NearbyStationsSection extends StatelessWidget {
             child: Container(
               height: 108,
               clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.lg)),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: colors.border),
+              ),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  MapGridBackground(
-                    baseColor: isDark ? const Color(0xFF141B34) : const Color(0xFFE9EDFB),
-                    lineColor: isDark ? Colors.white : AppColors.brandPrimary,
-                  ),
+                  MapGridBackground(baseColor: colors.surface, lineColor: colors.accentPrimary),
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
-                        colors: [
-                          (isDark ? AppColors.darkBackground : Colors.white).withValues(alpha: 0.92),
-                          (isDark ? AppColors.darkBackground : Colors.white).withValues(alpha: 0.15),
-                        ],
+                        colors: [colors.canvas.withValues(alpha: 0.92), colors.canvas.withValues(alpha: 0.1)],
                       ),
                     ),
                   ),
@@ -63,13 +63,13 @@ class NearbyStationsSection extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Sana En Yakın Noktalar', style: AppTextStyles.bodyStrong),
+                              Text('Sana En Yakın Noktalar', style: text.bodyStrong),
                               const SizedBox(height: 2),
                               Text(
                                 stations.isEmpty
                                     ? 'Haritada istasyonları keşfet'
                                     : '${Formatters.km(stations.first.distanceKm)} uzaklıkta istasyon var',
-                                style: AppTextStyles.caption.copyWith(color: context.voltaviaColors.textMuted),
+                                style: text.captionMuted,
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Row(
@@ -78,14 +78,13 @@ class NearbyStationsSection extends StatelessWidget {
                                   Text(
                                     'Haritada Gör',
                                     style: TextStyle(
-                                      color: AppColors.brandPrimary,
+                                      color: colors.accentPrimary,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 13,
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_forward_rounded,
-                                      size: 15, color: AppColors.brandPrimary),
+                                  Icon(LucideIcons.arrowRight, size: 15, color: colors.accentPrimary),
                                 ],
                               ),
                             ],
@@ -95,10 +94,10 @@ class NearbyStationsSection extends StatelessWidget {
                           width: 44,
                           height: 44,
                           decoration: const BoxDecoration(
-                            color: AppColors.brandPrimary,
+                            gradient: LinearGradient(colors: AppPalette.indigoGradient),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.near_me_rounded, color: Colors.white, size: 20),
+                          child: const Icon(LucideIcons.navigation, color: Colors.white, size: 19),
                         ),
                       ],
                     ),
@@ -110,7 +109,7 @@ class NearbyStationsSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         SizedBox(
-          height: 96,
+          height: 100,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: stations.length,
@@ -139,56 +138,40 @@ class _NearbyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return SizedBox(
       width: 180,
-      child: Material(
-        color: context.voltaviaColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: context.voltaviaColors.border),
+      child: BentoCard(
+        onTap: onTap,
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              station.name,
+              style: text.bodyStrong.copyWith(fontSize: 13),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 2),
+            Text(
+              station.chargeOperator.name,
+              style: text.captionMuted,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const Spacer(),
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        station.name,
-                        style: AppTextStyles.bodyStrong.copyWith(fontSize: 13),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  station.chargeOperator.name,
-                  style: AppTextStyles.caption.copyWith(color: muted),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                StatusBadge(status: station.status, compact: true),
                 const Spacer(),
-                Row(
-                  children: [
-                    StatusBadge(status: station.status, compact: true),
-                    const Spacer(),
-                    Icon(Icons.place_outlined, size: 13, color: muted),
-                    const SizedBox(width: 2),
-                    Text(Formatters.km(station.distanceKm), style: AppTextStyles.caption.copyWith(color: muted)),
-                  ],
-                ),
+                Icon(LucideIcons.mapPin, size: 13, color: colors.textMuted),
+                const SizedBox(width: 2),
+                Text(Formatters.km(station.distanceKm), style: text.captionMuted),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
+import '../../widgets/bento_card.dart';
 import '../home/home_shell.dart';
 
 /// Şarj oturumu tamamlandığında gösterilen özet / makbuz ekranı.
@@ -26,7 +27,8 @@ class SessionSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -37,44 +39,28 @@ class SessionSummaryScreen extends StatelessWidget {
               Container(
                 width: 84,
                 height: 84,
-                decoration: BoxDecoration(
-                  color: context.voltaviaColors.success.withValues(alpha: 0.14),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.check_rounded, color: context.voltaviaColors.success, size: 44),
+                decoration: BoxDecoration(color: colors.success.withValues(alpha: 0.14), shape: BoxShape.circle),
+                child: Icon(LucideIcons.check, color: colors.success, size: 40),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Şarj Tamamlandı', style: AppTextStyles.displayMd),
+              Text('Şarj Tamamlandı', style: text.display),
               const SizedBox(height: AppSpacing.xxs),
-              Text(
-                'Ödeme $operatorName tarafından tahsil edildi.',
-                style: AppTextStyles.body.copyWith(color: muted),
-                textAlign: TextAlign.center,
-              ),
+              Text('Ödeme $operatorName tarafından tahsil edildi.', style: text.bodyMuted, textAlign: TextAlign.center),
               const SizedBox(height: AppSpacing.xl),
-              Container(
-                width: double.infinity,
+              BentoCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: context.voltaviaColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: context.voltaviaColors.border),
-                ),
                 child: Column(
                   children: [
                     _ReceiptRow(label: 'İstasyon', value: stationName),
                     _ReceiptRow(label: 'Operatör', value: operatorName),
                     _ReceiptRow(label: 'Süre', value: Formatters.duration(duration)),
                     _ReceiptRow(label: 'Enerji', value: Formatters.kwh(energyKwh)),
-                    const Divider(height: AppSpacing.lg),
+                    Divider(height: AppSpacing.lg, color: colors.border),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Toplam Tutar', style: AppTextStyles.title),
-                        Text(
-                          Formatters.tryPrice(costTry),
-                          style: AppTextStyles.headline.copyWith(color: AppColors.brandPrimary),
-                        ),
+                        Text('Toplam Tutar', style: text.title),
+                        Text(Formatters.tryPrice(costTry), style: text.headline.copyWith(color: colors.accentPrimary)),
                       ],
                     ),
                   ],
@@ -94,7 +80,7 @@ class SessionSummaryScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               TextButton.icon(
                 onPressed: () {},
-                icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                icon: const Icon(Icons.ios_share_rounded, size: 17),
                 label: const Text('Makbuzu Paylaş'),
               ),
             ],
@@ -113,14 +99,14 @@ class _ReceiptRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final text = context.text;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTextStyles.body.copyWith(color: muted)),
-          Text(value, style: AppTextStyles.bodyStrong),
+          Text(label, style: text.bodyMuted),
+          Text(value, style: text.bodyStrong),
         ],
       ),
     );

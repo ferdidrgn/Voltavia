@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_radius_extension.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/mock/mock_data.dart';
@@ -30,7 +29,8 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     final districts = _city == null ? <String>[] : MockData.districtsFor(_city!);
 
     return DraggableScrollableSheet(
@@ -49,17 +49,14 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                 child: Container(
                   width: 40,
                   height: 4,
-                  decoration: BoxDecoration(
-                    color: context.voltaviaColors.border,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+                  decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(4)),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Şehir / İlçe Seç', style: AppTextStyles.headline),
+                  Text('Şehir / İlçe Seç', style: text.headline),
                   TextButton(
                     onPressed: () => setState(() {
                       _city = null;
@@ -74,7 +71,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                 child: ListView(
                   controller: scrollController,
                   children: [
-                    Text('ŞEHİR', style: AppTextStyles.overline.copyWith(color: muted)),
+                    Text('ŞEHİR', style: text.overline),
                     const SizedBox(height: AppSpacing.xs),
                     Wrap(
                       spacing: AppSpacing.xs,
@@ -88,7 +85,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                             _city = selected ? null : city;
                             _district = null;
                           }),
-                          selectedColor: AppColors.brandPrimary,
+                          selectedColor: colors.accentPrimary,
                           labelStyle: TextStyle(
                             color: selected ? Colors.white : null,
                             fontWeight: FontWeight.w600,
@@ -98,7 +95,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                     ),
                     if (districts.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      Text('İLÇE', style: AppTextStyles.overline.copyWith(color: muted)),
+                      Text('İLÇE', style: text.overline),
                       const SizedBox(height: AppSpacing.xs),
                       Wrap(
                         spacing: AppSpacing.xs,
@@ -109,7 +106,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                             label: Text(d),
                             selected: selected,
                             onSelected: (_) => setState(() => _district = selected ? null : d),
-                            selectedColor: AppColors.brandPrimary,
+                            selectedColor: colors.accentPrimary,
                             labelStyle: TextStyle(
                               color: selected ? Colors.white : null,
                               fontWeight: FontWeight.w600,

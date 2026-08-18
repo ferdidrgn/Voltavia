@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/state/theme_controller.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/responsive.dart';
 import '../../widgets/initials_avatar.dart';
+import '../../widgets/kpi_stat_card.dart';
+import '../admin/admin_login_screen.dart';
 import '../auth/login_screen.dart';
 import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -16,130 +20,139 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
     final themeController = ThemeControllerScope.of(context);
+    final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          Row(
+      backgroundColor: Colors.transparent,
+      appBar: isDesktop ? null : AppBar(title: const Text('Profil')),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              isDesktop ? AppSpacing.xxl : AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.xxl,
+            ),
             children: [
-              const InitialsAvatar(name: 'Ferdi Durgun', size: 64),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Ferdi Durgun', style: AppTextStyles.headline),
-                    const SizedBox(height: 2),
-                    Text('ferdidurgun34@gmail.com', style: AppTextStyles.body.copyWith(color: muted)),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-                ),
-                icon: const Icon(Icons.edit_outlined),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: AppColors.heroGradient),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.bolt_rounded, color: Colors.white),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Bu ay 3 şarj oturumu',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                      ),
-                      Text(
-                        '91.5 kWh · 778,30 ₺ tasarruflu şarj',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
+              if (isDesktop) ...[
+                Text('Profil', style: context.text.display),
+                const SizedBox(height: AppSpacing.lg),
               ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _ProfileSection(
-            title: 'Hesabım',
-            items: [
-              _ProfileItem(
-                icon: Icons.history_rounded,
-                label: 'Şarj Geçmişi',
-                onTap: () => Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+              Row(
+                children: [
+                  const InitialsAvatar(name: 'Ferdi Durgun', size: 64),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Ferdi Durgun', style: context.text.headline),
+                        const SizedBox(height: 2),
+                        Text('ferdidurgun34@gmail.com', style: context.text.bodyMuted),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                    ),
+                    icon: const Icon(LucideIcons.pencil, size: 18),
+                  ),
+                ],
               ),
-              _ProfileItem(
-                icon: Icons.notifications_none_rounded,
-                label: 'Bildirimler',
-                onTap: () => Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+              const SizedBox(height: AppSpacing.lg),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                mainAxisSpacing: AppSpacing.sm,
+                crossAxisSpacing: AppSpacing.sm,
+                childAspectRatio: 0.95,
+                children: const [
+                  KpiStatCard(icon: LucideIcons.zap, label: 'Bu ay şarj', value: '3'),
+                  KpiStatCard(
+                    icon: Icons.electric_bolt_rounded,
+                    label: 'Toplam kWh',
+                    value: '91.5',
+                    accent: AppPalette.emerald,
+                  ),
+                  KpiStatCard(
+                    icon: LucideIcons.creditCard,
+                    label: 'Harcama',
+                    value: '778 ₺',
+                    accent: AppPalette.sky,
+                  ),
+                ],
               ),
-              const _ProfileItem(icon: Icons.credit_card_outlined, label: 'Ödeme Yöntemlerim'),
-              const _ProfileItem(icon: Icons.directions_car_filled_outlined, label: 'Araçlarım'),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _ProfileSection(
-            title: 'Tercihler',
-            items: [
-              ValueListenableBuilder<ThemeMode>(
-                valueListenable: themeController,
-                builder: (context, mode, _) => _ThemeModeSelector(
-                  mode: mode,
-                  onChanged: themeController.setMode,
+              const SizedBox(height: AppSpacing.lg),
+              _ProfileSection(
+                title: 'Hesabım',
+                items: [
+                  _ProfileItem(
+                    icon: LucideIcons.history,
+                    label: 'Şarj Geçmişi',
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+                  ),
+                  _ProfileItem(
+                    icon: LucideIcons.bell,
+                    label: 'Bildirimler',
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                  ),
+                  const _ProfileItem(icon: LucideIcons.creditCard, label: 'Ödeme Yöntemlerim'),
+                  const _ProfileItem(icon: Icons.directions_car_filled_outlined, label: 'Araçlarım'),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _ProfileSection(
+                title: 'Tercihler',
+                items: [
+                  ValueListenableBuilder<ThemeMode>(
+                    valueListenable: themeController,
+                    builder: (context, mode, _) => _ThemeModeSelector(mode: mode, onChanged: themeController.setMode),
+                  ),
+                  const _ProfileItem(icon: LucideIcons.globe, label: 'Dil · Türkçe'),
+                  const _ProfileItem(icon: LucideIcons.shield, label: 'Gizlilik ve KVKK'),
+                  const _ProfileItem(icon: Icons.help_outline_rounded, label: 'Yardım ve Destek'),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _ProfileSection(
+                title: 'Firma / Operatör müsün?',
+                items: [
+                  _ProfileItem(
+                    icon: LucideIcons.building,
+                    label: 'Firma Paneline Git',
+                    subtitle: 'İstasyonlarını ve lisansını yönet',
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => const AdminLoginScreen())),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: context.colors.danger,
+                    side: BorderSide(color: context.colors.danger.withValues(alpha: 0.5)),
+                  ),
+                  icon: const Icon(LucideIcons.logOut, size: 17),
+                  label: const Text('Çıkış Yap'),
                 ),
               ),
-              const _ProfileItem(icon: Icons.language_outlined, label: 'Dil · Türkçe'),
-              const _ProfileItem(icon: Icons.shield_outlined, label: 'Gizlilik ve KVKK'),
-              const _ProfileItem(icon: Icons.help_outline_rounded, label: 'Yardım ve Destek'),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          _ProfileSection(
-            title: 'Firma / Operatör müsün?',
-            items: [
-              const _ProfileItem(
-                icon: Icons.storefront_outlined,
-                label: 'Firma Paneline Git',
-                subtitle: 'İstasyonlarını ve lisansını yönet',
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.statusBusy,
-                side: const BorderSide(color: AppColors.statusBusy),
-              ),
-              icon: const Icon(Icons.logout_rounded),
-              label: const Text('Çıkış Yap'),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
+        ),
       ),
     );
   }
@@ -153,26 +166,24 @@ class _ProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.xs, left: 4),
-          child: Text(
-            title,
-            style: AppTextStyles.overline.copyWith(color: context.voltaviaColors.textMuted),
-          ),
+          child: Text(title, style: context.text.overline),
         ),
         Container(
           decoration: BoxDecoration(
-            color: context.voltaviaColors.surfaceElevated,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: context.voltaviaColors.border),
+            border: Border.all(color: colors.border),
           ),
           child: Column(
             children: [
               for (var i = 0; i < items.length; i++) ...[
-                if (i > 0) Divider(height: 1, color: context.voltaviaColors.border),
+                if (i > 0) Divider(height: 1, color: colors.border),
                 items[i],
               ],
             ],
@@ -193,28 +204,27 @@ class _ProfileItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return InkWell(
       onTap: onTap ??
-          () => ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Yakında eklenecek'))),
+          () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yakında eklenecek'))),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.brandPrimary),
+            Icon(icon, size: 19, color: colors.accentPrimary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTextStyles.body),
-                  if (subtitle != null)
-                    Text(subtitle!, style: AppTextStyles.caption.copyWith(color: muted)),
+                  Text(label, style: text.body),
+                  if (subtitle != null) Text(subtitle!, style: text.captionMuted),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: muted),
+            Icon(LucideIcons.chevronRight, size: 17, color: colors.textMuted),
           ],
         ),
       ),
@@ -232,7 +242,8 @@ class _ThemeModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
+    final colors = context.colors;
+    final text = context.text;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
@@ -240,9 +251,9 @@ class _ThemeModeSelector extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.palette_outlined, size: 20, color: AppColors.brandPrimary),
+              Icon(LucideIcons.monitor, size: 19, color: colors.accentPrimary),
               const SizedBox(width: AppSpacing.sm),
-              Text('Görünüm', style: AppTextStyles.body),
+              Text('Görünüm', style: text.body),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -250,28 +261,16 @@ class _ThemeModeSelector extends StatelessWidget {
             width: double.infinity,
             child: SegmentedButton<ThemeMode>(
               segments: const [
-                ButtonSegment(
-                  value: ThemeMode.system,
-                  icon: Icon(Icons.smartphone_outlined, size: 16),
-                  label: Text('Sistem'),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  icon: Icon(Icons.light_mode_outlined, size: 16),
-                  label: Text('Açık'),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  icon: Icon(Icons.dark_mode_outlined, size: 16),
-                  label: Text('Koyu'),
-                ),
+                ButtonSegment(value: ThemeMode.system, icon: Icon(LucideIcons.monitor, size: 15), label: Text('Sistem')),
+                ButtonSegment(value: ThemeMode.light, icon: Icon(LucideIcons.sun, size: 15), label: Text('Açık')),
+                ButtonSegment(value: ThemeMode.dark, icon: Icon(LucideIcons.moon, size: 15), label: Text('Koyu')),
               ],
               selected: {mode},
               showSelectedIcon: false,
               onSelectionChanged: (selection) => onChanged(selection.first),
               style: SegmentedButton.styleFrom(
                 textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
-                selectedBackgroundColor: AppColors.brandPrimary,
+                selectedBackgroundColor: colors.accentPrimary,
                 selectedForegroundColor: Colors.white,
               ),
             ),
@@ -283,7 +282,7 @@ class _ThemeModeSelector extends StatelessWidget {
                 : mode == ThemeMode.light
                     ? 'Voltavia açık tema her zaman kullanılır.'
                     : 'Voltavia koyu tema her zaman kullanılır.',
-            style: AppTextStyles.caption.copyWith(color: muted),
+            style: text.captionMuted,
           ),
         ],
       ),

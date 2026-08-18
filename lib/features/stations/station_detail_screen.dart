@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_radius_extension.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/models/station.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/connector_chip.dart';
 import '../../widgets/map_grid_background.dart';
 import '../../widgets/status_badge.dart';
@@ -21,19 +23,20 @@ class StationDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final muted = context.voltaviaColors.textMuted;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
+    final text = context.text;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
             expandedHeight: 190,
-            backgroundColor: context.voltaviaColors.surfaceElevated,
+            backgroundColor: colors.surface,
             leading: Padding(
               padding: const EdgeInsets.all(AppSpacing.xs),
-              child: _CircleButton(icon: Icons.arrow_back, onTap: () => Navigator.of(context).pop()),
+              child: _CircleButton(icon: LucideIcons.arrowLeft, onTap: () => Navigator.of(context).pop()),
             ),
             actions: [
               Padding(
@@ -41,8 +44,8 @@ class StationDetailScreen extends StatelessWidget {
                 child: AnimatedBuilder(
                   animation: appState,
                   builder: (context, _) => _CircleButton(
-                    icon: appState.isFavorite(station.id) ? Icons.favorite : Icons.favorite_border,
-                    iconColor: appState.isFavorite(station.id) ? AppColors.statusBusy : null,
+                    icon: appState.isFavorite(station.id) ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    iconColor: appState.isFavorite(station.id) ? colors.danger : null,
                     onTap: () => appState.toggleFavorite(station.id),
                   ),
                 ),
@@ -52,26 +55,18 @@ class StationDetailScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  MapGridBackground(
-                    baseColor: isDark ? const Color(0xFF0D1326) : const Color(0xFFE9EDFB),
-                    lineColor: isDark ? Colors.white : AppColors.brandPrimary,
-                  ),
+                  MapGridBackground(baseColor: colors.canvas, lineColor: colors.accentPrimary),
                   Center(
                     child: Container(
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: AppColors.brandPrimary,
+                        gradient: const LinearGradient(colors: AppPalette.indigoGradient),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.brandPrimary.withValues(alpha: 0.5),
-                            blurRadius: 16,
-                          ),
-                        ],
+                        border: Border.all(color: colors.canvas, width: 3),
+                        boxShadow: [BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.5), blurRadius: 20)],
                       ),
-                      child: const Icon(Icons.bolt, color: Colors.white, size: 28),
+                      child: const Icon(LucideIcons.zap, color: Colors.white, size: 26),
                     ),
                   ),
                 ],
@@ -91,11 +86,11 @@ class StationDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(station.name, style: AppTextStyles.displayMd),
+                            Text(station.name, style: text.display.copyWith(fontSize: 26)),
                             const SizedBox(height: 4),
                             Text(
                               '${station.address}, ${station.district}/${station.city}',
-                              style: AppTextStyles.body.copyWith(color: muted),
+                              style: text.bodyMuted,
                             ),
                           ],
                         ),
@@ -106,17 +101,17 @@ class StationDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
-                      Icon(Icons.star_rounded, color: AppColors.statusMaintenance, size: 18),
+                      Icon(Icons.star_rounded, color: colors.warning, size: 18),
                       const SizedBox(width: 2),
-                      Text(station.rating.toStringAsFixed(1), style: AppTextStyles.bodyStrong),
+                      Text(station.rating.toStringAsFixed(1), style: text.bodyStrong),
                       const SizedBox(width: AppSpacing.md),
-                      Icon(Icons.place_outlined, size: 16, color: muted),
+                      Icon(LucideIcons.mapPin, size: 15, color: colors.textMuted),
                       const SizedBox(width: 2),
-                      Text(Formatters.km(station.distanceKm), style: TextStyle(color: muted)),
+                      Text(Formatters.km(station.distanceKm), style: text.bodyMuted),
                       const SizedBox(width: AppSpacing.md),
-                      Icon(Icons.storefront_outlined, size: 16, color: muted),
+                      Icon(LucideIcons.building, size: 15, color: colors.textMuted),
                       const SizedBox(width: 2),
-                      Text(station.chargeOperator.name, style: TextStyle(color: muted)),
+                      Text(station.chargeOperator.name, style: text.bodyMuted),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -124,7 +119,7 @@ class StationDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _StatTile(
-                          icon: Icons.bolt,
+                          icon: LucideIcons.zap,
                           label: 'Maks. Güç',
                           value: '${station.maxPowerKw.toStringAsFixed(0)} kW',
                         ),
@@ -132,7 +127,7 @@ class StationDetailScreen extends StatelessWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _StatTile(
-                          icon: Icons.payments_outlined,
+                          icon: LucideIcons.creditCard,
                           label: 'Birim Fiyat',
                           value: '${Formatters.tryPrice(station.pricePerKwh)}/kWh',
                         ),
@@ -148,7 +143,7 @@ class StationDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('Bağlantı Tipleri', style: AppTextStyles.title),
+                  Text('Bağlantı Tipleri', style: text.title),
                   const SizedBox(height: AppSpacing.sm),
                   Wrap(
                     spacing: AppSpacing.xs,
@@ -156,58 +151,45 @@ class StationDetailScreen extends StatelessWidget {
                     children: station.connectors.map((c) => ConnectorChip(type: c)).toList(),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('Operatör Bilgisi', style: AppTextStyles.title),
+                  Text('Operatör Bilgisi', style: text.title),
                   const SizedBox(height: AppSpacing.sm),
-                  Material(
-                    color: context.voltaviaColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => OperatorDetailScreen(chargeOperator: station.chargeOperator),
+                  BentoCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => OperatorDetailScreen(chargeOperator: station.chargeOperator)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: AppPalette.auroraGradient),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            station.chargeOperator.logoLetter,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                          ),
                         ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                          border: Border.all(color: context.voltaviaColors.border),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(station.chargeOperator.name, style: text.bodyStrong),
+                              Text(
+                                station.canStartFromApp
+                                    ? 'Voltavia ile uygulama içi şarj mevcut'
+                                    : 'Bu operatörle uygulama içi entegrasyon henüz yok',
+                                style: text.captionMuted,
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: AppColors.energyGradient),
-                                borderRadius: BorderRadius.circular(AppRadius.sm),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                station.chargeOperator.logoLetter,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(station.chargeOperator.name, style: AppTextStyles.bodyStrong),
-                                  Text(
-                                    station.canStartFromApp
-                                        ? 'Voltavia ile uygulama içi şarj mevcut'
-                                        : 'Bu operatörle uygulama içi entegrasyon henüz yok',
-                                    style: AppTextStyles.caption.copyWith(color: muted),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(Icons.chevron_right, color: muted),
-                          ],
-                        ),
-                      ),
+                        Icon(LucideIcons.chevronRight, size: 18, color: colors.textMuted),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 120),
@@ -229,7 +211,7 @@ class StationDetailScreen extends StatelessWidget {
                       const SnackBar(content: Text('Navigasyon uygulamasına yönlendiriliyor…')),
                     );
                   },
-                  icon: const Icon(Icons.navigation_outlined),
+                  icon: const Icon(LucideIcons.navigation, size: 17),
                   label: const Text('Navigasyon'),
                 ),
               ),
@@ -242,7 +224,7 @@ class StationDetailScreen extends StatelessWidget {
                             MaterialPageRoute(builder: (_) => StartChargingScreen(station: station)),
                           )
                       : null,
-                  icon: const Icon(Icons.bolt_rounded),
+                  icon: const Icon(LucideIcons.zap, size: 17),
                   label: Text(station.canStartFromApp ? 'Şarjı Başlat' : 'Şu An Uygun Değil'),
                 ),
               ),
@@ -263,20 +245,15 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = context.voltaviaColors.textMuted;
-    return Container(
+    final text = context.text;
+    return BentoCard(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
-      decoration: BoxDecoration(
-        color: context.voltaviaColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.voltaviaColors.border),
-      ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.brandPrimary, size: 20),
+          Icon(icon, color: context.colors.accentPrimary, size: 20),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.bodyStrong, textAlign: TextAlign.center),
-          Text(label, style: AppTextStyles.caption.copyWith(color: muted)),
+          Text(value, style: text.bodyStrong, textAlign: TextAlign.center),
+          Text(label, style: text.captionMuted),
         ],
       ),
     );
@@ -292,15 +269,16 @@ class _CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Material(
-      color: context.voltaviaColors.surfaceElevated,
-      shape: const CircleBorder(),
+      color: colors.surface,
+      shape: CircleBorder(side: BorderSide(color: colors.border)),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xs),
-          child: Icon(icon, size: 20, color: iconColor),
+          child: Icon(icon, size: 19, color: iconColor ?? colors.textSecondary),
         ),
       ),
     );

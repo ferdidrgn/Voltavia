@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_radius_extension.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/mock/mock_data.dart';
@@ -16,10 +17,10 @@ class OperatorsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final preview = MockData.operators.take(10).toList();
-    final muted = context.voltaviaColors.textMuted;
+    final text = context.text;
 
     return SizedBox(
-      height: 104,
+      height: 108,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: preview.length,
@@ -43,11 +44,11 @@ class OperatorsSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600),
+                    style: text.caption.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Text(
                     '$stationCount istasyon',
-                    style: AppTextStyles.caption.copyWith(color: muted, fontSize: 10.5),
+                    style: text.captionMuted.copyWith(fontSize: 10.5),
                   ),
                 ],
               ),
@@ -66,15 +67,16 @@ class _OperatorLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Stack(
       children: [
         Container(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: AppColors.energyGradient),
+            gradient: const LinearGradient(colors: AppPalette.auroraGradient),
             shape: BoxShape.circle,
-            border: Border.all(color: context.voltaviaColors.border),
+            border: Border.all(color: colors.border),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -90,11 +92,11 @@ class _OperatorLogo extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: context.voltaviaColors.success,
+                color: colors.success,
                 shape: BoxShape.circle,
-                border: Border.all(color: context.voltaviaColors.surfaceElevated, width: 2),
+                border: Border.all(color: colors.canvas, width: 2),
               ),
-              child: const Icon(Icons.bolt, color: Colors.white, size: 11),
+              child: const Icon(LucideIcons.zap, color: Colors.white, size: 10),
             ),
           ),
       ],
