@@ -39,7 +39,7 @@ dependencies:
   google_fonts: ^8.2.1
   flutter_animate: ^4.5.2
   gap: ^3.0.1
-  lucide_icons: ^0.257.0
+  lucide_icons_flutter: ^3.0.0
   fl_chart: ^1.2.0
 
 dev_dependencies:

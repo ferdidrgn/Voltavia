@@ -288,7 +288,7 @@ abstract final class MockData {
           subtitle: 'Bursa ve Antalya artık Voltavia haritasında.',
           ctaLabel: 'Keşfet',
           icon: Icons.location_city_rounded,
-          colors: AppPalette.campaignGradient,
+          colors: AppPalette.indigoGradient,
         ),
       ];
 
