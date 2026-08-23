@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -25,7 +24,7 @@ class HistoryScreen extends StatelessWidget {
       body: sessions.isEmpty
           ? Center(
               child: EmptyState(
-                icon: LucideIcons.history,
+                icon: Icons.history_rounded,
                 title: 'Henüz şarj geçmişin yok',
                 message: 'Bir şarj oturumu tamamladığında burada listelenecek.',
               ),
@@ -36,12 +35,12 @@ class HistoryScreen extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: KpiStatCard(icon: LucideIcons.zap, label: 'Toplam Enerji', value: Formatters.kwh(totalKwh)),
+                      child: KpiStatCard(icon: Icons.bolt_rounded, label: 'Toplam Enerji', value: Formatters.kwh(totalKwh)),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: KpiStatCard(
-                        icon: LucideIcons.creditCard,
+                        icon: Icons.credit_card_rounded,
                         label: 'Toplam Harcama',
                         value: Formatters.tryPrice(totalCost),
                         accent: context.colors.accentSecondary,

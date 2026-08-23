@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../home/home_shell.dart';
@@ -29,8 +29,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(title: const Text('Hesap Oluştur')),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.sm),
@@ -39,26 +42,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Text('Birkaç bilgiyle şarj istasyonlarını keşfetmeye başla.', style: text.bodyMuted),
               const SizedBox(height: AppSpacing.xl),
               const TextField(
-                decoration: InputDecoration(labelText: 'Ad Soyad', prefixIcon: Icon(LucideIcons.user, size: 18)),
+                decoration: InputDecoration(labelText: 'Ad Soyad', prefixIcon: Icon(Icons.person_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
               const TextField(
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(LucideIcons.mail, size: 18)),
+                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
               const TextField(
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(LucideIcons.phone, size: 18)),
+                decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(Icons.phone_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
               TextField(
                 obscureText: _obscure,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
-                  prefixIcon: const Icon(LucideIcons.lock, size: 18),
+                  prefixIcon: const Icon(Icons.lock_rounded, size: 18),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscure ? LucideIcons.eye : LucideIcons.eyeOff, size: 18),
+                    icon: Icon(_obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded, size: 18),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -85,6 +88,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
             ],
+              ),
+            ),
           ),
         ),
       ),

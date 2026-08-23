@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:gap/gap.dart';
 
 import '../../core/state/theme_controller.dart';
 import '../../core/theme/app_palette.dart';
@@ -59,51 +59,54 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const EditProfileScreen()),
                     ),
-                    icon: const Icon(LucideIcons.pencil, size: 18),
+                    icon: const Icon(Icons.edit_rounded, size: 18),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                mainAxisSpacing: AppSpacing.sm,
-                crossAxisSpacing: AppSpacing.sm,
-                childAspectRatio: 0.95,
-                children: const [
-                  KpiStatCard(icon: LucideIcons.zap, label: 'Bu ay şarj', value: '3'),
-                  KpiStatCard(
-                    icon: Icons.electric_bolt_rounded,
-                    label: 'Toplam kWh',
-                    value: '91.5',
-                    accent: AppPalette.emerald,
-                  ),
-                  KpiStatCard(
-                    icon: LucideIcons.creditCard,
-                    label: 'Harcama',
-                    value: '778 ₺',
-                    accent: AppPalette.sky,
-                  ),
-                ],
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: const [
+                    Expanded(child: KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '3')),
+                    Gap(AppSpacing.sm),
+                    Expanded(
+                      child: KpiStatCard(
+                        icon: Icons.electric_bolt_rounded,
+                        label: 'Toplam kWh',
+                        value: '91.5',
+                        accent: AppPalette.emerald,
+                      ),
+                    ),
+                    Gap(AppSpacing.sm),
+                    Expanded(
+                      child: KpiStatCard(
+                        icon: Icons.credit_card_rounded,
+                        label: 'Harcama',
+                        value: '778 ₺',
+                        accent: AppPalette.sky,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
               _ProfileSection(
                 title: 'Hesabım',
                 items: [
                   _ProfileItem(
-                    icon: LucideIcons.history,
+                    icon: Icons.history_rounded,
                     label: 'Şarj Geçmişi',
                     onTap: () =>
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
                   ),
                   _ProfileItem(
-                    icon: LucideIcons.bell,
+                    icon: Icons.notifications_rounded,
                     label: 'Bildirimler',
                     onTap: () => Navigator.of(context)
                         .push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
                   ),
-                  const _ProfileItem(icon: LucideIcons.creditCard, label: 'Ödeme Yöntemlerim'),
+                  const _ProfileItem(icon: Icons.credit_card_rounded, label: 'Ödeme Yöntemlerim'),
                   const _ProfileItem(icon: Icons.directions_car_filled_outlined, label: 'Araçlarım'),
                 ],
               ),
@@ -115,8 +118,8 @@ class ProfileScreen extends StatelessWidget {
                     valueListenable: themeController,
                     builder: (context, mode, _) => _ThemeModeSelector(mode: mode, onChanged: themeController.setMode),
                   ),
-                  const _ProfileItem(icon: LucideIcons.globe, label: 'Dil · Türkçe'),
-                  const _ProfileItem(icon: LucideIcons.shield, label: 'Gizlilik ve KVKK'),
+                  const _ProfileItem(icon: Icons.public_rounded, label: 'Dil · Türkçe'),
+                  const _ProfileItem(icon: Icons.shield_rounded, label: 'Gizlilik ve KVKK'),
                   const _ProfileItem(icon: Icons.help_outline_rounded, label: 'Yardım ve Destek'),
                 ],
               ),
@@ -125,7 +128,7 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Firma / Operatör müsün?',
                 items: [
                   _ProfileItem(
-                    icon: LucideIcons.building,
+                    icon: Icons.apartment_rounded,
                     label: 'Firma Paneline Git',
                     subtitle: 'İstasyonlarını ve lisansını yönet',
                     onTap: () => Navigator.of(context)
@@ -145,7 +148,7 @@ class ProfileScreen extends StatelessWidget {
                     foregroundColor: context.colors.danger,
                     side: BorderSide(color: context.colors.danger.withValues(alpha: 0.5)),
                   ),
-                  icon: const Icon(LucideIcons.logOut, size: 17),
+                  icon: const Icon(Icons.logout_rounded, size: 17),
                   label: const Text('Çıkış Yap'),
                 ),
               ),
@@ -224,7 +227,7 @@ class _ProfileItem extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(LucideIcons.chevronRight, size: 17, color: colors.textMuted),
+            Icon(Icons.chevron_right_rounded, size: 17, color: colors.textMuted),
           ],
         ),
       ),
@@ -251,7 +254,7 @@ class _ThemeModeSelector extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.monitor, size: 19, color: colors.accentPrimary),
+              Icon(Icons.desktop_windows_rounded, size: 19, color: colors.accentPrimary),
               const SizedBox(width: AppSpacing.sm),
               Text('Görünüm', style: text.body),
             ],
@@ -261,9 +264,9 @@ class _ThemeModeSelector extends StatelessWidget {
             width: double.infinity,
             child: SegmentedButton<ThemeMode>(
               segments: const [
-                ButtonSegment(value: ThemeMode.system, icon: Icon(LucideIcons.monitor, size: 15), label: Text('Sistem')),
-                ButtonSegment(value: ThemeMode.light, icon: Icon(LucideIcons.sun, size: 15), label: Text('Açık')),
-                ButtonSegment(value: ThemeMode.dark, icon: Icon(LucideIcons.moon, size: 15), label: Text('Koyu')),
+                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.desktop_windows_rounded, size: 15), label: Text('Sistem')),
+                ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_rounded, size: 15), label: Text('Açık')),
+                ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_rounded, size: 15), label: Text('Koyu')),
               ],
               selected: {mode},
               showSelectedIcon: false,

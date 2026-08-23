@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_semantic_colors.dart';
@@ -24,7 +23,7 @@ class OperatorsSection extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: preview.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, i) {
           final op = preview[i];
           final stationCount = MockData.stationsFor(op.id).length;
@@ -96,7 +95,7 @@ class _OperatorLogo extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: colors.canvas, width: 2),
               ),
-              child: const Icon(LucideIcons.zap, color: Colors.white, size: 10),
+              child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 10),
             ),
           ),
       ],

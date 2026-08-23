@@ -60,7 +60,7 @@ class FavoritesScreen extends StatelessWidget {
               return ListView.separated(
                 padding: padding,
                 itemCount: favorites.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
                 itemBuilder: (context, i) => _card(context, favorites[i], appState, i),
               );
             },

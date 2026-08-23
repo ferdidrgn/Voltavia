@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -27,11 +26,11 @@ class _AdminShellState extends State<AdminShell> {
   int _index = 0;
 
   static const _items = [
-    NavItem(icon: LucideIcons.layoutGrid, activeIcon: LucideIcons.layoutGrid, label: 'Genel Bakış'),
+    NavItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'Genel Bakış'),
     NavItem(icon: Icons.ev_station_outlined, activeIcon: Icons.ev_station_rounded, label: 'İstasyonlar'),
-    NavItem(icon: LucideIcons.building, activeIcon: LucideIcons.building, label: 'Operatörler'),
-    NavItem(icon: LucideIcons.creditCard, activeIcon: LucideIcons.creditCard, label: 'Firma/Lisans'),
-    NavItem(icon: LucideIcons.shield, activeIcon: LucideIcons.shield, label: 'Audit Log'),
+    NavItem(icon: Icons.apartment_rounded, activeIcon: Icons.apartment_rounded, label: 'Operatörler'),
+    NavItem(icon: Icons.credit_card_rounded, activeIcon: Icons.credit_card_rounded, label: 'Firma/Lisans'),
+    NavItem(icon: Icons.shield_rounded, activeIcon: Icons.shield_rounded, label: 'Audit Log'),
   ];
 
   void _goToTab(int index) => setState(() => _index = index);
@@ -77,7 +76,7 @@ class _AdminShellState extends State<AdminShell> {
                     ],
                   ),
                 ),
-                Icon(LucideIcons.logOut, size: 16, color: colors.danger),
+                Icon(Icons.logout_rounded, size: 16, color: colors.danger),
               ],
             ),
           ),

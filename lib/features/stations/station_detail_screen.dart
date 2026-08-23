@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_palette.dart';
@@ -36,7 +35,7 @@ class StationDetailScreen extends StatelessWidget {
             backgroundColor: colors.surface,
             leading: Padding(
               padding: const EdgeInsets.all(AppSpacing.xs),
-              child: _CircleButton(icon: LucideIcons.arrowLeft, onTap: () => Navigator.of(context).pop()),
+              child: _CircleButton(icon: Icons.arrow_back_rounded, onTap: () => Navigator.of(context).pop()),
             ),
             actions: [
               Padding(
@@ -66,7 +65,7 @@ class StationDetailScreen extends StatelessWidget {
                         border: Border.all(color: colors.canvas, width: 3),
                         boxShadow: [BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.5), blurRadius: 20)],
                       ),
-                      child: const Icon(LucideIcons.zap, color: Colors.white, size: 26),
+                      child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 26),
                     ),
                   ),
                 ],
@@ -105,11 +104,11 @@ class StationDetailScreen extends StatelessWidget {
                       const SizedBox(width: 2),
                       Text(station.rating.toStringAsFixed(1), style: text.bodyStrong),
                       const SizedBox(width: AppSpacing.md),
-                      Icon(LucideIcons.mapPin, size: 15, color: colors.textMuted),
+                      Icon(Icons.place_rounded, size: 15, color: colors.textMuted),
                       const SizedBox(width: 2),
                       Text(Formatters.km(station.distanceKm), style: text.bodyMuted),
                       const SizedBox(width: AppSpacing.md),
-                      Icon(LucideIcons.building, size: 15, color: colors.textMuted),
+                      Icon(Icons.apartment_rounded, size: 15, color: colors.textMuted),
                       const SizedBox(width: 2),
                       Text(station.chargeOperator.name, style: text.bodyMuted),
                     ],
@@ -119,7 +118,7 @@ class StationDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _StatTile(
-                          icon: LucideIcons.zap,
+                          icon: Icons.bolt_rounded,
                           label: 'Maks. Güç',
                           value: '${station.maxPowerKw.toStringAsFixed(0)} kW',
                         ),
@@ -127,7 +126,7 @@ class StationDetailScreen extends StatelessWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _StatTile(
-                          icon: LucideIcons.creditCard,
+                          icon: Icons.credit_card_rounded,
                           label: 'Birim Fiyat',
                           value: '${Formatters.tryPrice(station.pricePerKwh)}/kWh',
                         ),
@@ -188,7 +187,7 @@ class StationDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Icon(LucideIcons.chevronRight, size: 18, color: colors.textMuted),
+                        Icon(Icons.chevron_right_rounded, size: 18, color: colors.textMuted),
                       ],
                     ),
                   ),
@@ -211,7 +210,7 @@ class StationDetailScreen extends StatelessWidget {
                       const SnackBar(content: Text('Navigasyon uygulamasına yönlendiriliyor…')),
                     );
                   },
-                  icon: const Icon(LucideIcons.navigation, size: 17),
+                  icon: const Icon(Icons.navigation_rounded, size: 17),
                   label: const Text('Navigasyon'),
                 ),
               ),
@@ -224,7 +223,7 @@ class StationDetailScreen extends StatelessWidget {
                             MaterialPageRoute(builder: (_) => StartChargingScreen(station: station)),
                           )
                       : null,
-                  icon: const Icon(LucideIcons.zap, size: 17),
+                  icon: const Icon(Icons.bolt_rounded, size: 17),
                   label: Text(station.canStartFromApp ? 'Şarjı Başlat' : 'Şu An Uygun Değil'),
                 ),
               ),

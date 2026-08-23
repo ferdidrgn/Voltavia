@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
@@ -39,9 +38,9 @@ class KpiStatCard extends StatelessWidget {
       TrendDirection.flat => colors.textMuted,
     };
     final trendIcon = switch (trend) {
-      TrendDirection.up => LucideIcons.trendingUp,
-      TrendDirection.down => LucideIcons.trendingDown,
-      TrendDirection.flat => LucideIcons.minus,
+      TrendDirection.up => Icons.trending_up_rounded,
+      TrendDirection.down => Icons.trending_down_rounded,
+      TrendDirection.flat => Icons.remove_rounded,
     };
 
     return BentoCard(

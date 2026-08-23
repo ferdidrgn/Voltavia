@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -17,12 +16,12 @@ class _OnboardPage {
 
 const _pages = [
   _OnboardPage(
-    icon: LucideIcons.map,
+    icon: Icons.map_rounded,
     title: 'Tüm istasyonlar tek haritada',
     description: 'Türkiye\'deki şarj istasyonlarını tek bir uygulamadan keşfet; şehir ve ilçeye göre filtrele.',
   ),
   _OnboardPage(
-    icon: LucideIcons.zap,
+    icon: Icons.bolt_rounded,
     title: 'Ayrı uygulama indirme',
     description: 'Anlaşmalı operatörlerde şarjı doğrudan Voltavia üzerinden başlat, farklı uygulamalarla uğraşma.',
   ),
@@ -86,29 +85,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (context, i) {
                   final page = _pages[i];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 140,
-                          height: 140,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: AppPalette.auroraGradient),
-                            borderRadius: BorderRadius.circular(AppRadius.xxl),
-                            boxShadow: [
-                              BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.3), blurRadius: 30, spreadRadius: 2),
-                            ],
-                          ),
-                          child: Icon(page.icon, size: 60, color: Colors.white),
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 440),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 140,
+                              height: 140,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: AppPalette.auroraGradient),
+                                borderRadius: BorderRadius.circular(AppRadius.xxl),
+                                boxShadow: [
+                                  BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.3), blurRadius: 30, spreadRadius: 2),
+                                ],
+                              ),
+                              child: Icon(page.icon, size: 60, color: Colors.white),
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            Text(page.title, style: text.display.copyWith(fontSize: 26), textAlign: TextAlign.center),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(page.description, textAlign: TextAlign.center, style: text.bodyMuted),
+                          ],
                         ),
-                        const SizedBox(height: AppSpacing.xl),
-                        Text(page.title, style: text.display.copyWith(fontSize: 26), textAlign: TextAlign.center),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(page.description, textAlign: TextAlign.center, style: text.bodyMuted),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -132,11 +136,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _next,
-                  child: Text(_index == _pages.length - 1 ? 'Başla' : 'Devam Et'),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 440),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _next,
+                      child: Text(_index == _pages.length - 1 ? 'Başla' : 'Devam Et'),
+                    ),
+                  ),
                 ),
               ),
             ),

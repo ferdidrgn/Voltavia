@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_palette.dart';
-import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
-import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/nav_item.dart';
 import '../../widgets/responsive_scaffold.dart';
@@ -30,11 +27,11 @@ class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
   static const _items = [
-    NavItem(icon: LucideIcons.layoutGrid, activeIcon: LucideIcons.layoutGrid, label: 'Ana Sayfa'),
-    NavItem(icon: LucideIcons.map, activeIcon: LucideIcons.map, label: 'Harita'),
+    NavItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'Ana Sayfa'),
+    NavItem(icon: Icons.map_rounded, activeIcon: Icons.map_rounded, label: 'Harita'),
     NavItem(icon: Icons.ev_station_outlined, activeIcon: Icons.ev_station_rounded, label: 'İstasyonlar'),
     NavItem(icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded, label: 'Favoriler'),
-    NavItem(icon: LucideIcons.user, activeIcon: LucideIcons.user, label: 'Profil'),
+    NavItem(icon: Icons.person_rounded, activeIcon: Icons.person_rounded, label: 'Profil'),
   ];
 
   void _goToTab(int index) => setState(() => _index = index);
@@ -90,7 +87,7 @@ class _ActiveSessionBanner extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(LucideIcons.zap, color: Colors.white, size: 18),
+              const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
@@ -100,7 +97,7 @@ class _ActiveSessionBanner extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(LucideIcons.chevronRight, color: Colors.white, size: 18),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 18),
             ],
           ),
         ),

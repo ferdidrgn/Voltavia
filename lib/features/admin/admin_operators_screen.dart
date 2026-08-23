@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -37,7 +36,7 @@ class AdminOperatorsScreen extends StatelessWidget {
                 if (isDesktop) Text('Operatörler', style: text.display) else Text('Şarj operatörü / firma hesapları', style: text.bodyMuted),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(LucideIcons.plus, size: 16),
+                  icon: const Icon(Icons.add_rounded, size: 16),
                   label: const Text('Yeni Operatör'),
                 ),
               ],
@@ -57,7 +56,7 @@ class AdminOperatorsScreen extends StatelessWidget {
                     Text(op.name, style: text.bodyStrong, maxLines: 1, overflow: TextOverflow.ellipsis),
                     Text('${MockData.stationsFor(op.id).length}', style: text.bodyMuted),
                     op.hasAppIntegration
-                        ? Icon(LucideIcons.check, size: 16, color: colors.success)
+                        ? Icon(Icons.check_rounded, size: 16, color: colors.success)
                         : Text('—', style: text.captionMuted),
                     Text(
                       op.hasAppIntegration ? 'Aktif' : 'Görüşme Aşamasında',

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -50,7 +49,7 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
                   Text('Ekle, düzenle, pasife al', style: text.bodyMuted),
                 ElevatedButton.icon(
                   onPressed: () => setState(() => _showForm = !_showForm),
-                  icon: Icon(_showForm ? LucideIcons.x : LucideIcons.plus, size: 16),
+                  icon: Icon(_showForm ? Icons.close_rounded : Icons.add_rounded, size: 16),
                   label: Text(_showForm ? 'Kapat' : 'Yeni İstasyon'),
                 ),
               ],
@@ -80,7 +79,7 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
                     StatusBadge(status: station.status, compact: true),
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(LucideIcons.pencil, size: 15, color: colors.textMuted),
+                      icon: Icon(Icons.edit_rounded, size: 15, color: colors.textMuted),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],

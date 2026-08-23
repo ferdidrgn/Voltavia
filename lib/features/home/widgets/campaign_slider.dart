@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/campaign.dart';
@@ -9,11 +9,7 @@ class CampaignSlider extends StatefulWidget {
   final List<Campaign> campaigns;
   final ValueChanged<Campaign> onTap;
 
-  const CampaignSlider({
-    super.key,
-    required this.campaigns,
-    required this.onTap,
-  });
+  const CampaignSlider({super.key, required this.campaigns, required this.onTap});
 
   @override
   State<CampaignSlider> createState() => _CampaignSliderState();
@@ -60,9 +56,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
                         borderRadius: BorderRadius.circular(AppRadius.lg),
                         boxShadow: [
                           BoxShadow(
-                            color: campaign.colors.first.withValues(
-                              alpha: 0.28,
-                            ),
+                            color: campaign.colors.first.withValues(alpha: 0.28),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -73,11 +67,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
                           Positioned(
                             right: -18,
                             bottom: -18,
-                            child: Icon(
-                              campaign.icon,
-                              size: 96,
-                              color: Colors.white.withValues(alpha: 0.14),
-                            ),
+                            child: Icon(campaign.icon, size: 96, color: Colors.white.withValues(alpha: 0.14)),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,10 +85,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
                               ),
                               Text(
                                 campaign.subtitle,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.88),
-                                  fontSize: 12.5,
-                                ),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.88), fontSize: 12.5),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -114,11 +101,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(
-                                    LucideIcons.arrowRight,
-                                    size: 15,
-                                    color: Colors.white,
-                                  ),
+                                  const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white),
                                 ],
                               ),
                             ],
@@ -143,9 +126,7 @@ class _CampaignSliderState extends State<CampaignSlider> {
               width: active ? 18 : 6,
               height: 6,
               decoration: BoxDecoration(
-                color: active
-                    ? context.colors.textSecondary
-                    : context.colors.border,
+                color: active ? context.colors.textSecondary : context.colors.border,
                 borderRadius: BorderRadius.circular(4),
               ),
             );

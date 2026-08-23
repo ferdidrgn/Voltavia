@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -106,7 +105,7 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                           child: Row(
                             children: [
-                              Icon(LucideIcons.search, color: colors.textMuted, size: 19),
+                              Icon(Icons.search_rounded, color: colors.textMuted, size: 19),
                               const SizedBox(width: AppSpacing.xs),
                               Expanded(
                                 child: Text(
@@ -120,7 +119,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       _RoundIconButton(
-                        icon: LucideIcons.slidersHorizontal,
+                        icon: Icons.tune_rounded,
                         highlighted: _selectedCity != null,
                         onTap: _openCityFilter,
                       ),
@@ -132,7 +131,7 @@ class _MapScreenState extends State<MapScreen> {
                       alignment: Alignment.centerLeft,
                       child: Chip(
                         label: Text(_selectedCity!),
-                        avatar: Icon(LucideIcons.building, size: 15, color: colors.accentPrimary),
+                        avatar: Icon(Icons.apartment_rounded, size: 15, color: colors.accentPrimary),
                         onDeleted: () => setState(() => _selectedCity = null),
                         backgroundColor: colors.surface,
                       ),
@@ -145,7 +144,7 @@ class _MapScreenState extends State<MapScreen> {
           Positioned(
             right: AppSpacing.md,
             bottom: _selected != null ? 200 : AppSpacing.lg,
-            child: _RoundIconButton(icon: LucideIcons.navigation, onTap: () {}),
+            child: _RoundIconButton(icon: Icons.navigation_rounded, onTap: () {}),
           ),
           if (_selected != null)
             Positioned(
@@ -192,7 +191,7 @@ class _MapPin extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 2.5),
               boxShadow: [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 1)],
             ),
-            child: const Icon(LucideIcons.zap, color: Colors.white, size: 16),
+            child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 16),
           ),
         ),
       ),
@@ -292,7 +291,7 @@ class _StationPreviewCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              IconButton(onPressed: onClose, icon: Icon(LucideIcons.x, size: 17, color: colors.textMuted)),
+              IconButton(onPressed: onClose, icon: Icon(Icons.close_rounded, size: 17, color: colors.textMuted)),
             ],
           ),
         ),

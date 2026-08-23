@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -39,7 +39,7 @@ class AdminAuditLogScreen extends StatelessWidget {
             if (logs.isEmpty)
               Center(
                 child: EmptyState(
-                  icon: LucideIcons.shield,
+                  icon: Icons.shield_rounded,
                   title: 'Kayıt yok',
                   message: 'Kritik değişiklikler burada listelenecek.',
                 ),
@@ -58,7 +58,7 @@ class AdminAuditLogScreen extends StatelessWidget {
                               color: colors.accentPrimary.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(LucideIcons.shield, size: 15, color: colors.accentPrimary),
+                            child: Icon(Icons.shield_rounded, size: 15, color: colors.accentPrimary),
                           ),
                           const Gap(AppSpacing.sm),
                           Expanded(

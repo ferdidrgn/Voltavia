@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -42,47 +41,7 @@ class AdminOverviewScreen extends StatelessWidget {
               Text('Voltavia platformunun anlık özeti', style: text.bodyMuted),
               const Gap(AppSpacing.lg),
             ],
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: isDesktop ? 4 : 2,
-              mainAxisSpacing: AppSpacing.sm,
-              crossAxisSpacing: AppSpacing.sm,
-              childAspectRatio: isDesktop ? 1.35 : 1.05,
-              children: [
-                KpiStatCard(
-                  icon: LucideIcons.mapPin,
-                  label: 'Toplam İstasyon',
-                  value: '${MockData.stations.length}',
-                  trendLabel: '+%4.2 bu ay',
-                  trend: TrendDirection.up,
-                ),
-                KpiStatCard(
-                  icon: LucideIcons.building,
-                  label: 'Aktif Operatör',
-                  value: '${MockData.operators.length}',
-                  trendLabel: '+2 yeni sözleşme',
-                  trend: TrendDirection.up,
-                  accent: colors.accentSecondary,
-                ),
-                KpiStatCard(
-                  icon: LucideIcons.users,
-                  label: 'Kayıtlı Kullanıcı',
-                  value: '86.4K',
-                  trendLabel: '+%11 bu ay',
-                  trend: TrendDirection.up,
-                  accent: colors.info,
-                ),
-                KpiStatCard(
-                  icon: LucideIcons.database,
-                  label: 'Veri Sürümü',
-                  value: 'v128',
-                  trendLabel: '3 gün önce',
-                  trend: TrendDirection.flat,
-                  accent: colors.warning,
-                ),
-              ],
-            ),
+            _OverviewKpiGrid(isDesktop: isDesktop, colors: colors),
             const Gap(AppSpacing.lg),
             TrendChart(
               title: 'Kayıtlı Kullanıcı Büyümesi',
@@ -120,6 +79,93 @@ class AdminOverviewScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// KPI kartlarını, kartların doğal içerik yüksekliğine göre satırlar halinde
+/// dizer — masaüstünde tek satırda 4, mobilde 2x2 — sabit bir en-boy oranının
+/// yol açtığı boş alan yerine kartlar her zaman içeriğine göre boyutlanır.
+class _OverviewKpiGrid extends StatelessWidget {
+  final bool isDesktop;
+  final AppSemanticColors colors;
+
+  const _OverviewKpiGrid({required this.isDesktop, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = [
+      KpiStatCard(
+        icon: Icons.place_rounded,
+        label: 'Toplam İstasyon',
+        value: '${MockData.stations.length}',
+        trendLabel: '+%4.2 bu ay',
+        trend: TrendDirection.up,
+      ),
+      KpiStatCard(
+        icon: Icons.apartment_rounded,
+        label: 'Aktif Operatör',
+        value: '${MockData.operators.length}',
+        trendLabel: '+2 yeni sözleşme',
+        trend: TrendDirection.up,
+        accent: colors.accentSecondary,
+      ),
+      KpiStatCard(
+        icon: Icons.groups_rounded,
+        label: 'Kayıtlı Kullanıcı',
+        value: '86.4K',
+        trendLabel: '+%11 bu ay',
+        trend: TrendDirection.up,
+        accent: colors.info,
+      ),
+      KpiStatCard(
+        icon: Icons.storage_rounded,
+        label: 'Veri Sürümü',
+        value: 'v128',
+        trendLabel: '3 gün önce',
+        trend: TrendDirection.flat,
+        accent: colors.warning,
+      ),
+    ];
+
+    if (isDesktop) {
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < cards.length; i++) ...[
+              if (i > 0) const Gap(AppSpacing.sm),
+              Expanded(child: cards[i]),
+            ],
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: cards[0]),
+              const Gap(AppSpacing.sm),
+              Expanded(child: cards[1]),
+            ],
+          ),
+        ),
+        const Gap(AppSpacing.sm),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: cards[2]),
+              const Gap(AppSpacing.sm),
+              Expanded(child: cards[3]),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

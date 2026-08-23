@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_semantic_colors.dart';
 import 'app_spacing.dart';
@@ -20,9 +19,9 @@ abstract final class AppTheme {
       muted: colors.textMuted,
     );
 
-    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme(
-      isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
-    );
+    final baseTextTheme =
+        (isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme)
+            .apply(fontFamily: kPlusJakartaSans);
 
     final colorScheme = ColorScheme(
       brightness: colors.brightness,
@@ -46,6 +45,7 @@ abstract final class AppTheme {
       canvasColor: colors.canvas,
       dividerColor: colors.border,
       splashFactory: InkSparkle.splashFactory,
+      fontFamily: kPlusJakartaSans,
       textTheme: baseTextTheme.apply(
         bodyColor: colors.textPrimary,
         displayColor: colors.textPrimary,

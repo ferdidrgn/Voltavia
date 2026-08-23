@@ -59,7 +59,7 @@ class ResponsiveScaffold extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: [
-                        if (topBanner != null) topBanner!,
+                        ?topBanner,
                         Expanded(child: stack),
                       ],
                     ),
@@ -68,7 +68,7 @@ class ResponsiveScaffold extends StatelessWidget {
               )
             : Column(
                 children: [
-                  if (topBanner != null) topBanner!,
+                  ?topBanner,
                   Expanded(child: stack),
                 ],
               ),

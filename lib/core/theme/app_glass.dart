@@ -19,10 +19,9 @@ abstract final class AppGlass {
   }) {
     final colors = context.colors;
     return BoxDecoration(
-      color: (tint ?? (elevated ? colors.surfaceHighlight : colors.surface))
-          .withValues(alpha: colors.isDark ? 0.72 : 0.92),
+      color: tint ?? (elevated ? colors.surfaceHighlight : colors.surface),
       borderRadius: BorderRadius.circular(radius),
-      border: Border.all(color: colors.border, width: 1),
+      border: Border.all(color: colors.borderStrong, width: 1),
       boxShadow: colors.isDark
           ? [
               BoxShadow(

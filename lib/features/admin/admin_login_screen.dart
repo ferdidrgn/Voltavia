@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_palette.dart';
@@ -37,7 +36,7 @@ class AdminLoginScreen extends StatelessWidget {
                     gradient: const LinearGradient(colors: AppPalette.indigoGradient),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Icon(LucideIcons.zap, color: Colors.white, size: 24),
+                  child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text('Voltavia', style: text.title),
@@ -48,12 +47,12 @@ class AdminLoginScreen extends StatelessWidget {
                 Text('İstasyon, operatör ve firma verilerini yönetmek için giriş yap.', style: text.bodyMuted),
                 const SizedBox(height: AppSpacing.xl),
                 const TextField(
-                  decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(LucideIcons.mail, size: 18)),
+                  decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 const TextField(
                   obscureText: true,
-                  decoration: InputDecoration(labelText: 'Şifre', prefixIcon: Icon(LucideIcons.lock, size: 18)),
+                  decoration: InputDecoration(labelText: 'Şifre', prefixIcon: Icon(Icons.lock_rounded, size: 18)),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 SizedBox(

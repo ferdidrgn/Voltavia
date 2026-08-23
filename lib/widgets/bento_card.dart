@@ -50,7 +50,7 @@ class _BentoCardState extends State<BentoCard> {
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
-      transform: hovered ? (Matrix4.identity()..translate(0.0, -2.0)) : Matrix4.identity(),
+      transform: hovered ? (Matrix4.identity()..translateByDouble(0.0, -2.0, 0.0, 1.0)) : Matrix4.identity(),
       decoration: decoration,
       padding: widget.padding,
       child: widget.child,

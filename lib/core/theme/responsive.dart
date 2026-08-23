@@ -26,7 +26,7 @@ abstract final class Responsive {
 
   /// İçerik alanının maksimum genişliği — çok geniş ekranlarda satırların
   /// aşırı uzamasını engeller.
-  static double maxContentWidth(BuildContext context) => 1440;
+  static double maxContentWidth(BuildContext context) => 1080;
 
   const Responsive._();
 }

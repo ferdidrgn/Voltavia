@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -46,7 +46,7 @@ class EditProfileScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: colors.canvas, width: 2),
                       ),
-                      child: const Icon(LucideIcons.camera, color: Colors.white, size: 15),
+                      child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 15),
                     ),
                   ),
                 ],

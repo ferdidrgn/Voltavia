@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../core/theme/app_palette.dart';
 import '../core/theme/app_semantic_colors.dart';
@@ -55,7 +54,7 @@ class AppSidebar extends StatelessWidget {
                     gradient: const LinearGradient(colors: AppPalette.indigoGradient),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
-                  child: const Icon(LucideIcons.zap, color: Colors.white, size: 18),
+                  child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -78,7 +77,7 @@ class AppSidebar extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 2),
+              separatorBuilder: (_, _) => const SizedBox(height: 2),
               itemBuilder: (context, i) {
                 final item = items[i];
                 final selected = i == selectedIndex;
@@ -90,7 +89,7 @@ class AppSidebar extends StatelessWidget {
               },
             ),
           ),
-          if (footer != null) footer!,
+          ?footer,
         ],
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -27,8 +26,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   bool _processing = false;
 
   final _methods = const [
-    ('Visa •••• 4242', LucideIcons.creditCard),
-    ('Mastercard •••• 8891', LucideIcons.creditCard),
+    ('Visa •••• 4242', Icons.credit_card_rounded),
+    ('Mastercard •••• 8891', Icons.credit_card_rounded),
   ];
 
   Future<void> _confirm() async {
@@ -85,13 +84,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             }),
             OutlinedButton.icon(
               onPressed: () {},
-              icon: const Icon(LucideIcons.plus, size: 17),
+              icon: const Icon(Icons.add_rounded, size: 17),
               label: const Text('Yeni kart ekle'),
             ),
             const Spacer(),
             Row(
               children: [
-                Icon(LucideIcons.lock, size: 15, color: colors.textMuted),
+                Icon(Icons.lock_rounded, size: 15, color: colors.textMuted),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text('Kart numarası ve CVV Voltavia veritabanında saklanmaz.', style: text.captionMuted),
@@ -101,7 +100,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             const SizedBox(height: AppSpacing.sm),
             _processing
                 ? const Center(child: CircularProgressIndicator())
-                : GradientButton(label: 'Şarjı Başlat', icon: LucideIcons.zap, onPressed: _confirm),
+                : GradientButton(label: 'Şarjı Başlat', icon: Icons.bolt_rounded, onPressed: _confirm),
           ],
         ),
       ),

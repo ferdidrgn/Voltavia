@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -98,7 +97,7 @@ class _StationListScreenState extends State<StationListScreen> {
                         onChanged: (v) => setState(() => _query = v),
                         decoration: InputDecoration(
                           hintText: 'İstasyon veya ilçe ara',
-                          prefixIcon: Icon(LucideIcons.search, size: 18),
+                          prefixIcon: Icon(Icons.search_rounded, size: 18),
                         ),
                       ),
                     ),
@@ -118,7 +117,7 @@ class _StationListScreenState extends State<StationListScreen> {
                             border: Border.all(color: colors.border),
                           ),
                           child: Icon(
-                            LucideIcons.filter,
+                            Icons.filter_list_rounded,
                             size: 19,
                             color: _city != null ? Colors.white : colors.textMuted,
                           ),
@@ -141,7 +140,7 @@ class _StationListScreenState extends State<StationListScreen> {
                     DropdownButtonHideUnderline(
                       child: DropdownButton<_SortBy>(
                         value: _sort,
-                        icon: Icon(LucideIcons.arrowUpDown, size: 15),
+                        icon: Icon(Icons.swap_vert_rounded, size: 15),
                         style: context.text.caption.copyWith(fontWeight: FontWeight.w600),
                         items: const [
                           DropdownMenuItem(value: _SortBy.distance, child: Text('Mesafeye göre')),
@@ -159,7 +158,7 @@ class _StationListScreenState extends State<StationListScreen> {
                 child: stations.isEmpty
                     ? Center(
                         child: EmptyState(
-                          icon: LucideIcons.searchX,
+                          icon: Icons.search_off_rounded,
                           title: 'İstasyon bulunamadı',
                           message: 'Aramanı ya da filtreni değiştirip tekrar dene.',
                         ),
@@ -185,7 +184,7 @@ class _StationListScreenState extends State<StationListScreen> {
                                   AppSpacing.md, 0, AppSpacing.md, AppSpacing.lg,
                                 ),
                                 itemCount: stations.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                                separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
                                 itemBuilder: (context, i) => _card(stations[i], appState, i),
                               ),
                       ),

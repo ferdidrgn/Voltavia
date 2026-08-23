@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -16,9 +15,9 @@ class NotificationsScreen extends StatelessWidget {
   IconData _iconFor(NotificationKind kind) {
     switch (kind) {
       case NotificationKind.session:
-        return LucideIcons.zap;
+        return Icons.bolt_rounded;
       case NotificationKind.system:
-        return LucideIcons.info;
+        return Icons.info_rounded;
       case NotificationKind.promo:
         return Icons.local_offer_outlined;
     }
@@ -35,7 +34,7 @@ class NotificationsScreen extends StatelessWidget {
       body: notifications.isEmpty
           ? Center(
               child: EmptyState(
-                icon: LucideIcons.bell,
+                icon: Icons.notifications_rounded,
                 title: 'Bildirim yok',
                 message: 'Şarj ve sistem bildirimleri burada görünecek.',
               ),
@@ -43,7 +42,7 @@ class NotificationsScreen extends StatelessWidget {
           : ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
               itemBuilder: (context, i) {
                 final n = notifications[i];
                 return BentoCard(

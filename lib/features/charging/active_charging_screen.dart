@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -109,7 +108,7 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(LucideIcons.zap, color: colors.accentSecondary, size: 26),
+                      Icon(Icons.bolt_rounded, color: colors.accentSecondary, size: 26),
                       Text('%${_batteryPercent.toStringAsFixed(0)}', style: text.numericLg),
                       Text('şarj seviyesi', style: text.captionMuted),
                     ],
@@ -121,15 +120,15 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _MetricTile(icon: LucideIcons.timer, label: 'Süre', value: Formatters.duration(elapsed)),
+                  child: _MetricTile(icon: Icons.timer_rounded, label: 'Süre', value: Formatters.duration(elapsed)),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _MetricTile(icon: LucideIcons.zap, label: 'Enerji', value: Formatters.kwh(_kwh)),
+                  child: _MetricTile(icon: Icons.bolt_rounded, label: 'Enerji', value: Formatters.kwh(_kwh)),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _MetricTile(icon: LucideIcons.creditCard, label: 'Tutar', value: Formatters.tryPrice(cost)),
+                  child: _MetricTile(icon: Icons.credit_card_rounded, label: 'Tutar', value: Formatters.tryPrice(cost)),
                 ),
               ],
             ),

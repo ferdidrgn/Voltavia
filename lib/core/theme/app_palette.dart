@@ -35,6 +35,7 @@ abstract final class AppPalette {
   static const List<Color> emeraldGradient = [Color(0xFF10B981), Color(0xFF34D399)];
   static const List<Color> auroraGradient = [Color(0xFF6366F1), Color(0xFF10B981)];
   static const List<Color> sunsetGradient = [Color(0xFFF59E0B), Color(0xFFEF4444)];
+  static const List<Color> campaignGradient = [Color(0xFF8B5CF6), Color(0xFFEC4899)];
 
   // Mikro kenarlık / yüzey opaklık ölçeği
   static const double borderSubtle = 0.08;

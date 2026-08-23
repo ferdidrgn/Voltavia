@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -84,7 +83,7 @@ class _StartChargingScreenState extends State<StartChargingScreen> {
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Row(
                 children: [
-                  Icon(LucideIcons.info, size: 17, color: colors.textMuted),
+                  Icon(Icons.info_rounded, size: 17, color: colors.textMuted),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Text(
@@ -99,7 +98,7 @@ class _StartChargingScreenState extends State<StartChargingScreen> {
             const Spacer(),
             GradientButton(
               label: 'Devam Et',
-              icon: LucideIcons.arrowRight,
+              icon: Icons.arrow_forward_rounded,
               onPressed: _selected == null
                   ? null
                   : () => Navigator.of(context).push(

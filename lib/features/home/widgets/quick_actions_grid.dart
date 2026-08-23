@@ -23,46 +23,43 @@ class QuickActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.text;
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: AppSpacing.sm,
-        crossAxisSpacing: AppSpacing.xs,
-        childAspectRatio: 0.78,
-      ),
-      itemBuilder: (context, i) {
-        final item = items[i];
-        return InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          onTap: item.onTap,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: colors.border),
-                ),
-                child: Icon(item.icon, color: colors.accentPrimary, size: 21),
+    return Wrap(
+      alignment: WrapAlignment.start,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.md,
+      children: [
+        for (final item in items)
+          SizedBox(
+            width: 84,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              onTap: item.onTap,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: colors.border),
+                    ),
+                    child: Icon(item.icon, color: colors.accentPrimary, size: 21),
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    item.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.captionMuted.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                item.label,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: text.captionMuted.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+      ],
     );
   }
 }

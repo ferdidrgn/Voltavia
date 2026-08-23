@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_palette.dart';
@@ -42,21 +42,21 @@ class HomeDashboardScreen extends StatelessWidget {
     final nearest = MockData.nearestStations.take(5).toList();
 
     final quickActions = [
-      QuickActionItem(icon: LucideIcons.map, label: 'Harita', onTap: () => onNavigateTab(1)),
+      QuickActionItem(icon: Icons.map_rounded, label: 'Harita', onTap: () => onNavigateTab(1)),
       QuickActionItem(icon: Icons.ev_station_rounded, label: 'İstasyonlar', onTap: () => onNavigateTab(2)),
       QuickActionItem(icon: Icons.favorite_rounded, label: 'Favoriler', onTap: () => onNavigateTab(3)),
       QuickActionItem(
-        icon: LucideIcons.history,
+        icon: Icons.history_rounded,
         label: 'Geçmiş',
         onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
       ),
       QuickActionItem(
-        icon: LucideIcons.bell,
+        icon: Icons.notifications_rounded,
         label: 'Bildirimler',
         onTap: () =>
             Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
       ),
-      QuickActionItem(icon: LucideIcons.user, label: 'Profil', onTap: () => onNavigateTab(4)),
+      QuickActionItem(icon: Icons.person_rounded, label: 'Profil', onTap: () => onNavigateTab(4)),
     ];
 
     final content = ListView(
@@ -100,7 +100,7 @@ class HomeDashboardScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(LucideIcons.search, color: colors.textMuted, size: 18),
+                Icon(Icons.search_rounded, color: colors.textMuted, size: 18),
                 const Gap(AppSpacing.xs),
                 Text('İstasyon, operatör veya şehir ara', style: text.bodyMuted),
               ],
@@ -116,36 +116,41 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ],
         const Gap(AppSpacing.lg),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: isDesktop ? 3 : 3,
-          mainAxisSpacing: AppSpacing.sm,
-          crossAxisSpacing: AppSpacing.sm,
-          childAspectRatio: isDesktop ? 1.5 : 0.92,
-          children: const [
-            KpiStatCard(
-              icon: LucideIcons.zap,
-              label: 'Bu ay şarj',
-              value: '3',
-              trendLabel: '+1 geçen aya göre',
-              trend: TrendDirection.up,
-            ),
-            KpiStatCard(
-              icon: Icons.electric_bolt_rounded,
-              label: 'Toplam kWh',
-              value: '91.5',
-              trendLabel: 'stabil',
-              trend: TrendDirection.flat,
-              accent: AppPalette.emerald,
-            ),
-            KpiStatCard(
-              icon: Icons.favorite_rounded,
-              label: 'Favoriler',
-              value: '2',
-              accent: AppPalette.sky,
-            ),
-          ],
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: const [
+              Expanded(
+                child: KpiStatCard(
+                  icon: Icons.bolt_rounded,
+                  label: 'Bu ay şarj',
+                  value: '3',
+                  trendLabel: '+1 geçen aya göre',
+                  trend: TrendDirection.up,
+                ),
+              ),
+              Gap(AppSpacing.sm),
+              Expanded(
+                child: KpiStatCard(
+                  icon: Icons.electric_bolt_rounded,
+                  label: 'Toplam kWh',
+                  value: '91.5',
+                  trendLabel: 'stabil',
+                  trend: TrendDirection.flat,
+                  accent: AppPalette.emerald,
+                ),
+              ),
+              Gap(AppSpacing.sm),
+              Expanded(
+                child: KpiStatCard(
+                  icon: Icons.favorite_rounded,
+                  label: 'Favoriler',
+                  value: '2',
+                  accent: AppPalette.sky,
+                ),
+              ),
+            ],
+          ),
         ).enterRise(delay: AppMotion.staggerStep),
         const Gap(AppSpacing.lg),
         CampaignSlider(
@@ -227,7 +232,7 @@ class _NotificationButton extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(LucideIcons.bell, color: colors.textSecondary, size: 20),
+              Icon(Icons.notifications_rounded, color: colors.textSecondary, size: 20),
               if (unreadCount > 0)
                 Positioned(
                   right: -2,
@@ -276,7 +281,7 @@ class _ActiveSessionCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), shape: BoxShape.circle),
-                child: const Icon(LucideIcons.zap, color: Colors.white, size: 19),
+                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 19),
               ),
               const Gap(AppSpacing.sm),
               Expanded(
@@ -293,7 +298,7 @@ class _ActiveSessionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(LucideIcons.chevronRight, color: Colors.white),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white),
             ],
           ),
         ),

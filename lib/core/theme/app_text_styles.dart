@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+/// Projeye gömülü Plus Jakarta Sans font ailesinin adı (bkz. pubspec.yaml
+/// `flutter.fonts`). Çalışma zamanında ağdan indirme yapılmaz.
+const String kPlusJakartaSans = 'PlusJakartaSans';
 
 /// Plus Jakarta Sans tabanlı, önceden renklendirilmiş metin hiyerarşisi.
 /// `context.text` ile kullanılır — her ekranda tekrar tekrar renk parametresi
@@ -38,7 +41,8 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     required Color muted,
   }) {
     TextStyle f(double size, FontWeight weight, Color color, {double? spacing, double? height}) {
-      return GoogleFonts.plusJakartaSans(
+      return TextStyle(
+        fontFamily: kPlusJakartaSans,
         fontSize: size,
         fontWeight: weight,
         color: color,

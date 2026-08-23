@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../core/theme/app_motion.dart';
 import '../core/theme/app_semantic_colors.dart';
@@ -48,7 +47,7 @@ class ErrorState extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             OutlinedButton.icon(
               onPressed: onRetry,
-              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              icon: const Icon(Icons.refresh_rounded, size: 16),
               label: const Text('Tekrar Dene'),
             ),
           ],

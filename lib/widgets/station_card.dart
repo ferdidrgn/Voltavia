@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../core/theme/app_motion.dart';
 import '../core/theme/app_palette.dart';
 import '../core/theme/app_semantic_colors.dart';
@@ -97,11 +97,11 @@ class StationCard extends StatelessWidget {
             children: [
               StatusBadge(status: station.status, compact: true),
               const SizedBox(width: AppSpacing.sm),
-              Icon(LucideIcons.zap, size: 14, color: colors.textMuted),
+              Icon(Icons.bolt_rounded, size: 14, color: colors.textMuted),
               const SizedBox(width: 2),
               Text('${station.maxPowerKw.toStringAsFixed(0)} kW', style: text.captionMuted),
               const SizedBox(width: AppSpacing.sm),
-              Icon(LucideIcons.mapPin, size: 14, color: colors.textMuted),
+              Icon(Icons.place_rounded, size: 14, color: colors.textMuted),
               const SizedBox(width: 2),
               Text(Formatters.km(station.distanceKm), style: text.captionMuted),
               const Spacer(),

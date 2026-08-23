@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -40,7 +39,7 @@ class SessionSummaryScreen extends StatelessWidget {
                 width: 84,
                 height: 84,
                 decoration: BoxDecoration(color: colors.success.withValues(alpha: 0.14), shape: BoxShape.circle),
-                child: Icon(LucideIcons.check, color: colors.success, size: 40),
+                child: Icon(Icons.check_rounded, color: colors.success, size: 40),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text('Şarj Tamamlandı', style: text.display),

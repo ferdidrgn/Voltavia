@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -32,8 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.xl),
@@ -45,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   gradient: const LinearGradient(colors: AppPalette.indigoGradient),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Icon(LucideIcons.zap, color: Colors.white, size: 28),
+                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text('Tekrar hoş geldin', style: text.display),
@@ -56,16 +58,16 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: AppSpacing.lg),
               const TextField(
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(LucideIcons.mail, size: 18)),
+                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
               TextField(
                 obscureText: _obscure,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
-                  prefixIcon: const Icon(LucideIcons.lock, size: 18),
+                  prefixIcon: const Icon(Icons.lock_rounded, size: 18),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscure ? LucideIcons.eye : LucideIcons.eyeOff, size: 18),
+                    icon: Icon(_obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded, size: 18),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -123,6 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
             ],
+              ),
+            ),
           ),
         ),
       ),
@@ -164,7 +168,7 @@ class _TestEntryBanner extends StatelessWidget {
                   color: colors.accentSecondary,
                   borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
-                child: const Icon(LucideIcons.eye, color: Colors.white, size: 18),
+                child: const Icon(Icons.visibility_rounded, color: Colors.white, size: 18),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -176,7 +180,7 @@ class _TestEntryBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(LucideIcons.arrowRight, size: 17, color: colors.accentSecondary),
+              Icon(Icons.arrow_forward_rounded, size: 17, color: colors.accentSecondary),
             ],
           ),
         ),

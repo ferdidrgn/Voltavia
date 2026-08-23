@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_semantic_colors.dart';
@@ -84,7 +83,7 @@ class NearbyStationsSection extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  Icon(LucideIcons.arrowRight, size: 15, color: colors.accentPrimary),
+                                  Icon(Icons.arrow_forward_rounded, size: 15, color: colors.accentPrimary),
                                 ],
                               ),
                             ],
@@ -97,7 +96,7 @@ class NearbyStationsSection extends StatelessWidget {
                             gradient: LinearGradient(colors: AppPalette.indigoGradient),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(LucideIcons.navigation, color: Colors.white, size: 19),
+                          child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 19),
                         ),
                       ],
                     ),
@@ -113,7 +112,7 @@ class NearbyStationsSection extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: stations.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
             itemBuilder: (context, i) {
               final station = stations[i];
               return _NearbyCard(
@@ -166,7 +165,7 @@ class _NearbyCard extends StatelessWidget {
               children: [
                 StatusBadge(status: station.status, compact: true),
                 const Spacer(),
-                Icon(LucideIcons.mapPin, size: 13, color: colors.textMuted),
+                Icon(Icons.place_rounded, size: 13, color: colors.textMuted),
                 const SizedBox(width: 2),
                 Text(Formatters.km(station.distanceKm), style: text.captionMuted),
               ],

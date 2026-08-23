@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
@@ -33,7 +32,7 @@ class SectionHeader extends StatelessWidget {
                     style: text.caption.copyWith(color: colors.accentPrimary, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(width: 2),
-                  Icon(LucideIcons.chevronRight, size: 16, color: colors.accentPrimary),
+                  Icon(Icons.chevron_right_rounded, size: 16, color: colors.accentPrimary),
                 ],
               ),
             ),

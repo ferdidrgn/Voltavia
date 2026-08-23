@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -53,14 +52,14 @@ class _OperatorsScreenState extends State<OperatorsScreen> {
                 ),
                 child: TextField(
                   onChanged: (v) => setState(() => _query = v),
-                  decoration: InputDecoration(hintText: 'Firma ara', prefixIcon: Icon(LucideIcons.search, size: 18)),
+                  decoration: InputDecoration(hintText: 'Firma ara', prefixIcon: Icon(Icons.search_rounded, size: 18)),
                 ),
               ),
               Expanded(
                 child: operators.isEmpty
                     ? Center(
                         child: EmptyState(
-                          icon: LucideIcons.building,
+                          icon: Icons.apartment_rounded,
                           title: 'Firma bulunamadı',
                           message: 'Farklı bir arama terimi dene.',
                         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_palette.dart';
@@ -44,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     BoxShadow(color: AppPalette.indigo.withValues(alpha: 0.4), blurRadius: 36, spreadRadius: 4),
                   ],
                 ),
-                child: const Icon(LucideIcons.zap, color: Colors.white, size: 46),
+                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 46),
               ).enterScale(),
               const SizedBox(height: AppSpacing.lg),
               const Text(
