@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_glass.dart';
+import '../core/theme/app_palette.dart';
 import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
@@ -62,26 +63,36 @@ class _NavTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? colors.accentPrimary.withValues(alpha: 0.14) : Colors.transparent,
+            gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
             borderRadius: BorderRadius.circular(AppRadius.pill),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppPalette.violet.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 selected ? item.activeIcon : item.icon,
-                size: 21,
-                color: selected ? colors.accentPrimary : colors.textMuted,
+                size: 20,
+                color: selected ? Colors.white : colors.textMuted,
               ),
               const SizedBox(height: 3),
               Text(
                 item.label,
                 style: text.captionMuted.copyWith(
                   fontSize: 10.5,
-                  color: selected ? colors.accentPrimary : colors.textMuted,
+                  color: selected ? Colors.white : colors.textMuted,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),

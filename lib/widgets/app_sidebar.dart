@@ -109,37 +109,59 @@ class _SidebarTile extends StatelessWidget {
     final text = context.text;
 
     return Material(
-      color: selected ? colors.accentPrimary.withValues(alpha: 0.12) : Colors.transparent,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadius.sm),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.sm),
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 11),
-          child: Row(
-            children: [
-              Icon(
-                selected ? item.activeIcon : item.icon,
-                size: 19,
-                color: selected ? colors.accentPrimary : colors.textSecondary,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  item.label,
-                  style: text.body.copyWith(
-                    color: selected ? colors.textPrimary : colors.textSecondary,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: selected ? colors.accentPrimary.withValues(alpha: 0.12) : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 18,
+                  margin: const EdgeInsets.only(right: AppSpacing.xs),
+                  decoration: BoxDecoration(
+                    gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
-              if (selected)
                 Container(
-                  width: 5,
-                  height: 5,
-                  decoration: BoxDecoration(color: colors.accentPrimary, shape: BoxShape.circle),
+                  width: 34,
+                  height: 34,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    boxShadow: selected
+                        ? [BoxShadow(color: AppPalette.violet.withValues(alpha: 0.35), blurRadius: 12, offset: const Offset(0, 4))]
+                        : null,
+                  ),
+                  child: Icon(
+                    selected ? item.activeIcon : item.icon,
+                    size: 18,
+                    color: selected ? Colors.white : colors.textSecondary,
+                  ),
                 ),
-            ],
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    item.label,
+                    style: text.body.copyWith(
+                      color: selected ? colors.textPrimary : colors.textSecondary,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

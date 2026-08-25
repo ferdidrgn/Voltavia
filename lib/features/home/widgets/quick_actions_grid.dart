@@ -8,8 +8,9 @@ class QuickActionItem {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color? color;
 
-  const QuickActionItem({required this.icon, required this.label, required this.onTap});
+  const QuickActionItem({required this.icon, required this.label, required this.onTap, this.color});
 }
 
 /// Ana sayfadaki "uygulama içi kısayollar" bölümü — Harita, İstasyonlar,
@@ -41,11 +42,11 @@ class QuickActionsGrid extends StatelessWidget {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: colors.surface,
+                      color: (item.color ?? colors.accentPrimary).withValues(alpha: colors.isDark ? 0.16 : 0.12),
                       borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: colors.border),
+                      border: Border.all(color: (item.color ?? colors.accentPrimary).withValues(alpha: 0.28)),
                     ),
-                    child: Icon(item.icon, color: colors.accentPrimary, size: 21),
+                    child: Icon(item.icon, color: item.color ?? colors.accentPrimary, size: 21),
                   ),
                   const SizedBox(height: AppSpacing.xxs),
                   Text(

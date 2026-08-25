@@ -42,21 +42,43 @@ class HomeDashboardScreen extends StatelessWidget {
     final nearest = MockData.nearestStations.take(5).toList();
 
     final quickActions = [
-      QuickActionItem(icon: Icons.map_rounded, label: 'Harita', onTap: () => onNavigateTab(1)),
-      QuickActionItem(icon: Icons.ev_station_rounded, label: 'İstasyonlar', onTap: () => onNavigateTab(2)),
-      QuickActionItem(icon: Icons.favorite_rounded, label: 'Favoriler', onTap: () => onNavigateTab(3)),
+      QuickActionItem(
+        icon: Icons.map_rounded,
+        label: 'Harita',
+        onTap: () => onNavigateTab(1),
+        color: AppPalette.violet,
+      ),
+      QuickActionItem(
+        icon: Icons.ev_station_rounded,
+        label: 'İstasyonlar',
+        onTap: () => onNavigateTab(2),
+        color: AppPalette.volt,
+      ),
+      QuickActionItem(
+        icon: Icons.favorite_rounded,
+        label: 'Favoriler',
+        onTap: () => onNavigateTab(3),
+        color: AppPalette.pink,
+      ),
       QuickActionItem(
         icon: Icons.history_rounded,
         label: 'Geçmiş',
         onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+        color: AppPalette.amber,
       ),
       QuickActionItem(
         icon: Icons.notifications_rounded,
         label: 'Bildirimler',
         onTap: () =>
             Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+        color: AppPalette.sky,
       ),
-      QuickActionItem(icon: Icons.person_rounded, label: 'Profil', onTap: () => onNavigateTab(4)),
+      QuickActionItem(
+        icon: Icons.person_rounded,
+        label: 'Profil',
+        onTap: () => onNavigateTab(4),
+        color: AppPalette.violetSoft,
+      ),
     ];
 
     final content = ListView(
