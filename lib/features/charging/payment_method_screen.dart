@@ -7,6 +7,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../data/models/station.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/gradient_button.dart';
+import '../profile/add_payment_method_screen.dart';
 import 'active_charging_screen.dart';
 
 /// Operatörün hosted/tokenized ödeme akışını temsil eden mock ekran.
@@ -22,13 +23,8 @@ class PaymentMethodScreen extends StatefulWidget {
 }
 
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
-  int _selected = 0;
+  String? _selectedId;
   bool _processing = false;
-
-  final _methods = const [
-    ('Visa •••• 4242', Icons.credit_card_rounded),
-    ('Mastercard •••• 8891', Icons.credit_card_rounded),
-  ];
 
   Future<void> _confirm() async {
     setState(() => _processing = true);
@@ -46,6 +42,12 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.text;
+    final appState = AppStateScope.of(context);
+    final methods = appState.paymentMethods;
+    _selectedId ??= methods.isNotEmpty
+        ? methods.firstWhere((m) => m.isDefault, orElse: () => methods.first).id
+        : null;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Ödeme Yöntemi')),
       body: Padding(
@@ -60,30 +62,30 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               style: text.bodyMuted,
             ),
             const SizedBox(height: AppSpacing.lg),
-            ...List.generate(_methods.length, (i) {
-              final selected = i == _selected;
-              final (label, icon) = _methods[i];
-              return Padding(
+            for (final method in methods)
+              Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: BentoCard(
-                  onTap: () => setState(() => _selected = i),
-                  tint: selected ? colors.accentPrimary.withValues(alpha: 0.08) : null,
+                  onTap: () => setState(() => _selectedId = method.id),
+                  tint: method.id == _selectedId ? colors.accentPrimary.withValues(alpha: 0.08) : null,
                   child: Row(
                     children: [
-                      Icon(icon, color: colors.accentPrimary),
+                      Icon(Icons.credit_card_rounded, color: colors.accentPrimary),
                       const SizedBox(width: AppSpacing.sm),
-                      Expanded(child: Text(label, style: text.bodyStrong)),
+                      Expanded(
+                        child: Text('${method.label} •••• ${method.last4}', style: text.bodyStrong),
+                      ),
                       Icon(
-                        selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                        color: selected ? colors.accentPrimary : colors.textMuted,
+                        method.id == _selectedId ? Icons.radio_button_checked : Icons.radio_button_off,
+                        color: method.id == _selectedId ? colors.accentPrimary : colors.textMuted,
                       ),
                     ],
                   ),
                 ),
-              );
-            }),
+              ),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen())),
               icon: const Icon(Icons.add_rounded, size: 17),
               label: const Text('Yeni kart ekle'),
             ),
@@ -100,7 +102,11 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             const SizedBox(height: AppSpacing.sm),
             _processing
                 ? const Center(child: CircularProgressIndicator())
-                : GradientButton(label: 'Şarjı Başlat', icon: Icons.bolt_rounded, onPressed: _confirm),
+                : GradientButton(
+                    label: 'Şarjı Başlat',
+                    icon: Icons.bolt_rounded,
+                    onPressed: _selectedId == null ? null : _confirm,
+                  ),
           ],
         ),
       ),

@@ -19,6 +19,7 @@ import '../charging/active_charging_screen.dart';
 import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../operators/operators_screen.dart';
+import '../route_planner/widgets/route_planner_banner.dart';
 import 'widgets/campaign_slider.dart';
 import 'widgets/nearby_stations_section.dart';
 import 'widgets/operators_section.dart';
@@ -181,6 +182,8 @@ class HomeDashboardScreen extends StatelessWidget {
         ).enterRise(delay: AppMotion.staggerStep * 2),
         const Gap(AppSpacing.lg),
         QuickActionsGrid(items: quickActions).enterRise(delay: AppMotion.staggerStep * 3),
+        const Gap(AppSpacing.lg),
+        const RoutePlannerBanner().enterRise(delay: AppMotion.staggerStep * 3),
         const Gap(AppSpacing.lg),
         SectionHeader(
           title: 'Sana En Yakın Noktalar',

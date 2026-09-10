@@ -14,6 +14,11 @@ import '../auth/login_screen.dart';
 import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
 import 'edit_profile_screen.dart';
+import 'help_support_screen.dart';
+import 'language_screen.dart';
+import 'payment_methods_screen.dart';
+import 'privacy_screen.dart';
+import 'vehicles_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -106,8 +111,18 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => Navigator.of(context)
                         .push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
                   ),
-                  const _ProfileItem(icon: Icons.credit_card_rounded, label: 'Ödeme Yöntemlerim'),
-                  const _ProfileItem(icon: Icons.directions_car_filled_outlined, label: 'Araçlarım'),
+                  _ProfileItem(
+                    icon: Icons.credit_card_rounded,
+                    label: 'Ödeme Yöntemlerim',
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => const PaymentMethodsScreen())),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.directions_car_filled_outlined,
+                    label: 'Araçlarım',
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const VehiclesScreen())),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -118,9 +133,24 @@ class ProfileScreen extends StatelessWidget {
                     valueListenable: themeController,
                     builder: (context, mode, _) => _ThemeModeSelector(mode: mode, onChanged: themeController.setMode),
                   ),
-                  const _ProfileItem(icon: Icons.public_rounded, label: 'Dil · Türkçe'),
-                  const _ProfileItem(icon: Icons.shield_rounded, label: 'Gizlilik ve KVKK'),
-                  const _ProfileItem(icon: Icons.help_outline_rounded, label: 'Yardım ve Destek'),
+                  _ProfileItem(
+                    icon: Icons.public_rounded,
+                    label: 'Dil · Türkçe',
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LanguageScreen())),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.shield_rounded,
+                    label: 'Gizlilik ve KVKK',
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PrivacyScreen())),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.help_outline_rounded,
+                    label: 'Yardım ve Destek',
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => const HelpSupportScreen())),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),

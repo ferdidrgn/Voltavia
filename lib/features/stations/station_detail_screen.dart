@@ -149,6 +149,40 @@ class StationDetailScreen extends StatelessWidget {
                     runSpacing: AppSpacing.xs,
                     children: station.connectors.map((c) => ConnectorChip(type: c)).toList(),
                   ),
+                  const SizedBox(height: AppSpacing.sm),
+                  AnimatedBuilder(
+                    animation: appState,
+                    builder: (context, _) {
+                      final vehicle = appState.defaultVehicle;
+                      if (vehicle == null) return const SizedBox.shrink();
+                      final compatible = station.connectors.contains(vehicle.connector);
+                      final tint = compatible ? colors.success : colors.warning;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                        decoration: BoxDecoration(
+                          color: tint.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(color: tint.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(compatible ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                                size: 15, color: tint),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                compatible
+                                    ? '${vehicle.brand} ${vehicle.model} ile uyumlu (${vehicle.connector.label})'
+                                    : '${vehicle.brand} ${vehicle.model} aracının konnektörü (${vehicle.connector.label}) bu istasyonda yok',
+                                style: text.captionMuted.copyWith(color: tint, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: AppSpacing.lg),
                   Text('Operatör Bilgisi', style: text.title),
                   const SizedBox(height: AppSpacing.sm),
@@ -182,6 +216,30 @@ class StationDetailScreen extends StatelessWidget {
                                 station.canStartFromApp
                                     ? 'Voltavia ile uygulama içi şarj mevcut'
                                     : 'Bu operatörle uygulama içi entegrasyon henüz yok',
+                                style: text.captionMuted,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.chevron_right_rounded, size: 18, color: colors.textMuted),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  BentoCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    onTap: () => _showReportSheet(context),
+                    child: Row(
+                      children: [
+                        Icon(Icons.flag_outlined, size: 20, color: colors.textSecondary),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Sorun Bildir', style: text.bodyStrong),
+                              Text(
+                                'Bozuk cihaz, yanlış bilgi ya da erişim sorunu mu var?',
                                 style: text.captionMuted,
                               ),
                             ],
@@ -230,6 +288,103 @@ class StationDetailScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showReportSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => _ReportIssueSheet(stationName: station.name),
+    );
+  }
+}
+
+const _issueTypes = [
+  ('Bozuk şarj cihazı', Icons.build_outlined),
+  ('Yanlış bilgi (fiyat, güç vb.)', Icons.error_outline_rounded),
+  ('Dolu görünüyor ama boş', Icons.help_outline_rounded),
+  ('Erişilemiyor / kapalı alan', Icons.block_rounded),
+];
+
+class _ReportIssueSheet extends StatefulWidget {
+  final String stationName;
+
+  const _ReportIssueSheet({required this.stationName});
+
+  @override
+  State<_ReportIssueSheet> createState() => _ReportIssueSheetState();
+}
+
+class _ReportIssueSheetState extends State<_ReportIssueSheet> {
+  int? _selected;
+  bool _sent = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final text = context.text;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _sent
+            ? [
+                Row(
+                  children: [
+                    Icon(Icons.check_circle_rounded, color: colors.success, size: 22),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(child: Text('Bildirim alındı, teşekkürler!', style: text.bodyStrong)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Ekibimiz ve ${widget.stationName} operatörü bilgilendirildi.',
+                  style: text.bodyMuted,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ]
+            : [
+                Text('Sorun Bildir', style: text.title),
+                const SizedBox(height: 4),
+                Text(widget.stationName, style: text.bodyMuted),
+                const SizedBox(height: AppSpacing.md),
+                for (var i = 0; i < _issueTypes.length; i++) ...[
+                  BentoCard(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    onTap: () => setState(() => _selected = i),
+                    tint: _selected == i ? colors.accentPrimary.withValues(alpha: 0.08) : null,
+                    child: Row(
+                      children: [
+                        Icon(_issueTypes[i].$2, size: 18, color: colors.accentPrimary),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(child: Text(_issueTypes[i].$1, style: text.body)),
+                        Icon(
+                          _selected == i ? Icons.radio_button_checked : Icons.radio_button_off,
+                          color: _selected == i ? colors.accentPrimary : colors.textMuted,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                ],
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _selected == null ? null : () => setState(() => _sent = true),
+                    child: const Text('Gönder'),
+                  ),
+                ),
+              ],
       ),
     );
   }
