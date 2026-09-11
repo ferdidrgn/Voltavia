@@ -16,27 +16,28 @@ abstract final class AppGlass {
     double radius = AppRadius.lg,
     bool elevated = false,
     Color? tint,
+    Color? glowColor,
   }) {
     final colors = context.colors;
+    final base = tint ?? (elevated ? colors.surfaceHighlight : colors.surface);
     return BoxDecoration(
-      color: tint ?? (elevated ? colors.surfaceHighlight : colors.surface),
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: colors.isDark
+            ? [Color.lerp(base, Colors.white, 0.05)!, base]
+            : [Color.lerp(base, Colors.white, 0.6)!, base],
+      ),
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(color: colors.borderStrong, width: 1),
-      boxShadow: colors.isDark
-          ? [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.36),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ]
-          : [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+      boxShadow: [
+        if (glowColor != null)
+          BoxShadow(color: glowColor.withValues(alpha: colors.isDark ? 0.28 : 0.18), blurRadius: 32, spreadRadius: -4),
+        if (colors.isDark)
+          BoxShadow(color: Colors.black.withValues(alpha: 0.36), blurRadius: 24, offset: const Offset(0, 12))
+        else
+          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8)),
+      ],
     );
   }
 

@@ -31,7 +31,7 @@ class _OperatorsScreenState extends State<OperatorsScreen> {
         MockData.operators.where((o) => o.name.toLowerCase().contains(_query.toLowerCase())).toList();
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: colors.canvas,
       appBar: isDesktop ? null : AppBar(title: const Text('Firmalar')),
       body: Center(
         child: ConstrainedBox(

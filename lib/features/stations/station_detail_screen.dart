@@ -26,7 +26,7 @@ class StationDetailScreen extends StatelessWidget {
     final text = context.text;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: colors.canvas,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(

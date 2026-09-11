@@ -52,17 +52,17 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     }
 
     return AppTextStyles(
-      display: f(34, FontWeight.w800, primary, spacing: -0.8, height: 1.15),
-      headline: f(22, FontWeight.w700, primary, spacing: -0.3, height: 1.25),
-      title: f(16.5, FontWeight.w600, primary, height: 1.3),
+      display: f(38, FontWeight.w800, primary, spacing: -0.9, height: 1.1),
+      headline: f(24, FontWeight.w800, primary, spacing: -0.4, height: 1.2),
+      title: f(17.5, FontWeight.w700, primary, height: 1.3),
       body: f(14.5, FontWeight.w400, primary, height: 1.5),
       bodyMuted: f(14.5, FontWeight.w400, secondary, height: 1.5),
       bodyStrong: f(14.5, FontWeight.w600, primary, height: 1.4),
       caption: f(12.5, FontWeight.w500, secondary, height: 1.3),
       captionMuted: f(12.5, FontWeight.w500, muted, height: 1.3),
-      overline: f(11, FontWeight.w700, muted, spacing: 1.0, height: 1.2),
-      numeric: f(28, FontWeight.w800, primary, spacing: -0.6, height: 1.0),
-      numericLg: f(38, FontWeight.w800, primary, spacing: -1.0, height: 1.0),
+      overline: f(11, FontWeight.w800, muted, spacing: 1.2, height: 1.2),
+      numeric: f(31, FontWeight.w800, primary, spacing: -0.7, height: 1.0),
+      numericLg: f(42, FontWeight.w800, primary, spacing: -1.1, height: 1.0),
     );
   }
 

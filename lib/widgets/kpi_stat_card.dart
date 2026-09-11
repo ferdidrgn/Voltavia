@@ -44,17 +44,23 @@ class KpiStatCard extends StatelessWidget {
     };
 
     return BentoCard(
+      glowColor: accentColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [accentColor, Color.lerp(accentColor, Colors.black, 0.25)!],
+              ),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              boxShadow: [BoxShadow(color: accentColor.withValues(alpha: 0.4), blurRadius: 14, offset: const Offset(0, 6))],
             ),
-            child: Icon(icon, color: accentColor, size: 20),
+            child: Icon(icon, color: Colors.white, size: 21),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(value, style: text.numeric),

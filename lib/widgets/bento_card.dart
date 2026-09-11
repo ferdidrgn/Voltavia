@@ -14,15 +14,17 @@ class BentoCard extends StatefulWidget {
   final double radius;
   final Color? tint;
   final bool elevated;
+  final Color? glowColor;
 
   const BentoCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.onTap,
-    this.radius = AppRadius.lg,
+    this.radius = AppRadius.xl,
     this.tint,
     this.elevated = false,
+    this.glowColor,
   });
 
   @override
@@ -40,9 +42,10 @@ class _BentoCardState extends State<BentoCard> {
       radius: widget.radius,
       elevated: widget.elevated,
       tint: widget.tint,
+      glowColor: widget.glowColor,
     ).copyWith(
       border: Border.all(
-        color: hovered ? context.colors.accentPrimary.withValues(alpha: 0.5) : context.colors.border,
+        color: hovered ? context.colors.accentPrimary.withValues(alpha: 0.5) : context.colors.borderStrong,
         width: 1,
       ),
     );
@@ -50,7 +53,9 @@ class _BentoCardState extends State<BentoCard> {
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
-      transform: hovered ? (Matrix4.identity()..translateByDouble(0.0, -2.0, 0.0, 1.0)) : Matrix4.identity(),
+      transform: hovered
+          ? (Matrix4.identity()..translateByDouble(0.0, -3.0, 0.0, 1.0))
+          : Matrix4.identity(),
       decoration: decoration,
       padding: widget.padding,
       child: widget.child,

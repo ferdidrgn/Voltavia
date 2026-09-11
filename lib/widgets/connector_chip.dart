@@ -13,20 +13,29 @@ class ConnectorChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 5),
+      padding: const EdgeInsets.only(left: 4, right: AppSpacing.xs, top: 4, bottom: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.xs),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
         color: colors.surfaceHighlight,
-        border: Border.all(color: colors.border),
+        border: Border.all(color: colors.borderStrong),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(type.icon, size: 14, color: colors.accentPrimary),
-          const SizedBox(width: 4),
+          Container(
+            width: 18,
+            height: 18,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [colors.accentPrimary, colors.accentSecondary]),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(type.icon, size: 11, color: Colors.white),
+          ),
+          const SizedBox(width: 5),
           Text(
             type.label,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.textSecondary),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colors.textSecondary),
           ),
         ],
       ),
