@@ -4,6 +4,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../widgets/gradient_button.dart';
 import '../home/home_shell.dart';
 import 'register_screen.dart';
 
@@ -77,10 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton(onPressed: () {}, child: const Text('Şifremi unuttum')),
               ),
               const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(onPressed: _continue, child: const Text('Giriş Yap')),
-              ),
+              GradientButton(label: 'Giriş Yap', onPressed: _continue),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [

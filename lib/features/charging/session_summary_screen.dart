@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/bento_card.dart';
+import '../../widgets/gradient_button.dart';
 import '../home/home_shell.dart';
 
 /// Şarj oturumu tamamlandığında gösterilen özet / makbuz ekranı.
@@ -36,10 +38,14 @@ class SessionSummaryScreen extends StatelessWidget {
             children: [
               const SizedBox(height: AppSpacing.lg),
               Container(
-                width: 84,
-                height: 84,
-                decoration: BoxDecoration(color: colors.success.withValues(alpha: 0.14), shape: BoxShape.circle),
-                child: Icon(Icons.check_rounded, color: colors.success, size: 40),
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: AppPalette.emeraldGradient),
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: colors.success.withValues(alpha: 0.45), blurRadius: 36, spreadRadius: 2)],
+                ),
+                child: const Icon(Icons.check_rounded, color: Colors.white, size: 42),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text('Şarj Tamamlandı', style: text.display),
@@ -48,6 +54,7 @@ class SessionSummaryScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
               BentoCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
+                glowColor: colors.accentPrimary,
                 child: Column(
                   children: [
                     _ReceiptRow(label: 'İstasyon', value: stationName),
@@ -66,14 +73,12 @@ class SessionSummaryScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const HomeShell()),
-                    (route) => false,
-                  ),
-                  child: const Text('Tamam'),
+              GradientButton(
+                label: 'Tamam',
+                colors: AppPalette.emeraldGradient,
+                onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const HomeShell()),
+                  (route) => false,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),

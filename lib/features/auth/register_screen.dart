@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../widgets/gradient_button.dart';
 import '../home/home_shell.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -79,12 +80,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _acceptTerms ? _createAccount : null,
-                  child: const Text('Hesap Oluştur'),
-                ),
+              GradientButton(
+                label: 'Hesap Oluştur',
+                onPressed: _acceptTerms ? _createAccount : null,
               ),
               const SizedBox(height: AppSpacing.lg),
             ],
