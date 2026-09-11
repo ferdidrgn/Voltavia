@@ -92,13 +92,28 @@ class HomeDashboardScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            const InitialsAvatar(name: 'Ferdi Durgun', size: 46),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.4), blurRadius: 18, spreadRadius: 1)],
+              ),
+              child: const InitialsAvatar(name: 'Ferdi Durgun', size: 48),
+            ),
             const Gap(AppSpacing.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Merhaba, Ferdi 👋', style: text.title),
+                  Row(
+                    children: [
+                      Text('Merhaba, ', style: text.headline),
+                      ShaderMask(
+                        shaderCallback: (bounds) =>
+                            const LinearGradient(colors: AppPalette.indigoGradient).createShader(bounds),
+                        child: Text('Ferdi 👋', style: text.headline.copyWith(color: Colors.white)),
+                      ),
+                    ],
+                  ),
                   Text('Bugün nereden şarj alacaksın?', style: text.captionMuted),
                 ],
               ),
@@ -115,15 +130,18 @@ class HomeDashboardScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.pill),
           onTap: () => onNavigateTab(2),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 3),
             decoration: BoxDecoration(
               color: colors.surface,
               borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(color: colors.border),
+              border: Border.all(color: colors.borderStrong, width: 1.2),
+              boxShadow: [
+                if (colors.isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8)),
+              ],
             ),
             child: Row(
               children: [
-                Icon(Icons.search_rounded, color: colors.textMuted, size: 18),
+                Icon(Icons.search_rounded, color: colors.accentPrimary, size: 19),
                 const Gap(AppSpacing.xs),
                 Text('İstasyon, operatör veya şehir ara', style: text.bodyMuted),
               ],
