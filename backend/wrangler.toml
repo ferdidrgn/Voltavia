@@ -1,0 +1,10 @@
+name = "voltavia-api"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# Cloudflare Workers üzerinde çalışacak API iskeleti.
+# ROADMAP.md § 2.6 — Firebase (Firestore/Auth/FCM) + Cloudflare (Workers/R2/CDN) kararına uygundur.
+#
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "voltavia-media"
