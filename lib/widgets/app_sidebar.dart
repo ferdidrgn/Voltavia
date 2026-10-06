@@ -5,6 +5,7 @@ import '../core/theme/app_semantic_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
 import 'nav_item.dart';
+import 'plug_mark.dart';
 
 /// Masaüstü/Web (≥1024px) için sabit, cam yüzeyli sol navigasyon çubuğu.
 /// Hem tüketici uygulamasında hem admin dashboard'unda kullanılır.
@@ -47,15 +48,7 @@ class AppSidebar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             child: Row(
               children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: AppPalette.indigoGradient),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
-                ),
+                const PlugMark(size: 36, animate: false),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
@@ -121,34 +114,23 @@ class _SidebarTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 10),
             child: Row(
               children: [
-                Container(
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   width: 3,
-                  height: 18,
-                  margin: const EdgeInsets.only(right: AppSpacing.xs),
+                  height: selected ? 22 : 8,
+                  margin: const EdgeInsets.only(right: AppSpacing.sm),
                   decoration: BoxDecoration(
-                    gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
+                    color: selected ? AppPalette.sodium : Colors.transparent,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                Container(
-                  width: 34,
-                  height: 34,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                    boxShadow: selected
-                        ? [BoxShadow(color: AppPalette.violet.withValues(alpha: 0.35), blurRadius: 12, offset: const Offset(0, 4))]
-                        : null,
-                  ),
-                  child: Icon(
-                    selected ? item.activeIcon : item.icon,
-                    size: 18,
-                    color: selected ? Colors.white : colors.textSecondary,
-                  ),
+                Icon(
+                  selected ? item.activeIcon : item.icon,
+                  size: 20,
+                  color: selected ? AppPalette.sodium : colors.textSecondary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(

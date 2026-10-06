@@ -1,13 +1,13 @@
 :root {
-  --brand: #4c5fff;
-  --brand-dark: #3546d6;
-  --accent: #c6ff6b;
-  --bg: #0a0e1a;
-  --surface: #121729;
-  --surface-elevated: #1a2138;
-  --border: #262e48;
-  --text: #f4f6ff;
-  --text-muted: #9aa3c7;
+  --brand: #127a86;
+  --brand-dark: #0c3d4a;
+  --accent: #e7a317;
+  --bg: #07141c;
+  --surface: #102833;
+  --surface-elevated: #173444;
+  --border: #245063;
+  --text: #f3f7f8;
+  --text-muted: #a9c0c8;
   --success: #2ecc71;
   --danger: #ef4444;
   --warning: #f5a623;
@@ -60,7 +60,7 @@ a { color: inherit; }
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--brand), #7c3aed);
+  background: linear-gradient(135deg, var(--brand-dark), var(--accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,7 +109,7 @@ input:focus { outline: none; border-color: var(--brand); }
 .btn-primary {
   width: 100%;
   margin-top: 22px;
-  background: linear-gradient(135deg, var(--brand), #7c3aed);
+  background: linear-gradient(135deg, var(--brand-dark), var(--accent));
   color: white;
 }
 

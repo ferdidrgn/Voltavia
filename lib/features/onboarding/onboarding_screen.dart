@@ -1,21 +1,18 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../widgets/plug_mark.dart';
 import '../auth/login_screen.dart';
 
 class _OnboardPage {
-  final IconData icon;
   final String title;
   final String description;
   final List<Color> gradient;
 
   const _OnboardPage({
-    required this.icon,
     required this.title,
     required this.description,
     required this.gradient,
@@ -24,19 +21,16 @@ class _OnboardPage {
 
 const _pages = [
   _OnboardPage(
-    icon: Icons.map_rounded,
     title: 'Tüm istasyonlar tek haritada',
     description: 'Türkiye\'deki şarj istasyonlarını tek bir uygulamadan keşfet; şehir ve ilçeye göre filtrele.',
     gradient: AppPalette.indigoGradient,
   ),
   _OnboardPage(
-    icon: Icons.bolt_rounded,
     title: 'Ayrı uygulama indirme',
     description: 'Anlaşmalı operatörlerde şarjı doğrudan Voltavia üzerinden başlat, farklı uygulamalarla uğraşma.',
     gradient: AppPalette.voltGradient,
   ),
   _OnboardPage(
-    icon: Icons.verified_user_rounded,
     title: 'Güvenli ödeme',
     description: 'Ödeme, operatörün lisanslı altyapısı üzerinden alınır. Kart bilgilerin platformda tutulmaz.',
     gradient: AppPalette.campaignGradient,
@@ -124,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _OnboardIcon(page: p),
+                                PlugMark(size: 168, progress: (i + 1) / _pages.length),
                                 const SizedBox(height: AppSpacing.xxl),
                                 Text(
                                   p.title,
@@ -205,46 +199,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 }
 
-class _OnboardIcon extends StatelessWidget {
-  final _OnboardPage page;
-
-  const _OnboardIcon({required this.page});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Container(
-      width: 128,
-      height: 128,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: colors.surface.withValues(alpha: colors.isDark ? 0.6 : 0.85),
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-        border: Border.all(color: colors.borderStrong, width: 1.4),
-        boxShadow: [
-          BoxShadow(color: page.gradient.first.withValues(alpha: 0.35), blurRadius: 40, spreadRadius: 4),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.xxl - 1.4),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [page.gradient.first.withValues(alpha: 0.22), page.gradient.last.withValues(alpha: 0.1)],
-              ),
-            ),
-            child: ShaderMask(
-              shaderCallback: (bounds) => LinearGradient(colors: page.gradient).createShader(bounds),
-              child: Icon(page.icon, size: 56, color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

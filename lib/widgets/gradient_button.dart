@@ -45,7 +45,9 @@ class GradientButton extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(AppRadius.md),
             onTap: onPressed,
-            child: Padding(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -57,6 +59,7 @@ class GradientButton extends StatelessWidget {
                   Text(label, style: text.bodyStrong.copyWith(color: Colors.white, fontSize: 15.5)),
                 ],
               ),
+            ),
             ),
           ),
         ),

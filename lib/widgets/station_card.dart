@@ -35,20 +35,15 @@ class StationCard extends StatelessWidget {
     return BentoCard(
       onTap: onTap,
       padding: EdgeInsets.zero,
-      glowColor: colors.accentPrimary,
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
               width: 5,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: AppPalette.indigoGradient,
-                ),
-                borderRadius: const BorderRadius.horizontal(left: Radius.circular(AppRadius.xl)),
+              decoration: const BoxDecoration(
+                color: AppPalette.sodium,
+                borderRadius: BorderRadius.horizontal(left: Radius.circular(AppRadius.xl)),
               ),
             ),
             Expanded(
@@ -64,16 +59,14 @@ class StationCard extends StatelessWidget {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: AppPalette.indigoGradient),
+                            color: colors.surfaceHighlight,
                             borderRadius: BorderRadius.circular(AppRadius.md),
-                            boxShadow: [
-                              BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 6)),
-                            ],
+                            border: Border.all(color: AppPalette.sodium.withValues(alpha: 0.45)),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             station.chargeOperator.logoLetter,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 19),
+                            style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w800, fontSize: 19),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -118,7 +111,7 @@ class StationCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(AppRadius.xs),
                               ),
                               child: Text(
-                                '${Formatters.tryPrice(station.pricePerKwh)}/kWh',
+                                Formatters.kwhPrice(station.pricePerKwh),
                                 style: text.caption.copyWith(color: colors.accentPrimary, fontWeight: FontWeight.w800, fontSize: 11.5),
                               ),
                             ),

@@ -3,6 +3,8 @@
 abstract final class Formatters {
   static String tryPrice(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} ₺';
 
+  static String kwhPrice(double value) => value <= 0 ? 'Fiyat yok' : '${tryPrice(value)}/kWh';
+
   static String kwh(double value) => '${value.toStringAsFixed(1)} kWh';
 
   static String km(double value) => '${value.toStringAsFixed(1)} km';

@@ -30,26 +30,27 @@ Voltavia/
 
 ## Tasarım Sistemi
 
-Linear/Vercel standardında, Slate/Zinc tabanlı derin bir SaaS estetiği:
+Liman Akımı: gece kıyı sürüşü ve şarj soketi. Eşit bento kartları ikincil
+bilgi için durur; her ekranın hatırlanan parçası soket yüzü ve arkada akan
+tek kablo eğrisidir.
 
-- **Palet:** Koyu tema (bayrak taşıyan/flagship) — Canvas `#09090B`, Kart `#18181B`,
-  Vurgulu yüzey `#27272A`, mikro kenarlıklar (`%8` beyaz alfa). Aksan: Elektrik
-  İndigo `#6366F1` + Zümrüt Nane `#10B981`. Açık tema aynı dilin aydınlık
-  karşılığıdır (Zinc-50 yüzeyler). Bkz. `lib/core/theme/app_palette.dart`,
-  `app_semantic_colors.dart`.
+- **Palet:** Gece `#07141C`, liman yüzeyi `#102833`, sisli açık zemin `#E4EEF2`.
+  İmza rengi sodyum lamba `#E7A317`. Eylemler oksit yeşili `#127A86`.
+  Bkz. `lib/core/theme/app_palette.dart`.
+- **Motif:** `PlugMark` ve `HarborAtmosphere` (`lib/widgets/`).
+- **Kurallar:** `.cursor/skills/voltavia-frontend/SKILL.md` ve
+  `.cursor/skills/voltavia-mobile/SKILL.md`.
 - **3 tema modu** (Profil → Görünüm): **Sistem**, **Açık**, **Koyu** — segmented
   control ile seçilir, `lib/core/state/theme_controller.dart` yönetir.
 - **Tipografi:** Google Fonts *Plus Jakarta Sans*, `AppTextStyles` ThemeExtension'ı
   üzerinden (`context.text.headline` vb.) — bkz. `app_text_styles.dart`.
-- **Bento-grid mimarisi:** `BentoCard` (mikro kenarlıklı, cam yüzeyli, masaüstünde
-  hover'da hafif yükselen kart) tüm dashboard bölümlerinin temel yapı taşı.
+- **Yüzeyler:** `BentoCard` düz, mikro kenarlıklı bir paneldir. Kahraman sahne
+  soket yüzüdür; kart ızgarası ikincil bilgiyi taşır.
 - **Adaptive kabuk:** `ResponsiveScaffold` — ≥1024px'de sabit `AppSidebar`,
   altında havada asılı buzlu-cam `FloatingBottomNav`. Hem tüketici uygulaması
   hem Admin Dashboard aynı bileşeni paylaşır.
-- **Mikro etkileşimler:** `flutter_animate` ile kademeli `fadeIn`/`slideY`/`scale`
-  giriş animasyonları (`lib/core/theme/app_motion.dart`), `gap` paketiyle
-  boşluklar, `lucide_icons` (+ gerekli yerlerde Material ikonlar) modern ikon
-  seti, `fl_chart` ile interaktif trend grafikleri.
+- **Hareket:** Arka planda tek kablo kıvılcımı (`HarborAtmosphere`). Azaltılmış
+  hareket tercihinde animasyon durur. `fl_chart` trend grafikleri durur.
 - **Durumlar:** Yükleme için shimmer `Skeleton`, `EmptyState`, `ErrorState` —
   bkz. `lib/widgets/skeleton.dart`, `empty_state.dart`, `error_state.dart`.
 

@@ -128,7 +128,7 @@ class StationDetailScreen extends StatelessWidget {
                         child: _StatTile(
                           icon: Icons.credit_card_rounded,
                           label: 'Birim Fiyat',
-                          value: '${Formatters.tryPrice(station.pricePerKwh)}/kWh',
+                          value: Formatters.kwhPrice(station.pricePerKwh),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),

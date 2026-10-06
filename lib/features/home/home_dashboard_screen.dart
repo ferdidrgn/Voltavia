@@ -12,7 +12,6 @@ import '../../data/mock/mock_data.dart';
 import '../../data/models/app_notification.dart';
 import '../../data/models/campaign.dart';
 import '../../widgets/bento_card.dart';
-import '../../widgets/initials_avatar.dart';
 import '../../widgets/kpi_stat_card.dart';
 import '../../widgets/section_header.dart';
 import '../charging/active_charging_screen.dart';
@@ -20,8 +19,11 @@ import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../operators/operators_screen.dart';
 import '../route_planner/widgets/route_planner_banner.dart';
+import '../map/station_map.dart';
+import '../stations/station_detail_screen.dart';
 import 'widgets/campaign_slider.dart';
 import 'widgets/nearby_stations_section.dart';
+import 'widgets/nearest_charge_stage.dart';
 import 'widgets/operators_section.dart';
 import 'widgets/quick_actions_grid.dart';
 
@@ -40,7 +42,8 @@ class HomeDashboardScreen extends StatelessWidget {
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);
     final unreadCount = MockData.notifications.where((n) => !n.isRead).length;
-    final nearest = MockData.nearestStations.take(5).toList();
+    final catalog = List.of(appState.stations)..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+    final nearest = catalog.take(5).toList();
 
     final quickActions = [
       QuickActionItem(
@@ -90,42 +93,21 @@ class HomeDashboardScreen extends StatelessWidget {
         AppSpacing.xxl,
       ),
       children: [
-        Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.4), blurRadius: 18, spreadRadius: 1)],
-              ),
-              child: const InitialsAvatar(name: 'Ferdi Durgun', size: 48),
-            ),
-            const Gap(AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text('Merhaba, ', style: text.headline),
-                      ShaderMask(
-                        shaderCallback: (bounds) =>
-                            const LinearGradient(colors: AppPalette.indigoGradient).createShader(bounds),
-                        child: Text('Ferdi 👋', style: text.headline.copyWith(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                  Text('Bugün nereden şarj alacaksın?', style: text.captionMuted),
-                ],
-              ),
-            ),
-            _NotificationButton(
-              unreadCount: unreadCount,
-              onTap: () =>
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-            ),
-          ],
+        if (nearest.isNotEmpty)
+        NearestChargeStage(
+          station: nearest.first,
+          onOpen: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => StationDetailScreen(station: nearest.first)),
+          ),
+          trailing: _NotificationButton(
+            unreadCount: unreadCount,
+            onTap: () =>
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+          ),
         ).enterFade(),
-        const Gap(AppSpacing.lg),
+        const Gap(AppSpacing.md),
+        Text('Ferdi, bugün nereden şarj alacaksın?', style: text.bodyMuted).enterFade(),
+        const Gap(AppSpacing.md),
         InkWell(
           borderRadius: BorderRadius.circular(AppRadius.pill),
           onTap: () => onNavigateTab(2),
@@ -230,11 +212,21 @@ class HomeDashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: isDesktop
-          ? Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: Responsive.maxContentWidth(context)),
-                child: content,
-              ),
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(width: 460, child: content),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: StationMap(
+                    stations: catalog,
+                    selected: nearest.isEmpty ? null : nearest.first,
+                    onSelect: (station) => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => StationDetailScreen(station: station)),
+                    ),
+                  ),
+                ),
+              ],
             )
           : content,
     );

@@ -6,7 +6,7 @@
     "background_color": "#09090B",
     "theme_color": "#09090B",
     "description": "Türkiye'deki elektrikli araç şarj istasyonlarını tek uygulamada toplayan platform.",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

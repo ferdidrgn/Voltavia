@@ -1,12 +1,14 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
+import 'app_palette.dart';
 import 'app_semantic_colors.dart';
 import 'app_spacing.dart';
 import 'app_text_styles.dart';
 
-/// Voltavia'nın Linear/Vercel standardındaki tasarım sisteminin
-/// `ThemeData` montajı. Koyu tema bayrak taşıyan (flagship) deneyimdir;
-/// açık tema aynı dilin aydınlık bir karşılığıdır.
+/// Liman Akımı temasının `ThemeData` montajı. Koyu tema gece sürüşüdür;
+/// açık tema aynı kıyı paletinin sisli karşılığıdır. Gövde saydamdır;
+/// kablo motifi [HarborFrame] üzerinden görünür.
 abstract final class AppTheme {
   static ThemeData get dark => _build(AppSemanticColors.dark());
   static ThemeData get light => _build(AppSemanticColors.light());
@@ -28,7 +30,7 @@ abstract final class AppTheme {
       primary: colors.accentPrimary,
       onPrimary: Colors.white,
       secondary: colors.accentSecondary,
-      onSecondary: Colors.white,
+      onSecondary: AppPalette.ink,
       error: colors.danger,
       onError: Colors.white,
       surface: colors.surface,
@@ -41,7 +43,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: colors.brightness,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: colors.canvas,
+      scaffoldBackgroundColor: Colors.transparent,
       canvasColor: colors.canvas,
       dividerColor: colors.border,
       splashFactory: InkSparkle.splashFactory,
@@ -165,6 +167,16 @@ abstract final class AppTheme {
           border: Border.all(color: colors.border),
         ),
         textStyle: appText.caption,
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.linux: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.windows: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: FadeForwardsPageTransitionsBuilder(),
+        },
       ),
       extensions: [colors, appText],
     );

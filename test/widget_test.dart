@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:voltavia/main.dart';
@@ -13,5 +14,6 @@ void main() {
     // zamanlayıcısı kullanıyor; test bitmeden önce bu zamanlayıcıyı tüketmek
     // için o sürenin ötesine pump ediyoruz.
     await tester.pump(const Duration(milliseconds: 1700));
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 }

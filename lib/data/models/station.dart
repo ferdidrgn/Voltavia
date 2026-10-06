@@ -15,6 +15,9 @@ class Station {
   final double distanceKm;
   final double rating;
   final int socketCount;
+  final double latitude;
+  final double longitude;
+  final String origin;
 
   const Station({
     required this.id,
@@ -30,6 +33,9 @@ class Station {
     required this.distanceKm,
     required this.rating,
     required this.socketCount,
+    this.latitude = 41.015137,
+    this.longitude = 28.979530,
+    this.origin = 'Örnek',
   });
 
   bool get canStartFromApp => chargeOperator.hasAppIntegration && status == StationStatus.available;

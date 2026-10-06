@@ -5,7 +5,6 @@ import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/station.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/station_card.dart';
@@ -27,7 +26,7 @@ class _StationListScreenState extends State<StationListScreen> {
   _SortBy _sort = _SortBy.distance;
 
   List<Station> get _filtered {
-    var list = MockData.stations.where((s) {
+    var list = AppStateScope.of(context).stations.where((s) {
       final matchesCity = _city == null || s.city == _city;
       final matchesQuery = _query.isEmpty ||
           s.name.toLowerCase().contains(_query.toLowerCase()) ||

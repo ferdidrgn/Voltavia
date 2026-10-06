@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../core/state/app_state.dart';
 
 /// Şehir/ilçe filtresi için modal alt sayfa (bottom sheet).
 class CityFilterSheet extends StatefulWidget {
@@ -31,7 +31,12 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.text;
-    final districts = _city == null ? <String>[] : MockData.districtsFor(_city!);
+    final stations = AppStateScope.of(context).stations;
+    final cities = stations.map((s) => s.city).where((c) => c.isNotEmpty).toSet().toList()..sort();
+    final districts = _city == null
+        ? <String>[]
+        : stations.where((s) => s.city == _city && s.district.isNotEmpty).map((s) => s.district).toSet().toList()
+      ..sort();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
@@ -76,7 +81,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                     Wrap(
                       spacing: AppSpacing.xs,
                       runSpacing: AppSpacing.xs,
-                      children: MockData.cities.map((city) {
+                      children: cities.map((city) {
                         final selected = city == _city;
                         return ChoiceChip(
                           label: Text(city),

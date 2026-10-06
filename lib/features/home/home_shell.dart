@@ -26,6 +26,15 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppStateScope.of(context).refreshStations();
+    });
+  }
+
   static const _items = [
     NavItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'Ana Sayfa'),
     NavItem(icon: Icons.map_rounded, activeIcon: Icons.map_rounded, label: 'Harita'),
@@ -79,25 +88,27 @@ class _ActiveSessionBanner extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: AppPalette.indigoGradient),
+            color: AppPalette.harbor,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            boxShadow: [
-              BoxShadow(color: AppPalette.indigo.withValues(alpha: 0.35), blurRadius: 18, offset: const Offset(0, 8)),
-            ],
+            border: Border.all(color: AppPalette.sodium.withValues(alpha: 0.7)),
           ),
           child: Row(
             children: [
-              const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(color: AppPalette.sodium, shape: BoxShape.circle),
+              ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
                   '${session.stationName} · şarj oluyor · ${Formatters.duration(elapsed)}',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                  style: const TextStyle(color: AppPalette.darkTextPrimary, fontWeight: FontWeight.w700, fontSize: 13),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 18),
+              const Icon(Icons.chevron_right_rounded, color: AppPalette.sodium, size: 18),
             ],
           ),
         ),

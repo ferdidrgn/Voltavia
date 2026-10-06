@@ -4,6 +4,7 @@ import 'core/state/app_state.dart';
 import 'core/state/theme_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
+import 'widgets/harbor_atmosphere.dart';
 
 void main() {
   runApp(const VoltaviaApp());
@@ -42,6 +43,7 @@ class _VoltaviaAppState extends State<VoltaviaApp> {
               themeMode: mode,
               theme: AppTheme.light,
               darkTheme: AppTheme.dark,
+              builder: (context, child) => HarborFrame(child: child ?? const SizedBox.shrink()),
               home: const SplashScreen(),
             );
           },

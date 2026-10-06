@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 import 'app_semantic_colors.dart';
 import 'app_spacing.dart';
 
-/// Linear/Vercel tarzı "glassmorphism" yüzeyler için paylaşılan dekorasyon
-/// ve blur sarmalayıcıları. Kartlar gerçek arka plan bulanıklığı yerine çoğu
-/// yerde performanslı bir "yarı saydam yüzey + mikro kenarlık + yumuşak
-/// gölge" kombinasyonu kullanır; [GlassPanel] gerçek `BackdropFilter`
-/// bulanıklığı gerektiren yüzeyler (sidebar, floating nav) için ayrılmıştır.
+/// Yüzeyler düz ve sessiz tutulur. Gölge ve cam efekti yalnızca yüzen
+/// gezinme ve kenar çubuğunda kullanılır; kartlar mikro kenarlıkla durur.
 abstract final class AppGlass {
   static BoxDecoration surface(
     BuildContext context, {
@@ -21,22 +18,12 @@ abstract final class AppGlass {
     final colors = context.colors;
     final base = tint ?? (elevated ? colors.surfaceHighlight : colors.surface);
     return BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: colors.isDark
-            ? [Color.lerp(base, Colors.white, 0.05)!, base]
-            : [Color.lerp(base, Colors.white, 0.6)!, base],
-      ),
+      color: base,
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(color: colors.borderStrong, width: 1),
       boxShadow: [
         if (glowColor != null)
-          BoxShadow(color: glowColor.withValues(alpha: colors.isDark ? 0.28 : 0.18), blurRadius: 32, spreadRadius: -4),
-        if (colors.isDark)
-          BoxShadow(color: Colors.black.withValues(alpha: 0.36), blurRadius: 24, offset: const Offset(0, 12))
-        else
-          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(color: glowColor.withValues(alpha: colors.isDark ? 0.16 : 0.1), blurRadius: 18, spreadRadius: -8),
       ],
     );
   }

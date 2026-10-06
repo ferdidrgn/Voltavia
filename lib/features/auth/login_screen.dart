@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../widgets/gradient_button.dart';
+import '../../widgets/plug_mark.dart';
 import '../home/home_shell.dart';
 import 'register_screen.dart';
 
@@ -40,16 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              Container(
-                width: 56,
-                height: 56,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: AppPalette.indigoGradient),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
-              ),
+              const PlugMark(size: 72, progress: 0.66, animate: false),
               const SizedBox(height: AppSpacing.lg),
               Text('Tekrar hoş geldin', style: text.display),
               const SizedBox(height: AppSpacing.xxs),

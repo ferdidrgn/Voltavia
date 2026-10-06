@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/mock/mock_data.dart';
+import '../../data/stations/station_repository.dart';
 import '../../data/models/charging_session.dart';
 import '../../data/models/connector_type.dart';
 import '../../data/models/saved_payment_method.dart';
@@ -14,6 +15,34 @@ import '../../data/models/vehicle.dart';
 /// katman repository çağrılarıyla değiştirilebilir.
 class AppState extends ChangeNotifier {
   final Set<String> _favoriteStationIds = {};
+  final StationRepository _stationsRepo = StationRepository();
+  List<Station> _stations = List<Station>.of(MockData.stations);
+  bool _stationsLoading = false;
+  bool _usingLiveStations = false;
+  bool _disposed = false;
+
+  List<Station> get stations => List.unmodifiable(_stations);
+  bool get stationsLoading => _stationsLoading;
+  bool get usingLiveStations => _usingLiveStations;
+
+  Future<void> refreshStations() async {
+    _stationsLoading = true;
+    _notify();
+    try {
+      final live = await _stationsRepo.fetchTurkeySample();
+      if (_disposed) return;
+      if (live.isNotEmpty) {
+        _stations = live;
+        _usingLiveStations = true;
+      }
+    } catch (_) {
+      if (_disposed) return;
+      _usingLiveStations = false;
+    } finally {
+      _stationsLoading = false;
+      _notify();
+    }
+  }
   ChargingSession? _activeSession;
   Station? _activeStation;
 
@@ -114,7 +143,7 @@ class AppState extends ChangeNotifier {
   }
 
   List<Station> get favoriteStations =>
-      MockData.stations.where((s) => _favoriteStationIds.contains(s.id)).toList();
+      _stations.where((s) => _favoriteStationIds.contains(s.id)).toList();
 
   void startSession(Station station) {
     _activeStation = station;
@@ -149,6 +178,16 @@ class AppState extends ChangeNotifier {
     _activeSession = null;
     _activeStation = null;
     notifyListeners();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 }
 

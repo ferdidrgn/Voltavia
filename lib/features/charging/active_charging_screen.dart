@@ -9,6 +9,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/bento_card.dart';
+import '../../widgets/plug_mark.dart';
 import 'session_summary_screen.dart';
 
 class ActiveChargingScreen extends StatefulWidget {
@@ -98,7 +99,7 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
                   Icon(Icons.bolt_rounded, color: colors.success, size: 13),
                   const SizedBox(width: 3),
                   Text(
-                    'ŞARJ EDİLİYOR',
+                    'Şarj ediliyor',
                     style: text.captionMuted.copyWith(color: colors.success, fontWeight: FontWeight.w800, fontSize: 11),
                   ),
                 ],
@@ -109,72 +110,10 @@ class _ActiveChargingScreenState extends State<ActiveChargingScreen> {
             const SizedBox(height: 4),
             Text(station?.chargeOperator.name ?? '', style: text.bodyMuted),
             const SizedBox(height: AppSpacing.xl),
-            SizedBox(
-              width: 240,
-              height: 240,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: colors.accentPrimary.withValues(alpha: 0.35), blurRadius: 60, spreadRadius: 6),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 220,
-                    height: 220,
-                    child: CircularProgressIndicator(
-                      value: 1,
-                      strokeWidth: 14,
-                      backgroundColor: colors.border,
-                      valueColor: AlwaysStoppedAnimation(colors.border),
-                      strokeCap: StrokeCap.round,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 220,
-                    height: 220,
-                    child: ShaderMask(
-                      shaderCallback: (bounds) => const SweepGradient(
-                        startAngle: -1.5708,
-                        endAngle: 4.7124,
-                        colors: [...AppPalette.indigoGradient, ...AppPalette.voltGradient],
-                        stops: [0, 0.5, 0.5, 1],
-                      ).createShader(bounds),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: _batteryPercent / 100),
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeOut,
-                        builder: (context, value, _) => CircularProgressIndicator(
-                          value: value,
-                          strokeWidth: 14,
-                          backgroundColor: Colors.transparent,
-                          valueColor: const AlwaysStoppedAnimation(Colors.white),
-                          strokeCap: StrokeCap.round,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) =>
-                            const LinearGradient(colors: AppPalette.indigoGradient).createShader(bounds),
-                        child: Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
-                      ),
-                      Text('%${_batteryPercent.toStringAsFixed(0)}', style: text.numericLg),
-                      Text('şarj seviyesi', style: text.captionMuted),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            PlugMark(size: 220, progress: _batteryPercent / 100),
+            const SizedBox(height: AppSpacing.md),
+            Text('%${_batteryPercent.toStringAsFixed(0)}', style: text.numericLg),
+            Text('şarj seviyesi', style: text.captionMuted),
             const SizedBox(height: AppSpacing.xl),
             IntrinsicHeight(
               child: Row(
@@ -242,6 +181,7 @@ class _MetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = context.text;
+    final onAccent = ThemeData.estimateBrightnessForColor(accent) == Brightness.dark ? Colors.white : AppPalette.ink;
     return BentoCard(
       glowColor: accent,
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
@@ -259,7 +199,7 @@ class _MetricTile extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(icon, color: Colors.white, size: 17),
+            child: Icon(icon, color: onAccent, size: 17),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(value, style: text.bodyStrong, textAlign: TextAlign.center),

@@ -65,34 +65,32 @@ class _NavTile extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(vertical: 9),
-          decoration: BoxDecoration(
-            gradient: selected ? const LinearGradient(colors: AppPalette.indigoGradient) : null,
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppPalette.violet.withValues(alpha: 0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
-          ),
+          constraints: const BoxConstraints(minHeight: 48),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 selected ? item.activeIcon : item.icon,
-                size: 20,
-                color: selected ? Colors.white : colors.textMuted,
+                size: 22,
+                color: selected ? AppPalette.sodium : colors.textMuted,
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                width: selected ? 16 : 0,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: AppPalette.sodium,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 2),
               Text(
                 item.label,
                 style: text.captionMuted.copyWith(
-                  fontSize: 10.5,
-                  color: selected ? Colors.white : colors.textMuted,
+                  fontSize: 11,
+                  color: selected ? colors.textPrimary : colors.textMuted,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),

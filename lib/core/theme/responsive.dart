@@ -26,7 +26,8 @@ abstract final class Responsive {
 
   /// İçerik alanının maksimum genişliği — çok geniş ekranlarda satırların
   /// aşırı uzamasını engeller.
-  static double maxContentWidth(BuildContext context) => 1080;
+  /// Geniş pencerede içerik telefon sütununa sıkışmaz; alanın kendisini kullanır.
+  static double maxContentWidth(BuildContext context) => MediaQuery.sizeOf(context).width;
 
   const Responsive._();
 }
