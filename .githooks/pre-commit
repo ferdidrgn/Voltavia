@@ -10,7 +10,7 @@ if [ -n "$blocked" ]; then
   exit 1
 fi
 
-if git diff --cached -U0 -- . ':(exclude).githooks/pre-commit' | grep -E '-----BEGIN ((RSA|OPENSSH|EC) )?PRIVATE KEY-----|sk-ant-|AKIA[0-9A-Z]{16}'; then
+if git diff --cached -U0 -- . ':(exclude).githooks/pre-commit' | grep -E -e '-----BEGIN ((RSA|OPENSSH|EC) )?PRIVATE KEY-----' -e 'sk-ant-' -e 'AKIA[0-9A-Z]{16}'; then
   echo "Commit içinde gizli anahtar izi var."
   exit 1
 fi
