@@ -32,12 +32,12 @@ class PaymentMethodsScreen extends StatelessWidget {
             return Center(
               child: EmptyState(
                 icon: Icons.credit_card_off_outlined,
-                title: 'Henüz kart eklemedin',
-                message: 'Şarj ödemelerini hızlandırmak için bir kart ekle.',
+                title: 'Ödeme onayı yok',
+                message: 'Kart numarası istenmez. Şarj bedelini operatörün tahsil edeceğini onayla.',
                 action: SizedBox(
                   width: 200,
                   child: GradientButton(
-                    label: 'Kart Ekle',
+                    label: 'Onayla',
                     icon: Icons.add_rounded,
                     onPressed: () => Navigator.of(context)
                         .push(MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen())),
@@ -55,7 +55,7 @@ class PaymentMethodsScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Kart numarası ve CVV Voltavia veritabanında saklanmaz.',
+                      'Kart numarası bu uygulamada tutulmaz. Onay, operatörün tahsil edeceğini söyler.',
                       style: text.captionMuted,
                     ),
                   ),
@@ -68,7 +68,7 @@ class PaymentMethodsScreen extends StatelessWidget {
               ],
               const SizedBox(height: AppSpacing.sm),
               GradientButton(
-                label: 'Kart Ekle',
+                label: 'Onayla',
                 icon: Icons.add_rounded,
                 onPressed: () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen())),
@@ -112,7 +112,7 @@ class _PaymentMethodCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text('${method.label} •••• ${method.last4}', style: text.bodyStrong),
+                    Text(method.title, style: text.bodyStrong),
                     if (method.isDefault) ...[
                       const SizedBox(width: AppSpacing.xs),
                       Container(
@@ -133,7 +133,10 @@ class _PaymentMethodCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                Text('${method.holderName} · SKT ${method.expiry}', style: text.captionMuted),
+                Text(
+                  method.operatorCheckout ? method.holderName : '${method.holderName} · SKT ${method.expiry}',
+                  style: text.captionMuted,
+                ),
               ],
             ),
           ),

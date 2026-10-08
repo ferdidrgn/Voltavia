@@ -104,8 +104,17 @@ coverage/
 # Environment / secrets - projeye özel eklenenler
 .env
 *.env
+.env.*
+!.env.example
 **/firebase_options.dart.bak
+google-services.json
+GoogleService-Info.plist
+**/firebase-adminsdk*.json
+**/*serviceAccount*.json
+**/*service-account*.json
 android/key.properties
 android/app/*.jks
 android/app/*.keystore
+*.jks
+*.keystore
 android/local.properties

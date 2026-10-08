@@ -33,6 +33,7 @@ class NearestChargeStage extends StatelessWidget {
       StationStatus.busy => 0.46,
       StationStatus.maintenance => 0.22,
       StationStatus.offline => 0.12,
+      StationStatus.unknown => 0.4,
     };
 
     return Material(

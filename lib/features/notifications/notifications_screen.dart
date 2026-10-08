@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
 import '../../core/utils/formatters.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/app_notification.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
@@ -38,7 +38,7 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notifications = MockData.notifications;
+    final notifications = AppStateScope.of(context).notifications;
     final colors = context.colors;
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);

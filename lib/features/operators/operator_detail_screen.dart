@@ -5,11 +5,12 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/operator.dart';
+import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/station_card.dart';
 import '../stations/station_detail_screen.dart';
+import 'operator_partnership_screen.dart';
 
 class OperatorDetailScreen extends StatelessWidget {
   final ChargeOperator chargeOperator;
@@ -21,7 +22,7 @@ class OperatorDetailScreen extends StatelessWidget {
     final appState = AppStateScope.of(context);
     final colors = context.colors;
     final text = context.text;
-    final stations = MockData.stationsFor(chargeOperator.id);
+    final stations = appState.stationsForOperator(chargeOperator.id);
 
     return Scaffold(
       appBar: AppBar(title: Text(chargeOperator.name)),
@@ -84,6 +85,35 @@ class OperatorDetailScreen extends StatelessWidget {
                 ? 'Bu operatör hakkında henüz bir açıklama eklenmedi.'
                 : chargeOperator.description,
             style: text.bodyMuted.copyWith(height: 1.6),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          BentoCard(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => OperatorPartnershipScreen(chargeOperator: chargeOperator),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.handshake_outlined, color: colors.accentPrimary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Anlaşma dosyası', style: text.bodyStrong),
+                      Text(
+                        chargeOperator.hasAppIntegration
+                            ? 'Şarj adımı bu operatörde açık. Dosya yine de takip edilir.'
+                            : 'OCPI, tarife ve tahsilat adımlarını işaretle. Bu şarj başlatmaz.',
+                        style: text.captionMuted,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 18, color: colors.textMuted),
+              ],
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text('İstasyonları', style: text.title),

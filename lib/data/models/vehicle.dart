@@ -35,4 +35,37 @@ class Vehicle {
         consumptionKwhPer100km: consumptionKwhPer100km,
         isDefault: isDefault ?? this.isDefault,
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'brand': brand,
+        'model': model,
+        'plate': plate,
+        'connector': connector.name,
+        'batteryCapacityKwh': batteryCapacityKwh,
+        'consumptionKwhPer100km': consumptionKwhPer100km,
+        'isDefault': isDefault,
+      };
+
+  static Vehicle? tryParse(Map<String, dynamic> json) {
+    try {
+      ConnectorType? connector;
+      for (final type in ConnectorType.values) {
+        if (type.name == json['connector']) connector = type;
+      }
+      if (connector == null) return null;
+      return Vehicle(
+        id: json['id'] as String,
+        brand: json['brand'] as String,
+        model: json['model'] as String,
+        plate: json['plate'] as String? ?? '',
+        connector: connector,
+        batteryCapacityKwh: (json['batteryCapacityKwh'] as num).toDouble(),
+        consumptionKwhPer100km: (json['consumptionKwhPer100km'] as num).toDouble(),
+        isDefault: json['isDefault'] == true,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
 }

@@ -17,16 +17,17 @@
       </div>
       <div class="brand-sub">Firma Paneli</div>
       <h1 style="margin-top:22px">Firma Girişi</h1>
-      <p class="lead">İstasyonlarını, fiyatlarını ve lisans durumunu yönet.</p>
+      <p class="lead">İstasyon kaydı ve lisans durumunu bu tarayıcıda dene.</p>
 
       <label for="email">E-posta</label>
-      <input id="email" type="email" placeholder="ops@voltcharge.com" value="ops@voltcharge.com" />
+      <input id="email" type="email" placeholder="ornek@firma.com" autocomplete="username" />
 
       <label for="password">Şifre</label>
-      <input id="password" type="password" placeholder="••••••••" value="••••••••" />
+      <input id="password" type="password" placeholder="Bu alanda kontrol yok" autocomplete="current-password" />
 
-      <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
-      <p class="hint">Bu bir arayüz iskeletidir (mock) — gerçek sürümde firma yetkilendirmesi Firebase Authentication + rol/yetki sistemiyle yapılacaktır.</p>
+      <p id="loginError" class="field-error" hidden></p>
+      <button class="btn btn-primary" type="button" onclick="login()">Giriş Yap</button>
+      <p class="hint">Yetkilendirme henüz Firebase değil. Dolu bir e-posta bu yerel demoyu açar; şifre kontrol edilmez.</p>
     </div>
   </section>
 
@@ -36,17 +37,17 @@
       <div class="brand" style="margin-bottom:32px">
         <div class="brand-mark">⚡</div>
         <div>
-          <div class="brand-name" style="font-size:16px">VoltCharge</div>
+          <div class="brand-name" style="font-size:16px">Voltavia</div>
           <div style="font-size:11px;color:var(--text-muted)">Firma Paneli</div>
         </div>
       </div>
-      <div class="nav-item active" data-view="viewOverview" onclick="showView(this)">📊 Genel Bakış</div>
-      <div class="nav-item" data-view="viewStations" onclick="showView(this)">🔌 İstasyonlarım</div>
-      <div class="nav-item" data-view="viewPricing" onclick="showView(this)">💳 Fiyatlandırma</div>
-      <div class="nav-item" data-view="viewIntegration" onclick="showView(this)">🔗 Entegrasyon Durumu</div>
-      <div class="nav-item" data-view="viewLicense" onclick="showView(this)">📄 Sözleşme / Lisans</div>
+      <button type="button" class="nav-item active" data-view="viewOverview" onclick="showView(this)">📊 Genel Bakış</button>
+      <button type="button" class="nav-item" data-view="viewStations" onclick="showView(this)">🔌 İstasyonlarım</button>
+      <button type="button" class="nav-item" data-view="viewPricing" onclick="showView(this)">💳 Fiyatlandırma</button>
+      <button type="button" class="nav-item" data-view="viewIntegration" onclick="showView(this)">🔗 Entegrasyon Durumu</button>
+      <button type="button" class="nav-item" data-view="viewLicense" onclick="showView(this)">📄 Sözleşme / Lisans</button>
       <div style="flex:1"></div>
-      <div class="nav-item" onclick="logout()">↩ Çıkış Yap</div>
+      <button type="button" class="nav-item" onclick="logout()">↩ Çıkış Yap</button>
     </aside>
 
     <main class="main">
@@ -55,39 +56,38 @@
         <div class="topbar">
           <div>
             <h1 style="margin:0">Genel Bakış</h1>
-            <p class="lead" style="margin:4px 0 0">VoltCharge şarj ağı özeti</p>
+            <p class="lead" style="margin:4px 0 0">Voltavia operatör lisansı — yerel Faz 2 demosu</p>
           </div>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
             <div class="stat-label">İSTASYONLARIM</div>
-            <div class="stat-value">412</div>
-            <div class="stat-delta">▲ 6 yeni bu ay</div>
+            <div class="stat-value" id="statStations">0</div>
+            <div class="stat-delta muted" id="statSockets">Yerel liste</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">GÜNLÜK GÖRÜNTÜLENME</div>
-            <div class="stat-value">18.204</div>
-            <div class="stat-delta">▲ %8.1</div>
+            <div class="stat-label">GÖRÜNTÜLENME</div>
+            <div class="stat-value">—</div>
+            <div class="stat-delta muted">Ölçülmüyor</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">ENTEGRASYON</div>
-            <div class="stat-value">Aktif</div>
-            <div class="stat-delta" style="color:var(--text-muted)">Uygulama içi şarj açık</div>
+            <div class="stat-value" id="statIntegration">Bağlı değil</div>
+            <div class="stat-delta muted" id="statIntegrationNote">Canlı veri yok</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">LİSANS PAKETİ</div>
-            <div class="stat-value">Kurumsal</div>
-            <div class="stat-delta" style="color:var(--text-muted)">Yenileme: 12 Mar 2027</div>
+            <div class="stat-label">LİSANS</div>
+            <div class="stat-value" id="statLicense">Taslak</div>
+            <div class="stat-delta muted" id="statLicenseNote">Henüz yürürlükte değil</div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-header"><strong>Bilgilendirme</strong></div>
-          <div style="padding:20px; color:var(--text-muted); font-size:14px; line-height:1.6">
-            Şarj bedeli tahsilatı sizin ödeme kuruluşunuz üzerinden yapılır; Voltavia şarj parasını
-            tahsil etmez. Platform geliri sabit yıllık/aylık lisans ve entegrasyon ücretine dayanır.
-            Şarj oturumları ve raporlar OCPI/API entegrasyonu tamamlandığında bu panelde görünür
-            hale gelecektir (Faz 3).
+          <div class="callout">
+            Bu ekran bir arka uç olmadan çalışır. İstasyon listesi, lisans durumu ve pilot işareti
+            yalnızca bu tarayıcıda saklanır. Canlı doluluk, fiyat ve şarj başlat/durdur için
+            OCPI veya özel API sözleşmesi gerekir. Voltavia şarj bedelini tahsil etmez.
           </div>
         </div>
       </div>
@@ -97,12 +97,25 @@
         <div class="topbar">
           <div>
             <h1 style="margin:0">İstasyonlarım</h1>
-            <p class="lead" style="margin:4px 0 0">Yetki verilen alanları görüntüle ve düzenle</p>
+            <p class="lead" style="margin:4px 0 0">Ad ve soket sayısını düzenle. Liste bu tarayıcıda durur.</p>
           </div>
         </div>
         <div class="panel">
+          <div class="panel-header">
+            <strong>Yerel kayıt</strong>
+            <span id="stationNotice" class="stat-delta muted"></span>
+          </div>
           <table>
-            <thead><tr><th>İstasyon</th><th>Şehir/İlçe</th><th>Soket</th><th>Durum</th><th></th></tr></thead>
+            <thead>
+              <tr>
+                <th>İstasyon</th>
+                <th>Şehir/İlçe</th>
+                <th>Soket</th>
+                <th>Durum</th>
+                <th>Fiyat</th>
+                <th></th>
+              </tr>
+            </thead>
             <tbody id="stationRows"></tbody>
           </table>
         </div>
@@ -113,16 +126,15 @@
         <div class="topbar">
           <div>
             <h1 style="margin:0">Fiyatlandırma</h1>
-            <p class="lead" style="margin:4px 0 0">Bağlantı tipine göre kWh birim fiyatı</p>
+            <p class="lead" style="margin:4px 0 0">kWh birim fiyatı bu aşamada yok</p>
           </div>
         </div>
-        <div class="panel" style="padding:20px">
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px">
-            <div><label>CCS2 (kWh)</label><input value="8,90 ₺" /></div>
-            <div><label>Type 2 (kWh)</label><input value="6,90 ₺" /></div>
-            <div><label>CHAdeMO (kWh)</label><input value="8,50 ₺" /></div>
+        <div class="panel">
+          <div class="panel-header"><strong>Fiyat yok</strong></div>
+          <div class="callout">
+            Canlı birim fiyat gösterilmez. Fiyat, OCPI veya operatöre özel API sözleşmesi
+            olmadan panele gelmez. İstasyon tablosundaki fiyat sütunu bu yüzden «Fiyat yok» der.
           </div>
-          <button class="btn btn-primary" style="margin-top:18px">Fiyatları Kaydet</button>
         </div>
       </div>
 
@@ -131,18 +143,61 @@
         <div class="topbar">
           <div>
             <h1 style="margin:0">Entegrasyon Durumu</h1>
-            <p class="lead" style="margin:4px 0 0">OCPI / API bağlantı sağlığı ve ödeme sağlayıcısı ayarları</p>
+            <p class="lead" style="margin:4px 0 0">Bağlantı yok — sözleşme bekleniyor</p>
           </div>
         </div>
         <div class="panel">
+          <div class="panel-header"><strong>Ne için sözleşme gerekir</strong></div>
+          <div class="callout">
+            Canlı doluluk, birim fiyat ve şarj başlat/durdur bu panelde çalışmaz.
+            Üçü de OCPI ya da operatöre özel bir API sözleşmesi ister.
+            Aşağıdaki düğme bağlantı kurmaz; yalnızca bu tarayıcıya «pilot isteniyor» yazar.
+          </div>
           <table>
-            <thead><tr><th>Bileşen</th><th>Durum</th><th>Son Kontrol</th></tr></thead>
+            <thead><tr><th>Bileşen</th><th>Durum</th><th>Not</th></tr></thead>
             <tbody>
-              <tr><td>OCPI Bağlantısı</td><td><span class="badge badge-available"><span class="badge-dot"></span>Sağlıklı</span></td><td>2 dk önce</td></tr>
-              <tr><td>Ödeme Sağlayıcısı (Hosted)</td><td><span class="badge badge-available"><span class="badge-dot"></span>Sağlıklı</span></td><td>2 dk önce</td></tr>
-              <tr><td>Şarj Başlat/Durdur API</td><td><span class="badge badge-maintenance"><span class="badge-dot"></span>Faz 3'te aktif olacak</span></td><td>—</td></tr>
+              <tr>
+                <td>OCPI</td>
+                <td><span class="badge badge-offline"><span class="badge-dot"></span>Bağlı değil</span></td>
+                <td>Sözleşme yok</td>
+              </tr>
+              <tr>
+                <td>Özel API</td>
+                <td><span class="badge badge-offline"><span class="badge-dot"></span>Bağlı değil</span></td>
+                <td>Sözleşme yok</td>
+              </tr>
+              <tr>
+                <td>Canlı doluluk</td>
+                <td><span class="badge badge-offline"><span class="badge-dot"></span>Bağlı değil</span></td>
+                <td>Sözleşme sonrası</td>
+              </tr>
+              <tr>
+                <td>Birim fiyat</td>
+                <td><span class="badge badge-offline"><span class="badge-dot"></span>Bağlı değil</span></td>
+                <td>Fiyat yok</td>
+              </tr>
+              <tr>
+                <td>Şarj başlat/durdur</td>
+                <td><span class="badge badge-offline"><span class="badge-dot"></span>Bağlı değil</span></td>
+                <td>Sözleşme sonrası</td>
+              </tr>
             </tbody>
           </table>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><strong>Operatörden istenecek dosya</strong></div>
+          <div class="callout">
+            <p>İşaretler bu tarayıcıda durur. OCPI bağlantısı kurulmuş sayılmaz.</p>
+            <div id="ocpiSteps"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><strong>Pilot isteği</strong></div>
+          <div class="callout">
+            <p>İşaret yereldir. API bağlı sayılmaz.</p>
+            <button id="pilotBtn" class="btn btn-primary btn-auto" type="button">Pilot istiyorum</button>
+            <p id="pilotNote" class="pilot-note"></p>
+          </div>
         </div>
       </div>
 
@@ -151,14 +206,20 @@
         <div class="topbar">
           <div>
             <h1 style="margin:0">Sözleşme / Lisans</h1>
-            <p class="lead" style="margin:4px 0 0">Paket ve fatura bilgileri</p>
+            <p class="lead" style="margin:4px 0 0">Durumu seç. Genel bakış aynı değeri gösterir.</p>
           </div>
         </div>
-        <div class="panel" style="padding:20px; color:var(--text-muted); line-height:1.8">
-          <p><strong style="color:var(--text)">Paket:</strong> Kurumsal</p>
-          <p><strong style="color:var(--text)">Aylık Bedel:</strong> 38.000 ₺</p>
-          <p><strong style="color:var(--text)">Yenileme Tarihi:</strong> 12 Mart 2027</p>
-          <p><strong style="color:var(--text)">Kapsam:</strong> Sınırsız istasyon, API/OCPI entegrasyonu, öncelikli destek</p>
+        <div class="panel">
+          <div class="panel-header"><strong>Lisans durumu</strong></div>
+          <div class="callout">
+            <p>Üç durum bu tarayıcıda saklanır. Fatura, paket bedeli veya yenileme tarihi yoktur.</p>
+            <div class="choice-row" id="licenseChoices">
+              <button type="button" class="choice" data-license="Taslak">Taslak</button>
+              <button type="button" class="choice" data-license="Görüşmede">Görüşmede</button>
+              <button type="button" class="choice" data-license="Aktif">Aktif</button>
+            </div>
+            <p id="licenseDetail" class="license-detail"></p>
+          </div>
         </div>
       </div>
     </main>

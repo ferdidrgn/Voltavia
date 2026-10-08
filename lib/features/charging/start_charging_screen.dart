@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -22,11 +23,19 @@ class StartChargingScreen extends StatefulWidget {
 
 class _StartChargingScreenState extends State<StartChargingScreen> {
   ConnectorType? _selected;
+  bool _syncedVehicle = false;
 
   @override
-  void initState() {
-    super.initState();
-    _selected = widget.station.connectors.first;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selected ??= widget.station.connectors.isEmpty ? null : widget.station.connectors.first;
+    if (_syncedVehicle) return;
+    final vehicle = AppStateScope.of(context).defaultVehicle;
+    if (vehicle == null) return;
+    _syncedVehicle = true;
+    if (widget.station.connectors.contains(vehicle.connector)) {
+      _selected = vehicle.connector;
+    }
   }
 
   @override

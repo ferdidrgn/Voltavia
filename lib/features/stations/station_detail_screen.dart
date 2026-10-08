@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_palette.dart';
@@ -13,6 +14,7 @@ import '../../widgets/map_grid_background.dart';
 import '../../widgets/status_badge.dart';
 import '../charging/start_charging_screen.dart';
 import '../operators/operator_detail_screen.dart';
+import '../profile/add_vehicle_screen.dart';
 
 class StationDetailScreen extends StatelessWidget {
   final Station station;
@@ -98,19 +100,44 @@ class StationDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Row(
+                  Wrap(
+                    spacing: AppSpacing.md,
+                    runSpacing: AppSpacing.xs,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Icon(Icons.star_rounded, color: colors.warning, size: 18),
-                      const SizedBox(width: 2),
-                      Text(station.rating.toStringAsFixed(1), style: text.bodyStrong),
-                      const SizedBox(width: AppSpacing.md),
-                      Icon(Icons.place_rounded, size: 15, color: colors.textMuted),
-                      const SizedBox(width: 2),
-                      Text(Formatters.km(station.distanceKm), style: text.bodyMuted),
-                      const SizedBox(width: AppSpacing.md),
-                      Icon(Icons.apartment_rounded, size: 15, color: colors.textMuted),
-                      const SizedBox(width: 2),
-                      Text(station.chargeOperator.name, style: text.bodyMuted),
+                      if (station.rating > 0)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.star_rounded, color: colors.warning, size: 18),
+                            const SizedBox(width: 2),
+                            Text(station.rating.toStringAsFixed(1), style: text.bodyStrong),
+                          ],
+                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.place_rounded, size: 15, color: colors.textMuted),
+                          const SizedBox(width: 2),
+                          Text(Formatters.km(station.distanceKm), style: text.bodyMuted),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.apartment_rounded, size: 15, color: colors.textMuted),
+                          const SizedBox(width: 2),
+                          Text(station.chargeOperator.name, style: text.bodyMuted),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.account_balance_outlined, size: 15, color: colors.textMuted),
+                          const SizedBox(width: 2),
+                          Text(station.origin, style: text.bodyMuted),
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -154,7 +181,15 @@ class StationDetailScreen extends StatelessWidget {
                     animation: appState,
                     builder: (context, _) {
                       final vehicle = appState.defaultVehicle;
-                      if (vehicle == null) return const SizedBox.shrink();
+                      if (vehicle == null) {
+                        return TextButton.icon(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
+                          ),
+                          icon: const Icon(Icons.directions_car_filled_outlined, size: 16),
+                          label: const Text('Aracını kaydet, uyumu görelim'),
+                        );
+                      }
                       final compatible = station.connectors.contains(vehicle.connector);
                       final tint = compatible ? colors.success : colors.warning;
                       return Container(
@@ -259,36 +294,99 @@ class StationDetailScreen extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.md),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (!station.canStartFromApp)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Text(
+                    'Şarjı başlatmak operatör anlaşması ister. Yol tarifi şimdi çalışır.',
+                    style: text.captionMuted,
+                  ),
+                )
+              else if (appState.defaultVehicle == null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Text(
+                    'Şarj adımı aracının konnektörünü ister. Önce aracı kaydet.',
+                    style: text.captionMuted,
+                  ),
+                )
+              else if (!station.connectors.contains(appState.defaultVehicle!.connector))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Text(
+                    'Kayıtlı aracın konnektörü bu istasyonda yok. Yol tarifi açık.',
+                    style: text.captionMuted,
+                  ),
+                ),
+              Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Navigasyon uygulamasına yönlendiriliyor…')),
-                    );
-                  },
+                  onPressed: () => _openNavigation(context, station),
                   icon: const Icon(Icons.navigation_rounded, size: 17),
                   label: const Text('Navigasyon'),
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                flex: 2,
-                child: ElevatedButton.icon(
-                  onPressed: station.canStartFromApp
-                      ? () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => StartChargingScreen(station: station)),
-                          )
-                      : null,
-                  icon: const Icon(Icons.bolt_rounded, size: 17),
-                  label: Text(station.canStartFromApp ? 'Şarjı Başlat' : 'Şu An Uygun Değil'),
+              if (station.canStartFromApp &&
+                  appState.defaultVehicle != null &&
+                  station.connectors.contains(appState.defaultVehicle!.connector)) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => StartChargingScreen(station: station)),
+                    ),
+                    icon: const Icon(Icons.bolt_rounded, size: 17),
+                    label: const Text('Şarjı Başlat'),
+                  ),
                 ),
+              ] else if (station.canStartFromApp && appState.defaultVehicle == null) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
+                    ),
+                    icon: const Icon(Icons.directions_car_filled_outlined, size: 17),
+                    label: const Text('Aracı kaydet'),
+                  ),
+                ),
+              ],
+            ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _openNavigation(BuildContext context, Station station) async {
+    final uri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}&travelmode=driving',
+    );
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      opened = false;
+    }
+    if (!opened) {
+      try {
+        opened = await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } catch (_) {
+        opened = false;
+      }
+    }
+    if (!context.mounted || opened) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Harita uygulaması açılamadı.')),
     );
   }
 

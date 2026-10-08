@@ -1,0 +1,11 @@
+rules_version = '2';
+// Varsayılan kapalı. Bir koleksiyonu açmadan önce Firebase App Check
+// (Play Integrity, DeviceCheck veya reCAPTCHA Enterprise) konsolda zorunlu
+// olmalı ve kural giriş yapmış kullanıcıya indirgenmeli.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

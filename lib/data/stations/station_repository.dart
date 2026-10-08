@@ -1,12 +1,17 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import '../../core/config/app_config.dart';
+import '../../core/network/api_client.dart';
+import '../../domain/stations/station_catalog.dart';
 import '../models/connector_type.dart';
 import '../models/operator.dart';
 import '../models/station.dart';
+import 'station_cache.dart';
 
 class _SocketSummary {
   double maxKw = 0;
@@ -16,7 +21,14 @@ class _SocketSummary {
 
 /// OpenStreetMap karoları ve iki istasyon listesi: Overpass kayıtları ile
 /// EPDK konumlarının İBB açık veri kopyası. Yakın noktalar tek pine indirilir.
-class StationRepository {
+class StationRepository implements StationCatalog {
+  StationRepository({ApiClient? api, StationCache? cache})
+      : _api = api ?? ApiClient(),
+        _cache = cache ?? StationCache();
+
+  final ApiClient _api;
+  final StationCache _cache;
+
   static const _istanbul = (lat: 41.015137, lon: 28.979530);
 
   static const _query = '''
@@ -31,17 +43,23 @@ class StationRepository {
 out body 180;
 ''';
 
+  @override
   Future<List<Station>> fetchTurkeySample() async {
-    final loaded = await Future.wait([
-      _orEmpty(_fetchOsm()),
-      _orEmpty(_fetchEpdk()),
-    ]);
-    final osm = loaded[0];
-    final epdk = loaded[1];
-    final merged = _merge(osm, epdk);
-    if (merged.isEmpty) throw StateError('İstasyon bulunamadı');
-    merged.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
-    return merged;
+    try {
+      final loaded = await Future.wait([
+        _orEmpty(_fetchOsm()),
+        _orEmpty(_fetchEpdk()),
+      ]);
+      final merged = _merge(loaded[0], loaded[1]);
+      if (merged.isNotEmpty) {
+        merged.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+        await _cache.save(merged);
+        return merged;
+      }
+    } catch (_) {}
+    final cached = await _cache.load();
+    if (cached.isNotEmpty) return cached;
+    throw StateError('İstasyon bulunamadı');
   }
 
   Future<List<Station>> _orEmpty(Future<List<Station>> future) async {
@@ -53,22 +71,21 @@ out body 180;
   }
 
   Future<List<Station>> _fetchOsm() async {
-    final response = await http
-        .post(
-          Uri.parse('https://overpass-api.de/api/interpreter'),
-          headers: const {
-            'User-Agent': 'Voltavia/1.0 (ev charging map)',
-            'Content-Type': 'text/plain; charset=utf-8',
-          },
-          body: _query,
-        )
-        .timeout(const Duration(seconds: 35));
+    final response = await _api.dio.post<String>(
+      AppConfig.overpassUrl,
+      data: _query,
+      options: Options(
+        headers: const {'Content-Type': 'text/plain; charset=utf-8'},
+        responseType: ResponseType.plain,
+        receiveTimeout: const Duration(seconds: 35),
+      ),
+    );
 
     if (response.statusCode != 200) {
       throw StateError('Overpass ${response.statusCode}');
     }
 
-    final decoded = jsonDecode(response.body);
+    final decoded = jsonDecode(response.data ?? '');
     if (decoded is! Map<String, dynamic>) return const [];
     final elements = decoded['elements'];
     if (elements is! List) return const [];
@@ -114,7 +131,7 @@ out body 180;
       connectors: connectors,
       maxPowerKw: power,
       pricePerKwh: 0,
-      status: StationStatus.available,
+      status: StationStatus.unknown,
       distanceKm: _km(_istanbul.lat, _istanbul.lon, lat, lon),
       rating: 0,
       socketCount: sockets,
@@ -123,11 +140,6 @@ out body 180;
       origin: 'OpenStreetMap',
     );
   }
-
-  static const _geoJsonUrl =
-      'https://data.ibb.gov.tr/dataset/79b0e26e-e923-498b-a675-453382274178/resource/726e9d82-37f7-4142-8fa0-4f70a5530188/download/sarj_istasyonlari.geojson';
-  static const _socketCsvUrl =
-      'https://data.ibb.gov.tr/dataset/17f75354-1553-4a74-a90f-3a79680343c9/resource/ff424a4c-6478-455c-9bd5-b597a7df7df1/download/sarj_istasyon_soket.csv';
 
   Future<List<Station>> _fetchEpdk() async {
     try {
@@ -140,13 +152,141 @@ out body 180;
   }
 
   Future<List<Station>> _fetchEpdkLive() async {
-    final responses = await Future.wait([
-      http.get(Uri.parse(_geoJsonUrl), headers: const {'User-Agent': 'Voltavia/1.0'}).timeout(const Duration(seconds: 40)),
-      http.get(Uri.parse(_socketCsvUrl), headers: const {'User-Agent': 'Voltavia/1.0'}).timeout(const Duration(seconds: 40)),
-    ]);
-    if (responses[0].statusCode != 200) throw StateError('EPDK geojson ${responses[0].statusCode}');
-    final csv = responses[1].statusCode == 200 ? utf8.decode(responses[1].bodyBytes) : '';
-    return _decodeEpdk(utf8.decode(responses[0].bodyBytes), csv);
+    final request = http.Request('GET', Uri.parse(AppConfig.epdkStationsUrl));
+    request.headers.addAll(const {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Accept': 'application/json',
+      'User-Agent': 'Voltavia/1.0 (ev charging map)',
+    });
+    request.body = jsonEncode(const {'hizmetSekli': 'HALKA_ACIK'});
+    final streamed = await request.send().timeout(const Duration(seconds: 45));
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode != 200) throw StateError('EPDK ${response.statusCode}');
+    final stations = _decodeEpdkGateway(utf8.decode(response.bodyBytes));
+    if (stations.isEmpty) throw StateError('EPDK boş');
+    return stations;
+  }
+
+  List<Station> _decodeEpdkGateway(String body) {
+    final rows = _findStationRows(jsonDecode(body));
+    if (rows == null) return const [];
+    final stations = <Station>[];
+    for (final row in rows) {
+      final station = _parseEpdkGateway(row);
+      if (station != null) stations.add(station);
+    }
+    return stations;
+  }
+
+  List<Map<String, dynamic>>? _findStationRows(dynamic node) {
+    if (node is List) {
+      final maps = <Map<String, dynamic>>[];
+      for (final item in node) {
+        if (item is Map) maps.add(Map<String, dynamic>.from(item));
+      }
+      if (maps.isNotEmpty && maps.first.keys.any(_isStationKey)) return maps;
+      for (final item in node) {
+        final found = _findStationRows(item);
+        if (found != null) return found;
+      }
+      return null;
+    }
+    if (node is Map) {
+      for (final value in node.values) {
+        final found = _findStationRows(value);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+
+  bool _isStationKey(String key) {
+    final normalized = key.toLowerCase();
+    return normalized == 'enlem' ||
+        normalized == 'boylam' ||
+        normalized == 'soketler' ||
+        normalized == 'sarjistasyonuno';
+  }
+
+  Station? _parseEpdkGateway(Map<String, dynamic> row) {
+    final lat = _fieldNum(row, const ['enlem', 'latitude', 'lat']);
+    final lon = _fieldNum(row, const ['boylam', 'longitude', 'lon']);
+    if (lat == null || lon == null || lat < 35 || lat > 43 || lon < 25 || lon > 46) return null;
+    final service = _fieldText(row, const ['hizmetsekli']);
+    if (service != null && service.toUpperCase() != 'HALKA_ACIK') return null;
+
+    final stationNo = _fieldText(row, const ['sarjistasyonuno', 'istasyonno']) ?? '';
+    final brand = _fieldText(row, const ['markaadi', 'marka']) ??
+        _fieldText(row, const ['sarjagiisletmecisiunvan', 'sarjagiisletmecisi']) ??
+        'EPDK';
+    final name = _fieldText(row, const ['sarjistasyonuadi', 'istasyonadi', 'ad']) ?? brand;
+    final address = _fieldText(row, const ['adres']) ?? '';
+    final place = _placeFromAddress(address);
+    final sockets = _gatewaySockets(row);
+    final connectors = sockets.connectors.isEmpty ? const [ConnectorType.type2] : sockets.connectors;
+
+    return Station(
+      id: 'epdk-$stationNo',
+      name: name,
+      city: place.$1,
+      district: place.$2,
+      address: address.isEmpty ? 'EPDK kaydı' : address,
+      chargeOperator: ChargeOperator(
+        id: 'epdk-${_slug(brand)}',
+        name: brand,
+        logoLetter: brand.isEmpty ? '?' : brand[0].toUpperCase(),
+        description: _fieldText(row, const ['sarjagiisletmecisiunvan', 'sarjistasyonuisletmecisi']) ??
+            'EPDK şarj ağı işletmecisi.',
+      ),
+      connectors: connectors,
+      maxPowerKw: sockets.maxKw <= 0 ? 22 : sockets.maxKw,
+      pricePerKwh: 0,
+      status: StationStatus.unknown,
+      distanceKm: _km(_istanbul.lat, _istanbul.lon, lat, lon),
+      rating: 0,
+      socketCount: sockets.count == 0 ? 1 : sockets.count,
+      latitude: lat,
+      longitude: lon,
+      origin: 'EPDK',
+    );
+  }
+
+  _SocketSummary _gatewaySockets(Map<String, dynamic> row) {
+    final summary = _SocketSummary();
+    final raw = row.entries
+        .where((entry) => entry.key.toLowerCase() == 'soketler')
+        .map((entry) => entry.value)
+        .whereType<List>()
+        .firstOrNull;
+    if (raw == null) return summary;
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final socket = Map<String, dynamic>.from(item);
+      final kw = _fieldNum(socket, const ['soketgucu']) ?? 0;
+      if (kw > summary.maxKw) summary.maxKw = kw;
+      summary.count++;
+      final type = _connectorFromTur(_fieldText(socket, const ['soketturu', 'sokettipi']) ?? '');
+      if (type != null && !summary.connectors.contains(type)) summary.connectors.add(type);
+    }
+    return summary;
+  }
+
+  double? _fieldNum(Map<String, dynamic> map, List<String> names) {
+    for (final entry in map.entries) {
+      if (!names.contains(entry.key.toLowerCase())) continue;
+      final value = entry.value;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value?.toString() ?? '');
+    }
+    return null;
+  }
+
+  String? _fieldText(Map<String, dynamic> map, List<String> names) {
+    for (final entry in map.entries) {
+      if (!names.contains(entry.key.toLowerCase())) continue;
+      return _text(entry.value);
+    }
+    return null;
   }
 
   List<Station> _decodeEpdk(String geoJson, String csv) {
@@ -223,7 +363,7 @@ out body 180;
       connectors: connectors,
       maxPowerKw: summary == null || summary.maxKw <= 0 ? 22 : summary.maxKw,
       pricePerKwh: 0,
-      status: StationStatus.available,
+      status: StationStatus.unknown,
       distanceKm: _km(_istanbul.lat, _istanbul.lon, lat, lon),
       rating: 0,
       socketCount: summary?.count ?? 1,

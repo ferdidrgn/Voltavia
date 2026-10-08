@@ -15,9 +15,17 @@ import '../../stations/station_detail_screen.dart';
 /// mesafeye göre sıralanmış yatay kaydırmalı istasyon önizlemeleri.
 class NearbyStationsSection extends StatelessWidget {
   final List<Station> stations;
+  final bool measuredFromDevice;
   final VoidCallback onOpenMap;
+  final VoidCallback? onRequestLocation;
 
-  const NearbyStationsSection({super.key, required this.stations, required this.onOpenMap});
+  const NearbyStationsSection({
+    super.key,
+    required this.stations,
+    required this.onOpenMap,
+    this.measuredFromDevice = false,
+    this.onRequestLocation,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,14 +70,34 @@ class NearbyStationsSection extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Sana En Yakın Noktalar', style: text.bodyStrong),
+                              Text(
+                                measuredFromDevice ? 'Sana En Yakın Noktalar' : 'İstanbul merkezine göre',
+                                style: text.bodyStrong,
+                              ),
                               const SizedBox(height: 2),
                               Text(
                                 stations.isEmpty
                                     ? 'Haritada istasyonları keşfet'
-                                    : '${Formatters.km(stations.first.distanceKm)} uzaklıkta istasyon var',
+                                    : measuredFromDevice
+                                        ? '${Formatters.km(stations.first.distanceKm)} uzaklıkta istasyon var'
+                                        : 'Konum izni yok · ${Formatters.km(stations.first.distanceKm)}',
                                 style: text.captionMuted,
                               ),
+                              if (!measuredFromDevice && onRequestLocation != null) ...[
+                                const SizedBox(height: 2),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton(
+                                    onPressed: onRequestLocation,
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: const Text('Konumu aç'),
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: AppSpacing.xs),
                               Row(
                                 mainAxisSize: MainAxisSize.min,

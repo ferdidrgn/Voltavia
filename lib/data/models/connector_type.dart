@@ -16,7 +16,8 @@ enum StationStatus {
   available('Müsait'),
   busy('Dolu'),
   offline('Çevrimdışı'),
-  maintenance('Bakımda');
+  maintenance('Bakımda'),
+  unknown('Durum yok');
 
   final String label;
 

@@ -6,8 +6,8 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
 import '../../core/utils/formatters.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/company_license.dart';
+import '../../widgets/empty_state.dart';
 import 'widgets/admin_data_table.dart';
 
 class AdminLicensesScreen extends StatelessWidget {
@@ -34,7 +34,7 @@ class AdminLicensesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);
-    final licenses = MockData.companyLicenses;
+    final licenses = <CompanyLicense>[];
     final activeRevenue = licenses
         .where((l) => l.status == LicenseStatus.active)
         .fold<double>(0, (sum, l) => sum + l.monthlyFeeTry);
@@ -54,11 +54,19 @@ class AdminLicensesScreen extends StatelessWidget {
           children: [
             if (isDesktop) Text('Firma / Lisans Yönetimi', style: text.display),
             Text(
-              'Sabit lisans/entegrasyon geliri — ROADMAP.md § 3 kapsamı. '
-              'Aktif aylık gelir: ${Formatters.tryPrice(activeRevenue)}',
+              licenses.isEmpty
+                  ? 'Kayıtlı lisans yok. Sözleşme Firebase’e yazılınca burada görünür.'
+                  : 'Aktif aylık gelir: ${Formatters.tryPrice(activeRevenue)}',
               style: text.bodyMuted,
             ),
             const Gap(AppSpacing.md),
+            if (licenses.isEmpty)
+              const EmptyState(
+                icon: Icons.apartment_outlined,
+                title: 'Firma yok',
+                message: 'Operatör lisansı imzalanmadan bu tablo boş kalır.',
+              )
+            else
             AdminDataTable(
               minWidth: isDesktop ? 0 : 680,
               columns: const [

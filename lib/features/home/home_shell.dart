@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/state/app_state.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/utils/formatters.dart';
@@ -35,19 +36,19 @@ class _HomeShellState extends State<HomeShell> {
     });
   }
 
-  static const _items = [
-    NavItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'Ana Sayfa'),
-    NavItem(icon: Icons.map_rounded, activeIcon: Icons.map_rounded, label: 'Harita'),
-    NavItem(icon: Icons.ev_station_outlined, activeIcon: Icons.ev_station_rounded, label: 'İstasyonlar'),
-    NavItem(icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded, label: 'Favoriler'),
-    NavItem(icon: Icons.person_rounded, activeIcon: Icons.person_rounded, label: 'Profil'),
-  ];
-
   void _goToTab(int index) => setState(() => _index = index);
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final appState = AppStateScope.of(context);
+    final items = [
+      NavItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: l10n.navHome),
+      NavItem(icon: Icons.map_rounded, activeIcon: Icons.map_rounded, label: l10n.navMap),
+      NavItem(icon: Icons.ev_station_outlined, activeIcon: Icons.ev_station_rounded, label: l10n.navStations),
+      NavItem(icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded, label: l10n.navFavorites),
+      NavItem(icon: Icons.person_rounded, activeIcon: Icons.person_rounded, label: l10n.navProfile),
+    ];
     final pages = [
       HomeDashboardScreen(onNavigateTab: _goToTab),
       const MapScreen(),
@@ -58,8 +59,8 @@ class _HomeShellState extends State<HomeShell> {
 
     return ResponsiveScaffold(
       brandLabel: 'Voltavia',
-      brandSubLabel: 'Şarj platformu',
-      items: _items,
+      brandSubLabel: l10n.brandSubtitle,
+      items: items,
       selectedIndex: _index,
       onSelect: _goToTab,
       pages: pages,

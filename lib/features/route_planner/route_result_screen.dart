@@ -2,11 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/mock/city_distances.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/station.dart';
 import '../../data/models/vehicle.dart';
 import '../../widgets/bento_card.dart';
@@ -35,8 +35,11 @@ class RouteResultScreen extends StatelessWidget {
     final effectiveRange = vehicle.estimatedRangeKm * 0.8;
     final stopsNeeded = effectiveRange > 0 ? math.max(0, (totalDistance / effectiveRange).ceil() - 1) : 0;
 
-    final compatibleStations = MockData.stations.where((s) => s.connectors.contains(vehicle.connector)).toList()
-      ..sort((a, b) => b.rating.compareTo(a.rating));
+    final compatibleStations = AppStateScope.of(context)
+        .stations
+        .where((s) => s.connectors.contains(vehicle.connector))
+        .toList()
+      ..sort((a, b) => b.maxPowerKw.compareTo(a.maxPowerKw));
     final stops = compatibleStations.take(stopsNeeded).toList();
 
     final segmentKm = stops.isEmpty ? totalDistance : totalDistance / (stops.length + 1);

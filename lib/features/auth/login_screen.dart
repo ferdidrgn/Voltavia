@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/firebase/account_service.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -17,11 +18,44 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscure = true;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  void _continue() {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _openCatalog() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeShell()),
       (route) => false,
+    );
+  }
+
+  Future<void> _signIn() async {
+    final message = await AccountService.signIn(_emailController.text, _passwordController.text);
+    if (!mounted) return;
+    if (message != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+    _openCatalog();
+  }
+
+  Future<void> _reset() async {
+    final message = await AccountService.sendReset(_emailController.text);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message ?? 'Sıfırlama bağlantısı gönderildi.')),
+    );
+  }
+
+  void _providerUnavailable() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Google ve Apple girişi Firebase projesi bağlanınca açılır.')),
     );
   }
 
@@ -46,14 +80,16 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: AppSpacing.xxs),
               Text('Şarj istasyonlarını bulmaya devam etmek için giriş yap.', style: text.bodyMuted),
               const SizedBox(height: AppSpacing.lg),
-              _TestEntryBanner(onTap: _continue),
+              _TestEntryBanner(onTap: _openCatalog),
               const SizedBox(height: AppSpacing.lg),
-              const TextField(
+              TextField(
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
+                decoration: const InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
               TextField(
+                controller: _passwordController,
                 obscureText: _obscure,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
@@ -66,10 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(onPressed: () {}, child: const Text('Şifremi unuttum')),
+                child: TextButton(onPressed: _reset, child: const Text('Şifremi unuttum')),
               ),
               const SizedBox(height: AppSpacing.sm),
-              GradientButton(label: 'Giriş Yap', onPressed: _continue),
+              GradientButton(label: 'Giriş Yap', onPressed: _signIn),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
@@ -85,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _continue,
+                  onPressed: _providerUnavailable,
                   icon: const Icon(Icons.g_mobiledata, size: 26),
                   label: const Text('Google ile devam et'),
                 ),
@@ -94,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _continue,
+                  onPressed: _providerUnavailable,
                   icon: const Icon(Icons.apple),
                   label: const Text('Apple ile devam et'),
                 ),
@@ -123,9 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-/// UI/UX incelemesi için giriş yapmadan uygulamaya erişim sağlayan kısayol.
-/// Yalnızca tasarım/mockup aşamasında kullanılır; gerçek Firebase Authentication
-/// bağlandığında bu banner kaldırılmalıdır.
+/// Hesap gerekmeden herkese açık istasyon kataloğuna geçer.
 class _TestEntryBanner extends StatelessWidget {
   final VoidCallback onTap;
 
@@ -164,8 +198,8 @@ class _TestEntryBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Test Girişi', style: text.bodyStrong),
-                    Text('Giriş yapmadan tüm ekranları incele', style: text.captionMuted),
+                    Text('Kataloğa bak', style: text.bodyStrong),
+                    Text('Hesap yok. İstasyon listesi herkese açık.', style: text.captionMuted),
                   ],
                 ),
               ),

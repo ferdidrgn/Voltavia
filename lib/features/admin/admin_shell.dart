@@ -46,12 +46,12 @@ class _AdminShellState extends State<AdminShell> {
       items: _items,
       selectedIndex: _index,
       onSelect: _goToTab,
-      pages: const [
-        AdminOverviewScreen(),
-        AdminStationsScreen(),
-        AdminOperatorsScreen(),
-        AdminLicensesScreen(),
-        AdminAuditLogScreen(),
+      pages: [
+        AdminOverviewScreen(onOpenStations: () => _goToTab(1)),
+        const AdminStationsScreen(),
+        const AdminOperatorsScreen(),
+        const AdminLicensesScreen(),
+        const AdminAuditLogScreen(),
       ],
       sidebarFooter: Padding(
         padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -65,14 +65,14 @@ class _AdminShellState extends State<AdminShell> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
             child: Row(
               children: [
-                const InitialsAvatar(name: 'Admin Voltavia', size: 32),
+                const InitialsAvatar(name: 'Panel', size: 32),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('admin@voltavia.app', style: text.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      Text('Çıkış Yap', style: text.captionMuted.copyWith(color: colors.danger)),
+                      Text('Yerel panel', style: text.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text('Giriş ekranına dön', style: text.captionMuted.copyWith(color: colors.danger)),
                     ],
                   ),
                 ),

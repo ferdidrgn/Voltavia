@@ -6,7 +6,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
 import '../../core/utils/formatters.dart';
-import '../../data/mock/mock_data.dart';
+import '../../data/models/audit_log_entry.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
 
@@ -18,7 +18,7 @@ class AdminAuditLogScreen extends StatelessWidget {
     final colors = context.colors;
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);
-    final logs = MockData.auditLog;
+    final logs = <AuditLogEntry>[];
 
     return Scaffold(
       backgroundColor: Colors.transparent,

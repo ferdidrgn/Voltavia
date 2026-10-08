@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/state/app_state.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/operator.dart';
 import '../../operators/operator_detail_screen.dart';
 
@@ -15,7 +15,7 @@ class OperatorsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final preview = MockData.operators.take(10).toList();
+    final preview = AppStateScope.of(context).operatorCatalog.take(10).toList();
     final text = context.text;
 
     return SizedBox(
@@ -25,8 +25,8 @@ class OperatorsSection extends StatelessWidget {
         itemCount: preview.length,
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, i) {
-          final op = preview[i];
-          final stationCount = MockData.stationsFor(op.id).length;
+          final op = preview[i].operator;
+          final stationCount = preview[i].stationCount;
           return SizedBox(
             width: 84,
             child: InkWell(

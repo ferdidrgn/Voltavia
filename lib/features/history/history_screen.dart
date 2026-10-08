@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
 import '../../core/utils/formatters.dart';
-import '../../data/mock/mock_data.dart';
 import '../../data/models/charging_session.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
@@ -21,7 +21,7 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sessions = MockData.history;
+    final sessions = AppStateScope.of(context).completedSessions;
     final totalKwh = sessions.fold<double>(0, (sum, s) => sum + s.energyKwh);
     final totalCost = sessions.fold<double>(0, (sum, s) => sum + s.costTry);
     final co2Saved = totalKwh * _co2SavedPerKwh;

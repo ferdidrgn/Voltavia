@@ -5,6 +5,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/connector_type.dart';
 import '../../data/models/vehicle.dart';
+import '../../data/vehicles/vehicle_catalog.dart';
 import '../../widgets/gradient_button.dart';
 
 /// Kullanıcının aracını kaydettiği form — konnektör tipi ve batarya
@@ -43,7 +44,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         id: 'v-${DateTime.now().millisecondsSinceEpoch}',
         brand: _brandController.text.trim(),
         model: _modelController.text.trim(),
-        plate: _plateController.text.trim(),
+        plate: _plateController.text.trim().toUpperCase(),
         connector: _connector,
         batteryCapacityKwh: double.tryParse(_batteryController.text.replaceAll(',', '.')) ?? 60,
         consumptionKwhPer100km: double.tryParse(_consumptionController.text.replaceAll(',', '.')) ?? 16,
@@ -68,6 +69,31 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text('Katalogdan doldur', style: text.bodyStrong),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Rakamlar öneridir. Plakayı sen yazarsın.',
+                      style: text.captionMuted,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
+                      children: [
+                        for (final preset in vehiclePresets)
+                          ActionChip(
+                            label: Text(preset.label),
+                            onPressed: () => setState(() {
+                              _brandController.text = preset.brand;
+                              _modelController.text = preset.model;
+                              _batteryController.text = preset.batteryCapacityKwh.toString();
+                              _consumptionController.text = preset.consumptionKwhPer100km.toString();
+                              _connector = preset.connector;
+                            }),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
                     TextFormField(
                       controller: _brandController,
                       decoration: const InputDecoration(
@@ -90,7 +116,6 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
                       controller: _plateController,
-                      textCapitalization: TextCapitalization.characters,
                       decoration: const InputDecoration(
                         labelText: 'Plaka',
                         hintText: '34 VT 3453',

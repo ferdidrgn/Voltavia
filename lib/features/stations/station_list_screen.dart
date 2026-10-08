@@ -5,11 +5,14 @@ import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
+import '../../data/models/connector_type.dart';
 import '../../data/models/station.dart';
+import '../../data/stations/station_query.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/station_card.dart';
 import 'station_detail_screen.dart';
 import 'widgets/city_filter_sheet.dart';
+import 'widgets/station_filter_bar.dart';
 
 enum _SortBy { distance, price, power }
 
@@ -23,15 +26,25 @@ class StationListScreen extends StatefulWidget {
 class _StationListScreenState extends State<StationListScreen> {
   String _query = '';
   String? _city;
+  ConnectorType? _connector;
+  double _minKw = 0;
   _SortBy _sort = _SortBy.distance;
+  bool _syncedVehicle = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_syncedVehicle) return;
+    final vehicle = AppStateScope.of(context).defaultVehicle;
+    if (vehicle == null) return;
+    _syncedVehicle = true;
+    _connector = vehicle.connector;
+  }
 
   List<Station> get _filtered {
+    final filter = DiscoveryFilter(connector: _connector, minKw: _minKw);
     var list = AppStateScope.of(context).stations.where((s) {
-      final matchesCity = _city == null || s.city == _city;
-      final matchesQuery = _query.isEmpty ||
-          s.name.toLowerCase().contains(_query.toLowerCase()) ||
-          s.district.toLowerCase().contains(_query.toLowerCase());
-      return matchesCity && matchesQuery;
+      return stationMatches(s, query: _query, city: _city, filter: filter);
     }).toList();
 
     switch (_sort) {
@@ -95,7 +108,7 @@ class _StationListScreenState extends State<StationListScreen> {
                       child: TextField(
                         onChanged: (v) => setState(() => _query = v),
                         decoration: InputDecoration(
-                          hintText: 'İstasyon veya ilçe ara',
+                          hintText: 'İstasyon, ilçe veya işletmeci',
                           prefixIcon: Icon(Icons.search_rounded, size: 18),
                         ),
                       ),
@@ -124,6 +137,20 @@ class _StationListScreenState extends State<StationListScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                  0,
+                  isDesktop ? AppSpacing.xxl : AppSpacing.md,
+                  AppSpacing.xs,
+                ),
+                child: StationFilterBar(
+                  connector: _connector,
+                  minKw: _minKw,
+                  onConnector: (value) => setState(() => _connector = value),
+                  onMinKw: (value) => setState(() => _minKw = value),
                 ),
               ),
               Padding(

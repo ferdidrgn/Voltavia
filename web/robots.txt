@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# Üretim alan adı seçilmeden sitemap adresi yazılmaz.

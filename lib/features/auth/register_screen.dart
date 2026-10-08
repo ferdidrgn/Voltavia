@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/firebase/account_service.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../widgets/gradient_button.dart';
@@ -16,7 +17,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscure = true;
   bool _acceptTerms = false;
 
-  void _createAccount() {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _createAccount() async {
+    final message = await AccountService.register(_emailController.text, _passwordController.text);
+    if (!mounted) return;
+    if (message != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeShell()),
       (route) => false,
@@ -46,17 +63,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: InputDecoration(labelText: 'Ad Soyad', prefixIcon: Icon(Icons.person_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
-              const TextField(
+              TextField(
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
+                decoration: const InputDecoration(labelText: 'E-posta', prefixIcon: Icon(Icons.mail_rounded, size: 18)),
               ),
               const SizedBox(height: AppSpacing.md),
-              const TextField(
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(Icons.phone_rounded, size: 18)),
-              ),
               const SizedBox(height: AppSpacing.md),
               TextField(
+                controller: _passwordController,
                 obscureText: _obscure,
                 decoration: InputDecoration(
                   labelText: 'Şifre',

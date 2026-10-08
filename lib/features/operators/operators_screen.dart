@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/responsive.dart';
-import '../../data/mock/mock_data.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/empty_state.dart';
 import 'operator_detail_screen.dart';
@@ -27,8 +27,9 @@ class _OperatorsScreenState extends State<OperatorsScreen> {
     final colors = context.colors;
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);
-    final operators =
-        MockData.operators.where((o) => o.name.toLowerCase().contains(_query.toLowerCase())).toList();
+    final operators = AppStateScope.of(context).operatorCatalog.where((entry) {
+      return entry.operator.name.toLowerCase().contains(_query.toLowerCase());
+    }).toList();
 
     return Scaffold(
       backgroundColor: colors.canvas,
@@ -79,8 +80,8 @@ class _OperatorsScreenState extends State<OperatorsScreen> {
                         ),
                         itemCount: operators.length,
                         itemBuilder: (context, i) {
-                          final op = operators[i];
-                          final stationCount = MockData.stationsFor(op.id).length;
+                          final op = operators[i].operator;
+                          final stationCount = operators[i].stationCount;
                           return BentoCard(
                             onTap: () => Navigator.of(context)
                                 .push(MaterialPageRoute(builder: (_) => OperatorDetailScreen(chargeOperator: op))),

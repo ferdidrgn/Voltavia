@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/state/locale_controller.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -20,21 +21,15 @@ const _languages = [
   _AppLanguage(code: 'ar', name: 'Arapça', nativeName: 'العربية'),
 ];
 
-/// Dil seçim ekranı — şu an yalnızca Türkçe aktif, diğerleri yol haritasında.
-class LanguageScreen extends StatefulWidget {
+/// Türkçe ve İngilizce çalışma anında değişir. Diğer diller henüz çevrilmedi.
+class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
-
-  @override
-  State<LanguageScreen> createState() => _LanguageScreenState();
-}
-
-class _LanguageScreenState extends State<LanguageScreen> {
-  String _selected = 'tr';
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.text;
+    final selected = LocaleControllerScope.of(context).value?.languageCode;
     return Scaffold(
       appBar: AppBar(title: const Text('Dil')),
       body: ListView(
@@ -42,9 +37,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
         children: [
           for (final lang in _languages) ...[
             BentoCard(
-              onTap: lang.code == 'tr' ? () => setState(() => _selected = lang.code) : null,
+              onTap: lang.code == 'tr' || lang.code == 'en'
+                  ? () => LocaleControllerScope.of(context).setLocale(Locale(lang.code))
+                  : null,
               child: Opacity(
-                opacity: lang.code == 'tr' ? 1 : 0.5,
+                opacity: lang.code == 'tr' || lang.code == 'en' ? 1 : 0.5,
                 child: Row(
                   children: [
                     Expanded(
@@ -56,7 +53,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                         ],
                       ),
                     ),
-                    if (lang.code != 'tr')
+                    if (lang.code != 'tr' && lang.code != 'en')
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
@@ -67,8 +64,8 @@ class _LanguageScreenState extends State<LanguageScreen> {
                       )
                     else
                       Icon(
-                        _selected == lang.code ? Icons.radio_button_checked : Icons.radio_button_off,
-                        color: _selected == lang.code ? colors.accentPrimary : colors.textMuted,
+                        selected == lang.code ? Icons.radio_button_checked : Icons.radio_button_off,
+                        color: selected == lang.code ? colors.accentPrimary : colors.textMuted,
                       ),
                   ],
                 ),

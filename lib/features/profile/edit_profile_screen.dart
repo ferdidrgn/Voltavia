@@ -1,30 +1,50 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_semantic_colors.dart';
+import '../../core/state/app_state.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../widgets/initials_avatar.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  bool _loaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loaded) return;
+    _loaded = true;
+    _nameController.text = AppStateScope.of(context).displayName;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    await AppStateScope.of(context).setDisplayName(_nameController.text);
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final text = context.text;
+    final name = _nameController.text.trim().isEmpty ? 'Misafir' : _nameController.text.trim();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profili Düzenle'),
         actions: [
-          TextButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profil güncellendi (mock)')),
-              );
-              Navigator.of(context).pop();
-            },
-            child: const Text('Kaydet'),
-          ),
+          TextButton(onPressed: _save, child: const Text('Kaydet')),
         ],
       ),
       body: SingleChildScrollView(
@@ -32,48 +52,15 @@ class EditProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Stack(
-                children: [
-                  const InitialsAvatar(name: 'Ferdi Durgun', size: 88),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: colors.accentPrimary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: colors.canvas, width: 2),
-                      ),
-                      child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 15),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            Center(child: InitialsAvatar(name: name, size: 88)),
             const SizedBox(height: AppSpacing.xl),
-            Text('Ad Soyad', style: text.overline),
+            Text('Ad', style: text.overline),
             const SizedBox(height: AppSpacing.xxs),
-            const TextField(decoration: InputDecoration(hintText: 'Ferdi Durgun')),
-            const SizedBox(height: AppSpacing.md),
-            Text('E-posta', style: text.overline),
-            const SizedBox(height: AppSpacing.xxs),
-            const TextField(
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(hintText: 'ferdidurgun34@gmail.com'),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(hintText: 'Adın'),
+              onChanged: (_) => setState(() {}),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Text('Telefon', style: text.overline),
-            const SizedBox(height: AppSpacing.xxs),
-            const TextField(
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(hintText: '+90 5xx xxx xx xx'),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text('Araç Modeli', style: text.overline),
-            const SizedBox(height: AppSpacing.xxs),
-            const TextField(decoration: InputDecoration(hintText: 'Örn. Tesla Model 3')),
           ],
         ),
       ),

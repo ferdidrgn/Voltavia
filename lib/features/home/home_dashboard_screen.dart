@@ -7,10 +7,9 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/theme/responsive.dart';
-import '../../data/mock/mock_data.dart';
+import '../../core/firebase/firebase_gate.dart';
 import '../../data/models/app_notification.dart';
-import '../../data/models/campaign.dart';
+import '../../core/theme/responsive.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/kpi_stat_card.dart';
 import '../../widgets/section_header.dart';
@@ -18,14 +17,33 @@ import '../charging/active_charging_screen.dart';
 import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../operators/operators_screen.dart';
+import '../profile/add_vehicle_screen.dart';
 import '../route_planner/widgets/route_planner_banner.dart';
 import '../map/station_map.dart';
 import '../stations/station_detail_screen.dart';
-import 'widgets/campaign_slider.dart';
 import 'widgets/nearby_stations_section.dart';
 import 'widgets/nearest_charge_stage.dart';
 import 'widgets/operators_section.dart';
 import 'widgets/quick_actions_grid.dart';
+
+Future<void> _explainAndRequestLocation(BuildContext context) async {
+  final accepted = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('Yakındaki istasyonlar'),
+      content: const Text(
+        'Listeyi sana göre sıralamak için konumunu yalnızca bu istekte kullanırız. Arka planda izleme yok.',
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Şimdi değil')),
+        TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Konumu kullan')),
+      ],
+    ),
+  );
+  if (accepted == true && context.mounted) {
+    await AppStateScope.of(context).requestDeviceLocation();
+  }
+}
 
 /// Voltavia'nın Ana Sayfası — bento-grid mimarili gösterge paneli. Kullanıcının
 /// en sık ihtiyaç duyduğu tüm akışların (harita, istasyonlar, kampanyalar,
@@ -41,7 +59,8 @@ class HomeDashboardScreen extends StatelessWidget {
     final colors = context.colors;
     final text = context.text;
     final isDesktop = Responsive.isDesktop(context);
-    final unreadCount = MockData.notifications.where((n) => !n.isRead).length;
+    final unreadCount = appState.unreadNotificationCount;
+    final greetingName = appState.displayName.trim();
     final catalog = List.of(appState.stations)..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
     final nearest = catalog.take(5).toList();
 
@@ -106,7 +125,14 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ).enterFade(),
         const Gap(AppSpacing.md),
-        Text('Ferdi, bugün nereden şarj alacaksın?', style: text.bodyMuted).enterFade(),
+        Text(
+          greetingName.isEmpty ? 'Bugün nereden şarj alacaksın?' : '$greetingName, bugün nereden şarj alacaksın?',
+          style: text.bodyMuted,
+        ).enterFade(),
+        if (FirebaseGate.maintenance) ...[
+          const Gap(AppSpacing.sm),
+          Text('Bakım modu açık. Katalog gezilebilir, şarj başlatılmaz.', style: text.captionMuted),
+        ],
         const Gap(AppSpacing.md),
         InkWell(
           borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -139,58 +165,47 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ],
         const Gap(AppSpacing.lg),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: const [
-              Expanded(
-                child: KpiStatCard(
-                  icon: Icons.bolt_rounded,
-                  label: 'Bu ay şarj',
-                  value: '3',
-                  trendLabel: '+1 geçen aya göre',
-                  trend: TrendDirection.up,
-                ),
-              ),
-              Gap(AppSpacing.sm),
-              Expanded(
-                child: KpiStatCard(
-                  icon: Icons.electric_bolt_rounded,
-                  label: 'Toplam kWh',
-                  value: '91.5',
-                  trendLabel: 'stabil',
-                  trend: TrendDirection.flat,
-                  accent: AppPalette.emerald,
-                ),
-              ),
-              Gap(AppSpacing.sm),
-              Expanded(
-                child: KpiStatCard(
-                  icon: Icons.favorite_rounded,
-                  label: 'Favoriler',
-                  value: '2',
-                  accent: AppPalette.sky,
-                ),
-              ),
-            ],
-          ),
-        ).enterRise(delay: AppMotion.staggerStep),
-        const Gap(AppSpacing.lg),
-        CampaignSlider(
-          campaigns: MockData.campaigns,
-          onTap: (Campaign c) => _handleCampaignTap(context, c),
-        ).enterRise(delay: AppMotion.staggerStep * 2),
+        _HomeKpis(favoriteCount: appState.favoriteStationIds.length).enterRise(delay: AppMotion.staggerStep),
         const Gap(AppSpacing.lg),
         QuickActionsGrid(items: quickActions).enterRise(delay: AppMotion.staggerStep * 3),
         const Gap(AppSpacing.lg),
         const RoutePlannerBanner().enterRise(delay: AppMotion.staggerStep * 3),
+        if (appState.vehicles.isEmpty) ...[
+          const Gap(AppSpacing.lg),
+          BentoCard(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AddVehicleScreen())),
+            child: Row(
+              children: [
+                Icon(Icons.directions_car_filled_outlined, color: colors.accentPrimary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Aracını kaydet', style: text.bodyStrong),
+                      Text(
+                        'Konnektör uyumu, istasyon filtresi ve rota menzili bu kayda bağlanır.',
+                        style: text.captionMuted,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const Gap(AppSpacing.lg),
         SectionHeader(
-          title: 'Sana En Yakın Noktalar',
+          title: appState.usingDeviceLocation ? 'Sana En Yakın Noktalar' : 'İstanbul merkezine göre',
           actionLabel: 'Haritada Gör',
           onAction: () => onNavigateTab(1),
         ),
-        NearbyStationsSection(stations: nearest, onOpenMap: () => onNavigateTab(1)),
+        NearbyStationsSection(
+          stations: nearest,
+          measuredFromDevice: appState.usingDeviceLocation,
+          onOpenMap: () => onNavigateTab(1),
+          onRequestLocation: appState.usingDeviceLocation ? null : () => _explainAndRequestLocation(context),
+        ),
         const Gap(AppSpacing.lg),
         SectionHeader(
           title: 'Firmalar',
@@ -205,7 +220,10 @@ class HomeDashboardScreen extends StatelessWidget {
           onAction: () =>
               Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
         ),
-        ...MockData.notifications.take(2).map((n) => _NotificationPreview(notification: n)),
+        if (appState.notifications.isEmpty)
+          Text('Bildirim yok.', style: text.captionMuted)
+        else
+          ...appState.notifications.take(2).map((n) => _NotificationPreview(notification: n)),
       ],
     );
 
@@ -232,17 +250,50 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  void _handleCampaignTap(BuildContext context, Campaign campaign) {
-    if (campaign.id == 'c2') {
-      onNavigateTab(2);
-      return;
+}
+
+class _HomeKpis extends StatelessWidget {
+  final int favoriteCount;
+
+  const _HomeKpis({required this.favoriteCount});
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = [
+      const KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '0'),
+      const KpiStatCard(
+        icon: Icons.electric_bolt_rounded,
+        label: 'Toplam kWh',
+        value: '0',
+        accent: AppPalette.emerald,
+      ),
+      KpiStatCard(
+        icon: Icons.favorite_rounded,
+        label: 'Favoriler',
+        value: '$favoriteCount',
+        accent: AppPalette.sky,
+      ),
+    ];
+    if (Responsive.isMobile(context)) {
+      return Column(
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            if (i > 0) const Gap(AppSpacing.sm),
+            cards[i],
+          ],
+        ],
+      );
     }
-    if (campaign.id == 'c3') {
-      onNavigateTab(1);
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${campaign.title} — yakında')),
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            if (i > 0) const Gap(AppSpacing.sm),
+            Expanded(child: cards[i]),
+          ],
+        ],
+      ),
     );
   }
 }

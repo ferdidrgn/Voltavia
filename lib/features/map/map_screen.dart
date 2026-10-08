@@ -7,7 +7,10 @@ import '../../core/theme/app_semantic_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/formatters.dart';
+import '../../data/models/connector_type.dart';
 import '../../data/models/station.dart';
+import '../../data/stations/station_query.dart';
+import '../stations/widgets/station_filter_bar.dart';
 import '../../widgets/status_badge.dart';
 import '../stations/station_detail_screen.dart';
 import 'station_map.dart';
@@ -24,7 +27,20 @@ class _MapScreenState extends State<MapScreen> {
   final _mapController = MapController();
   final _query = TextEditingController();
   String _queryText = '';
+  ConnectorType? _connector;
+  double _minKw = 0;
   Station? _selected;
+  bool _syncedVehicle = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_syncedVehicle) return;
+    final vehicle = AppStateScope.of(context).defaultVehicle;
+    if (vehicle == null) return;
+    _syncedVehicle = true;
+    _connector = vehicle.connector;
+  }
 
   @override
   void dispose() {
@@ -34,14 +50,8 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   List<Station> _visible(List<Station> all) {
-    final q = _queryText.trim().toLowerCase();
-    if (q.isEmpty) return all;
-    return all.where((s) {
-      return s.name.toLowerCase().contains(q) ||
-          s.city.toLowerCase().contains(q) ||
-          s.district.toLowerCase().contains(q) ||
-          s.chargeOperator.name.toLowerCase().contains(q);
-    }).toList();
+    final filter = DiscoveryFilter(connector: _connector, minKw: _minKw);
+    return all.where((station) => stationMatches(station, query: _queryText, filter: filter)).toList();
   }
 
   void _focus(Station station) {
@@ -73,6 +83,10 @@ class _MapScreenState extends State<MapScreen> {
       query: _query,
       onQuery: (value) => setState(() => _queryText = value),
       onSelect: _focus,
+      connector: _connector,
+      minKw: _minKw,
+      onConnector: (value) => setState(() => _connector = value),
+      onMinKw: (value) => setState(() => _minKw = value),
     );
 
     if (!wide) {
@@ -85,7 +99,28 @@ class _MapScreenState extends State<MapScreen> {
               left: AppSpacing.md,
               right: AppSpacing.md,
               top: AppSpacing.md,
-              child: SafeArea(child: _SearchField(controller: _query, onChanged: (v) => setState(() => _queryText = v))),
+              child: SafeArea(
+                child: Material(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SearchField(controller: _query, onChanged: (v) => setState(() => _queryText = v)),
+                        const SizedBox(height: AppSpacing.xs),
+                        StationFilterBar(
+                          connector: _connector,
+                          minKw: _minKw,
+                          onConnector: (value) => setState(() => _connector = value),
+                          onMinKw: (value) => setState(() => _minKw = value),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
             if (_selected != null)
               Positioned(
@@ -117,9 +152,9 @@ class _MapScreenState extends State<MapScreen> {
                       Text(
                         appState.stationsLoading
                             ? 'Kayıtlar yükleniyor'
-                            : appState.usingLiveStations
-                                ? _sourceLine(stations)
-                                : '${stations.length} örnek nokta',
+                            : stations.isEmpty
+                                ? 'Katalog boş'
+                                : _sourceLine(stations),
                         style: text.captionMuted,
                       ),
                     ],
@@ -164,6 +199,10 @@ class _StationRail extends StatelessWidget {
   final TextEditingController query;
   final ValueChanged<String> onQuery;
   final ValueChanged<Station> onSelect;
+  final ConnectorType? connector;
+  final double minKw;
+  final ValueChanged<ConnectorType?> onConnector;
+  final ValueChanged<double> onMinKw;
 
   const _StationRail({
     required this.stations,
@@ -173,6 +212,10 @@ class _StationRail extends StatelessWidget {
     required this.query,
     required this.onQuery,
     required this.onSelect,
+    required this.connector,
+    required this.minKw,
+    required this.onConnector,
+    required this.onMinKw,
   });
 
   @override
@@ -195,6 +238,13 @@ class _StationRail extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               _SearchField(controller: query, onChanged: onQuery),
+              const SizedBox(height: AppSpacing.xs),
+              StationFilterBar(
+                connector: connector,
+                minKw: minKw,
+                onConnector: onConnector,
+                onMinKw: onMinKw,
+              ),
             ],
           ),
         ),

@@ -73,7 +73,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                       Icon(Icons.credit_card_rounded, color: colors.accentPrimary),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
-                        child: Text('${method.label} •••• ${method.last4}', style: text.bodyStrong),
+                        child: Text(method.title, style: text.bodyStrong),
                       ),
                       Icon(
                         method.id == _selectedId ? Icons.radio_button_checked : Icons.radio_button_off,
@@ -87,7 +87,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               onPressed: () => Navigator.of(context)
                   .push(MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen())),
               icon: const Icon(Icons.add_rounded, size: 17),
-              label: const Text('Yeni kart ekle'),
+              label: const Text('Operatör tahsilatını onayla'),
             ),
             const Spacer(),
             Row(
@@ -95,7 +95,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 Icon(Icons.lock_rounded, size: 15, color: colors.textMuted),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text('Kart numarası ve CVV Voltavia veritabanında saklanmaz.', style: text.captionMuted),
+                  child: Text(
+                    'Bu onay tahsilat başlatmaz. Kart, operatörün ödeme kuruluşunda kalır.',
+                    style: text.captionMuted,
+                  ),
                 ),
               ],
             ),

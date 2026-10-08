@@ -20,10 +20,10 @@
       <p class="lead">İstasyon, operatör ve firma verilerini yönetmek için giriş yap.</p>
 
       <label for="email">E-posta</label>
-      <input id="email" type="email" placeholder="admin@voltavia.app" value="admin@voltavia.app" />
+      <input id="email" type="email" placeholder="E-posta" autocomplete="username" />
 
       <label for="password">Şifre</label>
-      <input id="password" type="password" placeholder="••••••••" value="••••••••" />
+      <input id="password" type="password" placeholder="Şifre" autocomplete="current-password" />
 
       <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
       <p class="hint">Bu bir arayüz iskeletidir (mock) — Firebase Authentication bağlanınca gerçek girişe geçilecektir.</p>
@@ -63,23 +63,23 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="stat-label">TOPLAM İSTASYON</div>
-            <div class="stat-value">1.248</div>
-            <div class="stat-delta">▲ %4.2 bu ay</div>
+            <div class="stat-value">0</div>
+            <div class="stat-delta">Kayıt yok</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">AKTİF OPERATÖR</div>
-            <div class="stat-value">14</div>
-            <div class="stat-delta">▲ 2 yeni sözleşme</div>
+            <div class="stat-value">0</div>
+            <div class="stat-delta">Sözleşme yok</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">KAYITLI KULLANICI</div>
-            <div class="stat-value">86.402</div>
-            <div class="stat-delta">▲ %11 bu ay</div>
+            <div class="stat-value">0</div>
+            <div class="stat-delta">Hesap bağlı değil</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">VERİ SÜRÜMÜ</div>
-            <div class="stat-value">v128</div>
-            <div class="stat-delta" style="color:var(--text-muted)">3 gün önce güncellendi</div>
+            <div class="stat-value">—</div>
+            <div class="stat-delta" style="color:var(--text-muted)">Sürüm yok</div>
           </div>
         </div>
 

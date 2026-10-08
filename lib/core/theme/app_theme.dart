@@ -10,8 +10,18 @@ import 'app_text_styles.dart';
 /// açık tema aynı kıyı paletinin sisli karşılığıdır. Gövde saydamdır;
 /// kablo motifi [HarborFrame] üzerinden görünür.
 abstract final class AppTheme {
-  static ThemeData get dark => _build(AppSemanticColors.dark());
-  static ThemeData get light => _build(AppSemanticColors.light());
+  /// [platformAccent] varsa deniz yeşili ile %35 karışır. Marka paleti durur.
+  static ThemeData dark({Color? platformAccent}) => _build(
+        AppSemanticColors.dark().copyWith(
+          accentPrimary: platformAccent == null ? null : Color.lerp(AppPalette.sea, platformAccent, 0.35),
+        ),
+      );
+
+  static ThemeData light({Color? platformAccent}) => _build(
+        AppSemanticColors.light().copyWith(
+          accentPrimary: platformAccent == null ? null : Color.lerp(AppPalette.sea, platformAccent, 0.35),
+        ),
+      );
 
   static ThemeData _build(AppSemanticColors colors) {
     final isDark = colors.isDark;

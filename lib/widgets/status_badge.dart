@@ -41,6 +41,8 @@ class _StatusBadgeState extends State<StatusBadge> with SingleTickerProviderStat
         return c.textMuted;
       case StationStatus.maintenance:
         return c.warning;
+      case StationStatus.unknown:
+        return c.textMuted;
     }
   }
 

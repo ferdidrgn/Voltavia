@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
+import '../../core/state/app_state.dart';
+import '../../core/state/locale_controller.dart';
 import '../../core/state/theme_controller.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/app_semantic_colors.dart';
@@ -18,6 +20,7 @@ import 'help_support_screen.dart';
 import 'language_screen.dart';
 import 'payment_methods_screen.dart';
 import 'privacy_screen.dart';
+import 'terms_screen.dart';
 import 'vehicles_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -26,7 +29,9 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController = ThemeControllerScope.of(context);
+    final appState = AppStateScope.of(context);
     final isDesktop = Responsive.isDesktop(context);
+    final name = appState.displayName.trim().isEmpty ? 'Misafir' : appState.displayName.trim();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -48,15 +53,15 @@ class ProfileScreen extends StatelessWidget {
               ],
               Row(
                 children: [
-                  const InitialsAvatar(name: 'Ferdi Durgun', size: 64),
+                  InitialsAvatar(name: name, size: 64),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Ferdi Durgun', style: context.text.headline),
+                        Text(name, style: context.text.headline),
                         const SizedBox(height: 2),
-                        Text('ferdidurgun34@gmail.com', style: context.text.bodyMuted),
+                        Text('Hesap bağlı değil', style: context.text.bodyMuted),
                       ],
                     ),
                   ),
@@ -73,13 +78,13 @@ class ProfileScreen extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: const [
-                    Expanded(child: KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '3')),
+                    Expanded(child: KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '0')),
                     Gap(AppSpacing.sm),
                     Expanded(
                       child: KpiStatCard(
                         icon: Icons.electric_bolt_rounded,
                         label: 'Toplam kWh',
-                        value: '91.5',
+                        value: '0',
                         accent: AppPalette.emerald,
                       ),
                     ),
@@ -88,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
                       child: KpiStatCard(
                         icon: Icons.credit_card_rounded,
                         label: 'Harcama',
-                        value: '778 ₺',
+                        value: '0 ₺',
                         accent: AppPalette.sky,
                       ),
                     ),
@@ -131,11 +136,20 @@ class ProfileScreen extends StatelessWidget {
                 items: [
                   ValueListenableBuilder<ThemeMode>(
                     valueListenable: themeController,
-                    builder: (context, mode, _) => _ThemeModeSelector(mode: mode, onChanged: themeController.setMode),
+                    builder: (context, mode, _) => _ThemeModeSelector(
+                      mode: mode,
+                      usePlatformAccent: themeController.usePlatformAccent,
+                      onChanged: themeController.setMode,
+                      onPlatformAccent: themeController.setPlatformAccent,
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.public_rounded,
-                    label: 'Dil · Türkçe',
+                    label: switch (LocaleControllerScope.of(context).value?.languageCode) {
+                      'en' => 'Dil · English',
+                      'tr' => 'Dil · Türkçe',
+                      _ => 'Dil · Sistem',
+                    },
                     onTap: () =>
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LanguageScreen())),
                   ),
@@ -144,6 +158,12 @@ class ProfileScreen extends StatelessWidget {
                     label: 'Gizlilik ve KVKK',
                     onTap: () =>
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PrivacyScreen())),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.article_outlined,
+                    label: 'Kullanım şartları',
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TermsScreen())),
                   ),
                   _ProfileItem(
                     icon: Icons.help_outline_rounded,
@@ -269,9 +289,16 @@ class _ProfileItem extends StatelessWidget {
 /// temamız) arasında seçim yapılan 3'lü tema anahtarı.
 class _ThemeModeSelector extends StatelessWidget {
   final ThemeMode mode;
+  final bool usePlatformAccent;
   final ValueChanged<ThemeMode> onChanged;
+  final ValueChanged<bool> onPlatformAccent;
 
-  const _ThemeModeSelector({required this.mode, required this.onChanged});
+  const _ThemeModeSelector({
+    required this.mode,
+    required this.usePlatformAccent,
+    required this.onChanged,
+    required this.onPlatformAccent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -315,6 +342,22 @@ class _ThemeModeSelector extends StatelessWidget {
                 : mode == ThemeMode.light
                     ? 'Voltavia açık tema her zaman kullanılır.'
                     : 'Voltavia koyu tema her zaman kullanılır.',
+            style: text.captionMuted,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: Text('Duvar kağıdı rengi', style: text.body),
+              ),
+              Switch(
+                value: usePlatformAccent,
+                onChanged: onPlatformAccent,
+              ),
+            ],
+          ),
+          Text(
+            'Açıksa Android duvar kağıdındaki renk, deniz yeşiliyle karışır.',
             style: text.captionMuted,
           ),
         ],

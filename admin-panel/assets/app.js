@@ -1,32 +1,9 @@
-// Voltavia Admin Paneli — mock veriyle çalışan arayüz iskeleti.
-// Gerçek sürümde bu veriler Firestore + backend API'den (Cloudflare Workers) gelecektir.
+// Voltavia Admin Paneli — Firestore bağlanana kadar boş iskelet. Sahte kayıt yok.
 
-const stations = [
-  { name: 'Zorlu Center Şarj Noktası', city: 'İstanbul', district: 'Beşiktaş', operator: 'VoltCharge', power: '150 kW', status: 'available' },
-  { name: 'İstinye Park Otopark', city: 'İstanbul', district: 'Sarıyer', operator: 'Şimşek Enerji', power: '120 kW', status: 'busy' },
-  { name: 'Akbatı AVM Şarj İstasyonu', city: 'İstanbul', district: 'Esenyurt', operator: 'AkımNet', power: '22 kW', status: 'available' },
-  { name: 'Kadıköy Sahil Otoparkı', city: 'İstanbul', district: 'Kadıköy', operator: 'VoltCharge', power: '180 kW', status: 'maintenance' },
-  { name: 'Kızılay Meydan Şarj Üniteleri', city: 'Ankara', district: 'Çankaya', operator: 'ElektraPark', power: '90 kW', status: 'available' },
-];
-
-const operators = [
-  { name: 'VoltCharge', count: 412, integration: true, status: 'Aktif' },
-  { name: 'Şimşek Enerji', count: 268, integration: true, status: 'Aktif' },
-  { name: 'AkımNet', count: 190, integration: false, status: 'Görüşme Aşamasında' },
-  { name: 'ElektraPark', count: 378, integration: false, status: 'Aktif' },
-];
-
-const companies = [
-  { name: 'VoltCharge A.Ş.', plan: 'Kurumsal', fee: '38.000 ₺ / ay', renewal: '12 Mar 2027', status: 'Aktif' },
-  { name: 'Şimşek Enerji Ltd.', plan: 'Standart', fee: '24.000 ₺ / ay', renewal: '05 Kas 2026', status: 'Aktif' },
-  { name: 'AkımNet', plan: 'Deneme', fee: '—', renewal: '—', status: 'Görüşme' },
-];
-
-const auditLogs = [
-  { time: '13 Ağu 2026 · 14:22', user: 'admin@voltavia.app', action: 'Kadıköy Sahil Otoparkı istasyonu pasife alındı' },
-  { time: '12 Ağu 2026 · 09:10', user: 'admin@voltavia.app', action: 'Yeni istasyon eklendi: Kızılay Meydan Şarj Üniteleri' },
-  { time: '10 Ağu 2026 · 18:47', user: 'ops@voltcharge.com', action: 'VoltCharge lisans paketi Kurumsal olarak güncellendi' },
-];
+const stations = [];
+const operators = [];
+const companies = [];
+const auditLogs = [];
 
 const statusLabel = { available: 'Müsait', busy: 'Dolu', maintenance: 'Bakımda' };
 
@@ -34,7 +11,17 @@ function badge(status) {
   return `<span class="badge badge-${status}"><span class="badge-dot"></span>${statusLabel[status]}</span>`;
 }
 
+function emptyRow(cols, text) {
+  return `<tr><td colspan="${cols}">${text}</td></tr>`;
+}
+
 function renderStations() {
+  if (stations.length === 0) {
+    const empty = emptyRow(6, 'Kayıt yok.');
+    document.getElementById('stationRows').innerHTML = empty;
+    document.getElementById('dashboardStationRows').innerHTML = emptyRow(4, 'Kayıt yok.');
+    return;
+  }
   document.getElementById('stationRows').innerHTML = stations.map(s => `
     <tr>
       <td>${s.name}</td>
@@ -55,6 +42,10 @@ function renderStations() {
 }
 
 function renderOperators() {
+  if (operators.length === 0) {
+    document.getElementById('operatorRows').innerHTML = emptyRow(4, 'Kayıt yok.');
+    return;
+  }
   document.getElementById('operatorRows').innerHTML = operators.map(o => `
     <tr>
       <td>${o.name}</td>
@@ -65,6 +56,10 @@ function renderOperators() {
 }
 
 function renderCompanies() {
+  if (companies.length === 0) {
+    document.getElementById('companyRows').innerHTML = emptyRow(5, 'Kayıt yok.');
+    return;
+  }
   document.getElementById('companyRows').innerHTML = companies.map(c => `
     <tr>
       <td>${c.name}</td>
@@ -76,6 +71,10 @@ function renderCompanies() {
 }
 
 function renderAudit() {
+  if (auditLogs.length === 0) {
+    document.getElementById('auditRows').innerHTML = emptyRow(3, 'Kayıt yok.');
+    return;
+  }
   document.getElementById('auditRows').innerHTML = auditLogs.map(a => `
     <tr>
       <td>${a.time}</td>
@@ -85,9 +84,9 @@ function renderAudit() {
 }
 
 function login() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'flex';
-}
+  const note = document.querySelector('#loginScreen .hint');
+  if (note) note.textContent = 'Firebase projesi bağlı değil. Giriş açılmadı.';
+
 
 function logout() {
   document.getElementById('dashboard').style.display = 'none';
