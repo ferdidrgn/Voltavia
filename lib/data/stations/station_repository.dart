@@ -12,6 +12,7 @@ import '../models/connector_type.dart';
 import '../models/operator.dart';
 import '../models/station.dart';
 import 'station_cache.dart';
+import 'turkey_provinces.dart';
 
 class _SocketSummary {
   double maxKw = 0;
@@ -31,29 +32,44 @@ class StationRepository implements StationCatalog {
 
   static const _istanbul = (lat: 41.015137, lon: 28.979530);
 
-  static const _query = '''
-[out:json][timeout:40];
-(
-  node["amenity"="charging_station"](40.90,28.55,41.25,29.30);
-  node["amenity"="charging_station"](39.80,32.55,40.05,33.05);
-  node["amenity"="charging_station"](38.30,26.90,38.55,27.25);
-  node["amenity"="charging_station"](36.80,30.55,37.05,30.90);
-  node["amenity"="charging_station"](40.10,28.90,40.30,29.20);
-);
-out body 180;
-''';
+  /// Türkiye kara kutusu: güney, batı, kuzey, doğu.
+  static const _country = (south: 35.75, west: 25.55, north: 42.15, east: 44.85);
+
+  /// Ülke sorgusu zaman aşımına düşerse bölgeler sırayla çekilir.
+  static const _osmTiles = <({double south, double west, double north, double east})>[
+    (south: 40.2, west: 26.0, north: 42.2, east: 31.6),
+    (south: 37.4, west: 26.0, north: 40.5, east: 30.4),
+    (south: 35.8, west: 28.8, north: 38.0, east: 34.8),
+    (south: 35.8, west: 34.2, north: 38.6, east: 37.4),
+    (south: 38.0, west: 30.0, north: 41.3, east: 35.4),
+    (south: 40.3, west: 31.0, north: 42.2, east: 38.6),
+    (south: 39.8, west: 37.8, north: 42.2, east: 44.9),
+    (south: 37.0, west: 37.2, north: 40.8, east: 44.9),
+    (south: 35.9, west: 36.6, north: 38.0, east: 44.9),
+  ];
+
+  @override
+  Future<List<Station>> cachedStations() => _cache.load();
 
   @override
   Future<List<Station>> fetchTurkeySample() async {
     try {
       final loaded = await Future.wait([
         _orEmpty(_fetchOsm()),
-        _orEmpty(_fetchEpdk()),
+        _orEmpty(_fetchEpdkLive()),
       ]);
-      final merged = _merge(loaded[0], loaded[1]);
+      var epdk = loaded[1];
+      final bundleOnly = epdk.isEmpty;
+      if (bundleOnly) epdk = await _orEmpty(_fetchEpdkBundle());
+      final merged = _merge(loaded[0], epdk);
       if (merged.isNotEmpty) {
         merged.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
-        await _cache.save(merged);
+        if (!bundleOnly) {
+          await _cache.save(merged);
+          return merged;
+        }
+        final cached = await _cache.load();
+        if (cached.length > merged.length) return cached;
         return merged;
       }
     } catch (_) {}
@@ -71,13 +87,41 @@ out body 180;
   }
 
   Future<List<Station>> _fetchOsm() async {
+    try {
+      final country = await _fetchOsmQuery(_osmQuery(_country, timeout: 70), const Duration(seconds: 90));
+      if (country.length >= 200) return country;
+    } catch (_) {}
+
+    final byId = <String, Station>{};
+    for (final tile in _osmTiles) {
+      try {
+        final batch = await _fetchOsmQuery(_osmQuery(tile, timeout: 25), const Duration(seconds: 35));
+        for (final station in batch) {
+          byId[station.id] = station;
+        }
+      } catch (_) {}
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+    return byId.values.toList();
+  }
+
+  String _osmQuery(({double south, double west, double north, double east}) box, {required int timeout}) {
+    return '''
+[out:json][timeout:$timeout];
+node["amenity"="charging_station"](${box.south},${box.west},${box.north},${box.east});
+out body;
+''';
+  }
+
+  Future<List<Station>> _fetchOsmQuery(String query, Duration receiveTimeout) async {
     final response = await _api.dio.post<String>(
       AppConfig.overpassUrl,
-      data: _query,
+      data: query,
       options: Options(
         headers: const {'Content-Type': 'text/plain; charset=utf-8'},
         responseType: ResponseType.plain,
-        receiveTimeout: const Duration(seconds: 35),
+        receiveTimeout: receiveTimeout,
+        extra: const {'retry': 2},
       ),
     );
 
@@ -101,16 +145,25 @@ out body 180;
   }
 
   Station? _parse(Map<String, dynamic> node) {
-    final lat = (node['lat'] as num?)?.toDouble();
-    final lon = (node['lon'] as num?)?.toDouble();
+    final center = node['center'];
+    final lat = (node['lat'] as num?)?.toDouble() ??
+        (center is Map ? (center['lat'] as num?)?.toDouble() : null);
+    final lon = (node['lon'] as num?)?.toDouble() ??
+        (center is Map ? (center['lon'] as num?)?.toDouble() : null);
     if (lat == null || lon == null) return null;
 
     final tags = node['tags'];
     final map = tags is Map<String, dynamic> ? tags : const <String, dynamic>{};
     final operatorName = _text(map['operator']) ?? _text(map['brand']) ?? _text(map['network']) ?? 'Bağımsız';
     final name = _text(map['name']) ?? '$operatorName şarj noktası';
-    final city = _text(map['addr:city']) ?? _text(map['addr:province']) ?? _guessCity(lat, lon);
-    final district = _text(map['addr:suburb']) ?? _text(map['addr:district']) ?? '';
+    final place = resolvePlace(
+      latitude: lat,
+      longitude: lon,
+      taggedCity: _text(map['addr:province']) ?? _text(map['addr:city']),
+      taggedDistrict: _text(map['addr:district']) ?? _text(map['addr:suburb']),
+    );
+    final city = place.city;
+    final district = place.district;
     final street = _text(map['addr:street']);
     final connectors = _connectors(map);
     final power = _powerKw(map, connectors);
@@ -141,11 +194,7 @@ out body 180;
     );
   }
 
-  Future<List<Station>> _fetchEpdk() async {
-    try {
-      final live = await _fetchEpdkLive();
-      if (live.isNotEmpty) return live;
-    } catch (_) {}
+  Future<List<Station>> _fetchEpdkBundle() async {
     final geo = await rootBundle.loadString('assets/stations/sarj_istasyonlari.geojson');
     final csv = await rootBundle.loadString('assets/stations/sarj_istasyon_soket.csv');
     return _decodeEpdk(geo, csv);
@@ -159,7 +208,7 @@ out body 180;
       'User-Agent': 'Voltavia/1.0 (ev charging map)',
     });
     request.body = jsonEncode(const {'hizmetSekli': 'HALKA_ACIK'});
-    final streamed = await request.send().timeout(const Duration(seconds: 45));
+    final streamed = await request.send().timeout(const Duration(seconds: 90));
     final response = await http.Response.fromStream(streamed);
     if (response.statusCode != 200) throw StateError('EPDK ${response.statusCode}');
     final stations = _decodeEpdkGateway(utf8.decode(response.bodyBytes));
@@ -221,15 +270,21 @@ out body 180;
         'EPDK';
     final name = _fieldText(row, const ['sarjistasyonuadi', 'istasyonadi', 'ad']) ?? brand;
     final address = _fieldText(row, const ['adres']) ?? '';
-    final place = _placeFromAddress(address);
+    final place = resolvePlace(
+      latitude: lat,
+      longitude: lon,
+      taggedCity: _fieldText(row, const ['il', 'iladi', 'sehir']),
+      taggedDistrict: _fieldText(row, const ['ilce', 'ilceadi']),
+      address: address,
+    );
     final sockets = _gatewaySockets(row);
     final connectors = sockets.connectors.isEmpty ? const [ConnectorType.type2] : sockets.connectors;
 
     return Station(
       id: 'epdk-$stationNo',
       name: name,
-      city: place.$1,
-      district: place.$2,
+      city: place.city,
+      district: place.district,
       address: address.isEmpty ? 'EPDK kaydı' : address,
       chargeOperator: ChargeOperator(
         id: 'epdk-${_slug(brand)}',
@@ -344,15 +399,21 @@ out body 180;
     final brand = _text(props['MARKA_TESCIL_BELGESI']) ?? _text(props['AGIL_ISLETMECISI_UNVAN']) ?? 'EPDK';
     final name = _text(props['AD']) ?? brand;
     final address = _text(props['ADRES']) ?? '';
-    final place = _placeFromAddress(address);
+    final place = resolvePlace(
+      latitude: lat,
+      longitude: lon,
+      taggedCity: _text(props['IL']) ?? _text(props['SEHIR']),
+      taggedDistrict: _text(props['ILCE']),
+      address: address,
+    );
     final summary = sockets[stationNo];
     final connectors = summary == null || summary.connectors.isEmpty ? const [ConnectorType.type2] : List<ConnectorType>.from(summary.connectors);
 
     return Station(
       id: 'epdk-$stationNo',
       name: name,
-      city: place.$1,
-      district: place.$2,
+      city: place.city,
+      district: place.district,
       address: address.isEmpty ? 'EPDK kaydı' : address,
       chargeOperator: ChargeOperator(
         id: 'epdk-${_slug(brand)}',
@@ -371,16 +432,6 @@ out body 180;
       longitude: lon,
       origin: 'EPDK',
     );
-  }
-
-  (String, String) _placeFromAddress(String address) {
-    final parts = address.split('/');
-    if (parts.length < 2) return ('İstanbul', '');
-    final city = parts.last.trim();
-    final before = parts[parts.length - 2].trim();
-    final words = before.split(RegExp(r'\s+'));
-    final district = words.isEmpty ? '' : words.last;
-    return (city.isEmpty ? 'İstanbul' : city, district);
   }
 
   ConnectorType? _connectorFromTur(String raw) {
@@ -458,15 +509,6 @@ out body 180;
   }
 
   String _slug(String value) => value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
-
-  String _guessCity(double lat, double lon) {
-    if (lat > 40.7 && lon < 29.6) return 'İstanbul';
-    if (lat > 39.6 && lon > 32.2 && lon < 33.3) return 'Ankara';
-    if (lat > 38.1 && lat < 38.7 && lon < 27.5) return 'İzmir';
-    if (lat < 37.2 && lon > 30.4) return 'Antalya';
-    if (lat > 40.0 && lon > 28.7 && lon < 29.4) return 'Bursa';
-    return 'Türkiye';
-  }
 
   List<ConnectorType> _connectors(Map<String, dynamic> tags) {
     final keys = tags.keys.map((k) => k.toString().toLowerCase()).toList();

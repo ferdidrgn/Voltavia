@@ -4,6 +4,8 @@ import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/state/app_state.dart';
+import '../../../data/stations/station_query.dart';
+import '../../../data/stations/turkey_provinces.dart';
 
 /// Şehir/ilçe filtresi için modal alt sayfa (bottom sheet).
 class CityFilterSheet extends StatefulWidget {
@@ -19,6 +21,7 @@ class CityFilterSheet extends StatefulWidget {
 class _CityFilterSheetState extends State<CityFilterSheet> {
   String? _city;
   String? _district;
+  String _cityQuery = '';
 
   @override
   void initState() {
@@ -33,6 +36,8 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
     final text = context.text;
     final stations = AppStateScope.of(context).stations;
     final cities = stations.map((s) => s.city).where((c) => c.isNotEmpty).toSet().toList()..sort();
+    final needle = foldTr(_cityQuery);
+    final shownCities = needle.isEmpty ? cities : cities.where((city) => foldTr(city).contains(needle)).toList();
     final districts = _city == null
         ? <String>[]
         : stations.where((s) => s.city == _city && s.district.isNotEmpty).map((s) => s.district).toSet().toList()
@@ -61,7 +66,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Şehir / İlçe Seç', style: text.headline),
+                  Text('İl / İlçe', style: text.headline),
                   TextButton(
                     onPressed: () => setState(() {
                       _city = null;
@@ -72,16 +77,28 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
+              TextField(
+                onChanged: (value) => setState(() => _cityQuery = value),
+                decoration: const InputDecoration(
+                  hintText: 'İl ara',
+                  prefixIcon: Icon(Icons.search_rounded, size: 18),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               Expanded(
                 child: ListView(
                   controller: scrollController,
                   children: [
-                    Text('ŞEHİR', style: text.overline),
+                    Text('İl', style: text.title),
                     const SizedBox(height: AppSpacing.xs),
+                    if (shownCities.isEmpty)
+                      Text('Bu adla il yok', style: text.captionMuted)
+                    else
                     Wrap(
                       spacing: AppSpacing.xs,
                       runSpacing: AppSpacing.xs,
-                      children: cities.map((city) {
+                      children: shownCities.map((city) {
                         final selected = city == _city;
                         return ChoiceChip(
                           label: Text(city),
@@ -100,7 +117,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
                     ),
                     if (districts.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      Text('İLÇE', style: text.overline),
+                      Text('İlçe', style: text.title),
                       const SizedBox(height: AppSpacing.xs),
                       Wrap(
                         spacing: AppSpacing.xs,
@@ -126,7 +143,7 @@ class _CityFilterSheetState extends State<CityFilterSheet> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(_city),
+                  onPressed: () => Navigator.of(context).pop(PlaceSelection(city: _city, district: _district)),
                   child: const Text('Uygula'),
                 ),
               ),

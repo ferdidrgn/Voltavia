@@ -26,6 +26,8 @@ class StationListScreen extends StatefulWidget {
 class _StationListScreenState extends State<StationListScreen> {
   String _query = '';
   String? _city;
+  String? _district;
+  double? _maxKm;
   ConnectorType? _connector;
   double _minKw = 0;
   _SortBy _sort = _SortBy.distance;
@@ -44,7 +46,14 @@ class _StationListScreenState extends State<StationListScreen> {
   List<Station> get _filtered {
     final filter = DiscoveryFilter(connector: _connector, minKw: _minKw);
     var list = AppStateScope.of(context).stations.where((s) {
-      return stationMatches(s, query: _query, city: _city, filter: filter);
+      return stationMatches(
+        s,
+        query: _query,
+        city: _city,
+        district: _district,
+        maxDistanceKm: _maxKm,
+        filter: filter,
+      );
     }).toList();
 
     switch (_sort) {
@@ -62,13 +71,28 @@ class _StationListScreenState extends State<StationListScreen> {
   }
 
   Future<void> _openCityFilter() async {
-    final city = await showModalBottomSheet<String?>(
+    final selection = await showModalBottomSheet<PlaceSelection>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => CityFilterSheet(selectedCity: _city),
+      builder: (_) => CityFilterSheet(selectedCity: _city, selectedDistrict: _district),
     );
+    if (!mounted || selection == null) return;
+    setState(() {
+      _city = selection.city;
+      _district = selection.district;
+    });
+  }
+
+  Future<void> _near() async {
+    if (_maxKm != null) {
+      setState(() => _maxKm = null);
+      return;
+    }
+    final appState = AppStateScope.of(context);
+    await appState.requestDeviceLocation();
     if (!mounted) return;
-    setState(() => _city = city);
+    if (appState.deviceLatitude == null) return;
+    setState(() => _maxKm = 30);
   }
 
   @override
@@ -146,11 +170,22 @@ class _StationListScreenState extends State<StationListScreen> {
                   isDesktop ? AppSpacing.xxl : AppSpacing.md,
                   AppSpacing.xs,
                 ),
-                child: StationFilterBar(
-                  connector: _connector,
-                  minKw: _minKw,
-                  onConnector: (value) => setState(() => _connector = value),
-                  onMinKw: (value) => setState(() => _minKw = value),
+                child: Column(
+                  children: [
+                    StationFilterBar(
+                      connector: _connector,
+                      minKw: _minKw,
+                      onConnector: (value) => setState(() => _connector = value),
+                      onMinKw: (value) => setState(() => _minKw = value),
+                    ),
+                    PlaceFilterBar(
+                      city: _city,
+                      district: _district,
+                      maxDistanceKm: _maxKm,
+                      onPickPlace: _openCityFilter,
+                      onNear: _near,
+                    ),
+                  ],
                 ),
               ),
               Padding(
@@ -160,7 +195,13 @@ class _StationListScreenState extends State<StationListScreen> {
                     if (_city != null)
                       Padding(
                         padding: const EdgeInsets.only(right: AppSpacing.xs),
-                        child: Chip(label: Text(_city!), onDeleted: () => setState(() => _city = null)),
+                        child: Chip(
+                          label: Text(_district == null ? _city! : '$_district, $_city'),
+                          onDeleted: () => setState(() {
+                            _city = null;
+                            _district = null;
+                          }),
+                        ),
                       ),
                     const Spacer(),
                     DropdownButtonHideUnderline(

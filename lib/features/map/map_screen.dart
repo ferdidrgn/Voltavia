@@ -10,6 +10,8 @@ import '../../core/utils/formatters.dart';
 import '../../data/models/connector_type.dart';
 import '../../data/models/station.dart';
 import '../../data/stations/station_query.dart';
+import '../../data/stations/turkey_provinces.dart';
+import '../stations/widgets/city_filter_sheet.dart';
 import '../stations/widgets/station_filter_bar.dart';
 import '../../widgets/status_badge.dart';
 import '../stations/station_detail_screen.dart';
@@ -29,6 +31,9 @@ class _MapScreenState extends State<MapScreen> {
   String _queryText = '';
   ConnectorType? _connector;
   double _minKw = 0;
+  String? _city;
+  String? _district;
+  double? _maxKm;
   Station? _selected;
   bool _syncedVehicle = false;
 
@@ -51,7 +56,56 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Station> _visible(List<Station> all) {
     final filter = DiscoveryFilter(connector: _connector, minKw: _minKw);
-    return all.where((station) => stationMatches(station, query: _queryText, filter: filter)).toList();
+    return all.where((station) {
+      return stationMatches(
+        station,
+        query: _queryText,
+        city: _city,
+        district: _district,
+        maxDistanceKm: _maxKm,
+        filter: filter,
+      );
+    }).toList();
+  }
+
+  Future<void> _pickPlace() async {
+    final selection = await showModalBottomSheet<PlaceSelection>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => CityFilterSheet(selectedCity: _city, selectedDistrict: _district),
+    );
+    if (!mounted || selection == null) return;
+    setState(() {
+      _city = selection.city;
+      _district = selection.district;
+    });
+    final city = selection.city;
+    if (city == null) return;
+    final province = provinceByName(city);
+    if (province == null) return;
+    final zoom = selection.district == null ? 9.0 : 12.0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _mapController.move(LatLng(province.latitude, province.longitude), zoom);
+    });
+  }
+
+  Future<void> _near() async {
+    if (_maxKm != null) {
+      setState(() => _maxKm = null);
+      return;
+    }
+    final appState = AppStateScope.of(context);
+    await appState.requestDeviceLocation();
+    if (!mounted) return;
+    final lat = appState.deviceLatitude;
+    final lon = appState.deviceLongitude;
+    if (lat == null || lon == null) return;
+    setState(() => _maxKm = 30);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _mapController.move(LatLng(lat, lon), 12);
+    });
   }
 
   void _focus(Station station) {
@@ -87,6 +141,11 @@ class _MapScreenState extends State<MapScreen> {
       minKw: _minKw,
       onConnector: (value) => setState(() => _connector = value),
       onMinKw: (value) => setState(() => _minKw = value),
+      city: _city,
+      district: _district,
+      maxKm: _maxKm,
+      onPickPlace: _pickPlace,
+      onNear: _near,
     );
 
     if (!wide) {
@@ -115,6 +174,13 @@ class _MapScreenState extends State<MapScreen> {
                           minKw: _minKw,
                           onConnector: (value) => setState(() => _connector = value),
                           onMinKw: (value) => setState(() => _minKw = value),
+                        ),
+                        PlaceFilterBar(
+                          city: _city,
+                          district: _district,
+                          maxDistanceKm: _maxKm,
+                          onPickPlace: _pickPlace,
+                          onNear: _near,
                         ),
                       ],
                     ),
@@ -203,6 +269,11 @@ class _StationRail extends StatelessWidget {
   final double minKw;
   final ValueChanged<ConnectorType?> onConnector;
   final ValueChanged<double> onMinKw;
+  final String? city;
+  final String? district;
+  final double? maxKm;
+  final VoidCallback onPickPlace;
+  final VoidCallback onNear;
 
   const _StationRail({
     required this.stations,
@@ -216,6 +287,11 @@ class _StationRail extends StatelessWidget {
     required this.minKw,
     required this.onConnector,
     required this.onMinKw,
+    required this.city,
+    required this.district,
+    required this.maxKm,
+    required this.onPickPlace,
+    required this.onNear,
   });
 
   @override
@@ -230,7 +306,7 @@ class _StationRail extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(live ? 'EPDK ve OpenStreetMap' : 'Örnek istasyonlar', style: text.title),
+              Text(live ? 'EPDK ve OpenStreetMap' : 'Kayıtlı katalog', style: text.title),
               const SizedBox(height: 4),
               Text(
                 loading ? 'EPDK ve OpenStreetMap sorgulanıyor' : _sourceLine(stations),
@@ -244,6 +320,13 @@ class _StationRail extends StatelessWidget {
                 minKw: minKw,
                 onConnector: onConnector,
                 onMinKw: onMinKw,
+              ),
+              PlaceFilterBar(
+                city: city,
+                district: district,
+                maxDistanceKm: maxKm,
+                onPickPlace: onPickPlace,
+                onNear: onNear,
               ),
             ],
           ),

@@ -39,12 +39,16 @@ class AppState extends ChangeNotifier {
   bool _stationsLoading = false;
   bool _usingLiveStations = false;
   bool _usingDeviceLocation = false;
+  double? _deviceLatitude;
+  double? _deviceLongitude;
   bool _disposed = false;
 
   List<Station> get stations => List.unmodifiable(_stations);
   bool get stationsLoading => _stationsLoading;
   bool get usingLiveStations => _usingLiveStations;
   bool get usingDeviceLocation => _usingDeviceLocation;
+  double? get deviceLatitude => _deviceLatitude;
+  double? get deviceLongitude => _deviceLongitude;
   String get displayName => _displayName;
   List<AppNotification> get notifications => List.unmodifiable(_notifications);
   int get unreadNotificationCount => _notifications.where((item) => !item.isRead).length;
@@ -69,6 +73,14 @@ class AppState extends ChangeNotifier {
   Future<void> refreshStations() async {
     _stationsLoading = true;
     _notify();
+    if (_stations.isEmpty) {
+      final cached = await _stationsRepo.cachedStations();
+      if (!_disposed && _stations.isEmpty && cached.isNotEmpty) {
+        _stations = cached;
+        _usingLiveStations = true;
+        _notify();
+      }
+    }
     try {
       final live = await _stationsRepo.fetchTurkeySample();
       if (_disposed) return;
@@ -98,6 +110,8 @@ class AppState extends ChangeNotifier {
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
       ).timeout(const Duration(seconds: 12));
       if (_disposed) return;
+      _deviceLatitude = position.latitude;
+      _deviceLongitude = position.longitude;
       _stations = [
         for (final station in _stations)
           station.withDistance(kmBetween(position.latitude, position.longitude, station.latitude, station.longitude)),

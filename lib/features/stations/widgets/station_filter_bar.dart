@@ -51,3 +51,48 @@ class StationFilterBar extends StatelessWidget {
     );
   }
 }
+
+/// İl, ilçe ve yakın çevre. Mesafe, cihaz konumu ölçülünce uygulanır.
+class PlaceFilterBar extends StatelessWidget {
+  final String? city;
+  final String? district;
+  final double? maxDistanceKm;
+  final VoidCallback onPickPlace;
+  final VoidCallback onNear;
+
+  const PlaceFilterBar({
+    super.key,
+    required this.city,
+    required this.district,
+    required this.maxDistanceKm,
+    required this.onPickPlace,
+    required this.onNear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final place = district == null ? (city ?? 'İl') : '$district, $city';
+    final nearLabel = maxDistanceKm == null ? 'Yakınımda' : 'Yakınımda · ${maxDistanceKm!.round()} km';
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(place),
+              selected: city != null,
+              onSelected: (_) => onPickPlace(),
+            ),
+          ),
+          FilterChip(
+            label: Text(nearLabel),
+            selected: maxDistanceKm != null,
+            onSelected: (_) => onNear(),
+          ),
+        ],
+      ),
+    );
+  }
+}
