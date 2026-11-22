@@ -107,6 +107,10 @@ olmadan doğrudan tüketici uygulamasına girebilirsin.
 
 Cloudflare Workers iskeleti — bkz. `backend/README.md`.
 
+## Kotlin Multiplatform başlangıcı
+
+Compose Multiplatform ve Material 3 tabanlı, Android/iOS ortak arayüz prototipi `kmp/` altındadır. Mevcut Flutter uygulamasından ayrı tutulur. Rakip analizi ve ürün kararları `docs/analysis/voltavia-benchmark-and-product-analysis.md`, fazlı işler `docs/progress/voltavia-kmp-work-plan.md` dosyasındadır. KMP derleme/IDE yönergeleri için `kmp/README.md` dosyasına bakın.
+
 ---
 
 _Flutter starter şablonundan üretilmiştir._

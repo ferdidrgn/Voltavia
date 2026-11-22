@@ -31,7 +31,9 @@ class ProfileScreen extends StatelessWidget {
     final themeController = ThemeControllerScope.of(context);
     final appState = AppStateScope.of(context);
     final isDesktop = Responsive.isDesktop(context);
-    final name = appState.displayName.trim().isEmpty ? 'Misafir' : appState.displayName.trim();
+    final name = appState.displayName.trim().isEmpty
+        ? 'Misafir'
+        : appState.displayName.trim();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -61,13 +63,18 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         Text(name, style: context.text.headline),
                         const SizedBox(height: 2),
-                        Text('Hesap bağlı değil', style: context.text.bodyMuted),
+                        Text(
+                          'Hesap bağlı değil',
+                          style: context.text.bodyMuted,
+                        ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const EditProfileScreen(),
+                      ),
                     ),
                     icon: const Icon(Icons.edit_rounded, size: 18),
                   ),
@@ -78,7 +85,13 @@ class ProfileScreen extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: const [
-                    Expanded(child: KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '0')),
+                    Expanded(
+                      child: KpiStatCard(
+                        icon: Icons.bolt_rounded,
+                        label: 'Bu ay şarj',
+                        value: '0',
+                      ),
+                    ),
                     Gap(AppSpacing.sm),
                     Expanded(
                       child: KpiStatCard(
@@ -107,26 +120,37 @@ class ProfileScreen extends StatelessWidget {
                   _ProfileItem(
                     icon: Icons.history_rounded,
                     label: 'Şarj Geçmişi',
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.notifications_rounded,
                     label: 'Bildirimler',
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.credit_card_rounded,
                     label: 'Ödeme Yöntemlerim',
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const PaymentMethodsScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PaymentMethodsScreen(),
+                      ),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.directions_car_filled_outlined,
                     label: 'Araçlarım',
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const VehiclesScreen())),
+                    subtitle: appState.defaultVehicle == null
+                        ? 'Araç seçilmedi'
+                        : '${appState.defaultVehicle!.brand} ${appState.defaultVehicle!.model} · ${appState.vehicles.length} araç',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const VehiclesScreen()),
+                    ),
                   ),
                 ],
               ),
@@ -145,31 +169,39 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   _ProfileItem(
                     icon: Icons.public_rounded,
-                    label: switch (LocaleControllerScope.of(context).value?.languageCode) {
+                    label: switch (LocaleControllerScope.of(
+                      context,
+                    ).value?.languageCode) {
                       'en' => 'Dil · English',
                       'tr' => 'Dil · Türkçe',
                       _ => 'Dil · Sistem',
                     },
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LanguageScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LanguageScreen()),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.shield_rounded,
                     label: 'Gizlilik ve KVKK',
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PrivacyScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.article_outlined,
                     label: 'Kullanım şartları',
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TermsScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const TermsScreen()),
+                    ),
                   ),
                   _ProfileItem(
                     icon: Icons.help_outline_rounded,
                     label: 'Yardım ve Destek',
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const HelpSupportScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const HelpSupportScreen(),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -181,8 +213,11 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.apartment_rounded,
                     label: 'Firma Paneline Git',
                     subtitle: 'İstasyonlarını ve lisansını yönet',
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const AdminLoginScreen())),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AdminLoginScreen(),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -196,7 +231,9 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: context.colors.danger,
-                    side: BorderSide(color: context.colors.danger.withValues(alpha: 0.5)),
+                    side: BorderSide(
+                      color: context.colors.danger.withValues(alpha: 0.5),
+                    ),
                   ),
                   icon: const Icon(Icons.logout_rounded, size: 17),
                   label: const Text('Çıkış Yap'),
@@ -253,17 +290,28 @@ class _ProfileItem extends StatelessWidget {
   final String? subtitle;
   final VoidCallback? onTap;
 
-  const _ProfileItem({required this.icon, required this.label, this.subtitle, this.onTap});
+  const _ProfileItem({
+    required this.icon,
+    required this.label,
+    this.subtitle,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.text;
     return InkWell(
-      onTap: onTap ??
-          () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yakında eklenecek'))),
+      onTap:
+          onTap ??
+          () => ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Yakında eklenecek'))),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         child: Row(
           children: [
             Icon(icon, size: 19, color: colors.accentPrimary),
@@ -273,11 +321,16 @@ class _ProfileItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label, style: text.body),
-                  if (subtitle != null) Text(subtitle!, style: text.captionMuted),
+                  if (subtitle != null)
+                    Text(subtitle!, style: text.captionMuted),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, size: 17, color: colors.textMuted),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 17,
+              color: colors.textMuted,
+            ),
           ],
         ),
       ),
@@ -311,7 +364,11 @@ class _ThemeModeSelector extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.desktop_windows_rounded, size: 19, color: colors.accentPrimary),
+              Icon(
+                Icons.desktop_windows_rounded,
+                size: 19,
+                color: colors.accentPrimary,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Text('Görünüm', style: text.body),
             ],
@@ -321,15 +378,30 @@ class _ThemeModeSelector extends StatelessWidget {
             width: double.infinity,
             child: SegmentedButton<ThemeMode>(
               segments: const [
-                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.desktop_windows_rounded, size: 15), label: Text('Sistem')),
-                ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_rounded, size: 15), label: Text('Açık')),
-                ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_rounded, size: 15), label: Text('Koyu')),
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  icon: Icon(Icons.desktop_windows_rounded, size: 15),
+                  label: Text('Sistem'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  icon: Icon(Icons.light_mode_rounded, size: 15),
+                  label: Text('Açık'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  icon: Icon(Icons.dark_mode_rounded, size: 15),
+                  label: Text('Koyu'),
+                ),
               ],
               selected: {mode},
               showSelectedIcon: false,
               onSelectionChanged: (selection) => onChanged(selection.first),
               style: SegmentedButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+                textStyle: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                ),
                 selectedBackgroundColor: colors.accentPrimary,
                 selectedForegroundColor: Colors.white,
               ),
@@ -340,20 +412,15 @@ class _ThemeModeSelector extends StatelessWidget {
             mode == ThemeMode.system
                 ? 'Telefonunun tema ayarını takip eder.'
                 : mode == ThemeMode.light
-                    ? 'Voltavia açık tema her zaman kullanılır.'
-                    : 'Voltavia koyu tema her zaman kullanılır.',
+                ? 'Voltavia açık tema her zaman kullanılır.'
+                : 'Voltavia koyu tema her zaman kullanılır.',
             style: text.captionMuted,
           ),
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
-              Expanded(
-                child: Text('Duvar kağıdı rengi', style: text.body),
-              ),
-              Switch(
-                value: usePlatformAccent,
-                onChanged: onPlatformAccent,
-              ),
+              Expanded(child: Text('Duvar kağıdı rengi', style: text.body)),
+              Switch(value: usePlatformAccent, onChanged: onPlatformAccent),
             ],
           ),
           Text(

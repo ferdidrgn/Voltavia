@@ -9,6 +9,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/firebase/firebase_gate.dart';
 import '../../data/models/app_notification.dart';
+import '../../data/models/vehicle.dart';
 import '../../core/theme/responsive.dart';
 import '../../widgets/bento_card.dart';
 import '../../widgets/kpi_stat_card.dart';
@@ -18,6 +19,7 @@ import '../history/history_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../operators/operators_screen.dart';
 import '../profile/add_vehicle_screen.dart';
+import '../profile/vehicles_screen.dart';
 import '../route_planner/widgets/route_planner_banner.dart';
 import '../map/station_map.dart';
 import '../stations/station_detail_screen.dart';
@@ -35,8 +37,14 @@ Future<void> _explainAndRequestLocation(BuildContext context) async {
         'Listeyi sana göre sıralamak için konumunu yalnızca bu istekte kullanırız. Arka planda izleme yok.',
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Şimdi değil')),
-        TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Konumu kullan')),
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: const Text('Şimdi değil'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: const Text('Konumu kullan'),
+        ),
       ],
     ),
   );
@@ -61,7 +69,8 @@ class HomeDashboardScreen extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final unreadCount = appState.unreadNotificationCount;
     final greetingName = appState.displayName.trim();
-    final catalog = List.of(appState.stations)..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+    final catalog = List.of(appState.stations)
+      ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
     final nearest = catalog.take(5).toList();
 
     final quickActions = [
@@ -86,14 +95,17 @@ class HomeDashboardScreen extends StatelessWidget {
       QuickActionItem(
         icon: Icons.history_rounded,
         label: 'Geçmiş',
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
         color: AppPalette.amber,
       ),
       QuickActionItem(
         icon: Icons.notifications_rounded,
         label: 'Bildirimler',
-        onTap: () =>
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
         color: AppPalette.sky,
       ),
       QuickActionItem(
@@ -113,45 +125,68 @@ class HomeDashboardScreen extends StatelessWidget {
       ),
       children: [
         if (nearest.isNotEmpty)
-        NearestChargeStage(
-          station: nearest.first,
-          onOpen: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => StationDetailScreen(station: nearest.first)),
-          ),
-          trailing: _NotificationButton(
-            unreadCount: unreadCount,
-            onTap: () =>
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-          ),
-        ).enterFade(),
+          NearestChargeStage(
+            station: nearest.first,
+            onOpen: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => StationDetailScreen(station: nearest.first),
+              ),
+            ),
+            trailing: _NotificationButton(
+              unreadCount: unreadCount,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              ),
+            ),
+          ).enterFade(),
         const Gap(AppSpacing.md),
         Text(
-          greetingName.isEmpty ? 'Bugün nereden şarj alacaksın?' : '$greetingName, bugün nereden şarj alacaksın?',
+          greetingName.isEmpty
+              ? 'Bugün nereden şarj alacaksın?'
+              : '$greetingName, bugün nereden şarj alacaksın?',
           style: text.bodyMuted,
         ).enterFade(),
         if (FirebaseGate.maintenance) ...[
           const Gap(AppSpacing.sm),
-          Text('Bakım modu açık. Katalog gezilebilir, şarj başlatılmaz.', style: text.captionMuted),
+          Text(
+            'Bakım modu açık. Katalog gezilebilir, şarj başlatılmaz.',
+            style: text.captionMuted,
+          ),
         ],
         const Gap(AppSpacing.md),
         InkWell(
           borderRadius: BorderRadius.circular(AppRadius.pill),
           onTap: () => onNavigateTab(2),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm + 3,
+            ),
             decoration: BoxDecoration(
               color: colors.surface,
               borderRadius: BorderRadius.circular(AppRadius.pill),
               border: Border.all(color: colors.borderStrong, width: 1.2),
               boxShadow: [
-                if (colors.isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8)),
+                if (colors.isDark)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
               ],
             ),
             child: Row(
               children: [
-                Icon(Icons.search_rounded, color: colors.accentPrimary, size: 19),
+                Icon(
+                  Icons.search_rounded,
+                  color: colors.accentPrimary,
+                  size: 19,
+                ),
                 const Gap(AppSpacing.xs),
-                Text('İstasyon, operatör veya şehir ara', style: text.bodyMuted),
+                Text(
+                  'İstasyon, operatör veya şehir ara',
+                  style: text.bodyMuted,
+                ),
               ],
             ),
           ),
@@ -160,43 +195,28 @@ class HomeDashboardScreen extends StatelessWidget {
           const Gap(AppSpacing.lg),
           _ActiveSessionCard(
             stationName: appState.activeSession!.stationName,
-            onTap: () =>
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ActiveChargingScreen())),
-          ),
-        ],
-        const Gap(AppSpacing.lg),
-        _HomeKpis(favoriteCount: appState.favoriteStationIds.length).enterRise(delay: AppMotion.staggerStep),
-        const Gap(AppSpacing.lg),
-        QuickActionsGrid(items: quickActions).enterRise(delay: AppMotion.staggerStep * 3),
-        const Gap(AppSpacing.lg),
-        const RoutePlannerBanner().enterRise(delay: AppMotion.staggerStep * 3),
-        if (appState.vehicles.isEmpty) ...[
-          const Gap(AppSpacing.lg),
-          BentoCard(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AddVehicleScreen())),
-            child: Row(
-              children: [
-                Icon(Icons.directions_car_filled_outlined, color: colors.accentPrimary),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Aracını kaydet', style: text.bodyStrong),
-                      Text(
-                        'Konnektör uyumu, istasyon filtresi ve rota menzili bu kayda bağlanır.',
-                        style: text.captionMuted,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ActiveChargingScreen()),
             ),
           ),
         ],
         const Gap(AppSpacing.lg),
+        _HomeKpis(
+          favoriteCount: appState.favoriteStationIds.length,
+        ).enterRise(delay: AppMotion.staggerStep),
+        const Gap(AppSpacing.lg),
+        QuickActionsGrid(
+          items: quickActions,
+        ).enterRise(delay: AppMotion.staggerStep * 3),
+        const Gap(AppSpacing.lg),
+        const RoutePlannerBanner().enterRise(delay: AppMotion.staggerStep * 3),
+        const Gap(AppSpacing.lg),
+        _HomeVehicleCard(vehicle: appState.defaultVehicle),
+        const Gap(AppSpacing.lg),
         SectionHeader(
-          title: appState.usingDeviceLocation ? 'Sana En Yakın Noktalar' : 'İstanbul merkezine göre',
+          title: appState.usingDeviceLocation
+              ? 'Sana En Yakın Noktalar'
+              : 'İstanbul merkezine göre',
           actionLabel: 'Haritada Gör',
           onAction: () => onNavigateTab(1),
         ),
@@ -204,26 +224,33 @@ class HomeDashboardScreen extends StatelessWidget {
           stations: nearest,
           measuredFromDevice: appState.usingDeviceLocation,
           onOpenMap: () => onNavigateTab(1),
-          onRequestLocation: appState.usingDeviceLocation ? null : () => _explainAndRequestLocation(context),
+          onRequestLocation: appState.usingDeviceLocation
+              ? null
+              : () => _explainAndRequestLocation(context),
         ),
         const Gap(AppSpacing.lg),
         SectionHeader(
           title: 'Firmalar',
           actionLabel: 'Tümünü Gör',
-          onAction: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OperatorsScreen())),
+          onAction: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const OperatorsScreen())),
         ),
         const OperatorsSection(),
         const Gap(AppSpacing.lg),
         SectionHeader(
           title: 'Son Bildirimler',
           actionLabel: 'Tümünü Gör',
-          onAction: () =>
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+          onAction: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+          ),
         ),
         if (appState.notifications.isEmpty)
           Text('Bildirim yok.', style: text.captionMuted)
         else
-          ...appState.notifications.take(2).map((n) => _NotificationPreview(notification: n)),
+          ...appState.notifications
+              .take(2)
+              .map((n) => _NotificationPreview(notification: n)),
       ],
     );
 
@@ -240,7 +267,9 @@ class HomeDashboardScreen extends StatelessWidget {
                     stations: catalog,
                     selected: nearest.isEmpty ? null : nearest.first,
                     onSelect: (station) => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => StationDetailScreen(station: station)),
+                      MaterialPageRoute(
+                        builder: (_) => StationDetailScreen(station: station),
+                      ),
                     ),
                   ),
                 ),
@@ -249,7 +278,184 @@ class HomeDashboardScreen extends StatelessWidget {
           : content,
     );
   }
+}
 
+class _HomeVehicleCard extends StatelessWidget {
+  final Vehicle? vehicle;
+
+  const _HomeVehicleCard({required this.vehicle});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final text = context.text;
+    final hasVehicle = vehicle != null;
+    return BentoCard(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              hasVehicle ? const VehiclesScreen() : const AddVehicleScreen(),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              colors.surfaceHighlight.withValues(alpha: .35),
+              colors.surface.withValues(alpha: .2),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colors.accentPrimary.withValues(alpha: .13),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Icons.electric_car_rounded,
+                    color: colors.accentPrimary,
+                    size: 24,
+                  ),
+                ),
+                const Gap(AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hasVehicle
+                            ? 'VARSAYILAN ARACIN'
+                            : 'ARACINI VOLTAVIA’YA EKLE',
+                        style: text.overline,
+                      ),
+                      Text(
+                        hasVehicle
+                            ? '${vehicle!.brand} ${vehicle!.model}'
+                            : 'Elektrikli aracını tanımla',
+                        style: text.bodyStrong,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  color: colors.textMuted,
+                  size: 19,
+                ),
+              ],
+            ),
+            const Gap(AppSpacing.md),
+            if (hasVehicle) ...[
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  _VehicleMetric(
+                    icon: Icons.battery_charging_full_rounded,
+                    label:
+                        '${vehicle!.batteryCapacityKwh.toStringAsFixed(0)} kWh',
+                  ),
+                  _VehicleMetric(
+                    icon: vehicle!.connector.icon,
+                    label: vehicle!.connector.label,
+                  ),
+                  _VehicleMetric(
+                    icon: Icons.route_rounded,
+                    label:
+                        '~${vehicle!.estimatedRangeKm.toStringAsFixed(0)} km*',
+                  ),
+                ],
+              ),
+              const Gap(AppSpacing.sm),
+              Row(
+                children: [
+                  Icon(
+                    Icons.confirmation_number_outlined,
+                    size: 16,
+                    color: colors.textMuted,
+                  ),
+                  const Gap(6),
+                  Text(
+                    vehicle!.plate.isEmpty ? 'Plaka eklenmedi' : vehicle!.plate,
+                    style: text.captionMuted,
+                  ),
+                  const Spacer(),
+                  Text(
+                    'Aracı yönet',
+                    style: text.captionMuted.copyWith(
+                      color: colors.accentPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const Gap(AppSpacing.xs),
+              Text(
+                '*Batarya ve katalog tüketimine göre teorik tahmin; gerçek menzil sürüşe göre değişir.',
+                style: text.captionMuted.copyWith(fontSize: 10.5),
+              ),
+            ] else ...[
+              Text(
+                'Konnektör uyumunu gör, istasyon önerilerini aracına göre sırala ve rota menzilini planla.',
+                style: text.bodyMuted,
+              ),
+              const Gap(AppSpacing.xs),
+              Text(
+                'Araç seç  →',
+                style: text.captionMuted.copyWith(
+                  color: colors.accentPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VehicleMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _VehicleMetric({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: colors.surface.withValues(alpha: .72),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: colors.accentPrimary),
+          const Gap(5),
+          Text(
+            label,
+            style: context.text.captionMuted.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _HomeKpis extends StatelessWidget {
@@ -260,7 +466,11 @@ class _HomeKpis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cards = [
-      const KpiStatCard(icon: Icons.bolt_rounded, label: 'Bu ay şarj', value: '0'),
+      const KpiStatCard(
+        icon: Icons.bolt_rounded,
+        label: 'Bu ay şarj',
+        value: '0',
+      ),
       const KpiStatCard(
         icon: Icons.electric_bolt_rounded,
         label: 'Toplam kWh',
@@ -318,7 +528,11 @@ class _NotificationButton extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(Icons.notifications_rounded, color: colors.textSecondary, size: 20),
+              Icon(
+                Icons.notifications_rounded,
+                color: colors.textSecondary,
+                size: 20,
+              ),
               if (unreadCount > 0)
                 Positioned(
                   right: -2,
@@ -366,18 +580,34 @@ class _ActiveSessionCard extends StatelessWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), shape: BoxShape.circle),
-                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 19),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.bolt_rounded,
+                  color: Colors.white,
+                  size: 19,
+                ),
               ),
               const Gap(AppSpacing.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Şarj devam ediyor', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'Şarj devam ediyor',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     Text(
                       stationName,
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12.5),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12.5,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -413,7 +643,9 @@ class _NotificationPreview extends StatelessWidget {
               height: 8,
               margin: const EdgeInsets.only(right: AppSpacing.sm),
               decoration: BoxDecoration(
-                color: notification.isRead ? Colors.transparent : colors.accentPrimary,
+                color: notification.isRead
+                    ? Colors.transparent
+                    : colors.accentPrimary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -421,7 +653,10 @@ class _NotificationPreview extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(notification.title, style: text.bodyStrong.copyWith(fontSize: 13.5)),
+                  Text(
+                    notification.title,
+                    style: text.bodyStrong.copyWith(fontSize: 13.5),
+                  ),
                   Text(
                     notification.message,
                     maxLines: 1,
